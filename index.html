@@ -42,163 +42,151 @@
 </head>
 <body>
 
-<!-- Seção 01 -->
 <h1>Análise e Reparo em Campo Grupo BRMobility</h1>
-<p style="font-size:1em;">
-Este site tem o intuito de auxiliar as manuntenções em campo dos nossos Técnicos Externos, oferecendo mais velocidade em diagnóstico e reparos, assim como instruir e capacitar cada vez mais o conhecimento dos veículos do Grupo BRMobility.
-</p>
+<p>Este site tem o intuito de auxiliar as manuntenções em campo dos nossos Técnicos Externos, oferecendo mais velocidade em diagnóstico e reparos, assim como instruir e capacitar cada vez mais o conhecimento dos veículos do Grupo BRMobility.</p>
 <p class="alert">⚠️ Esse site não deve ser compartilhado com clientes ou outras pessoas que não façam parte do Grupo BRMobility.</p>
 
 <input type="text" id="chamado" placeholder="por exemplo #20991">
 <input type="text" id="posto" placeholder="por exemplo Shopping BRMobility">
 
-<!-- Seção 02 -->
 <div id="secao2" class="hidden">
   <h2>Qual o modelo do veículo?</h2>
   <div id="modeloBtns"></div>
 </div>
 
+<div id="secaoProblema" class="hidden">
+  <h2>Qual o problema descrito no chamado ou informado pelo cliente?</h2>
+  <input type="text" id="problemaInput" placeholder="Descreva o problema">
+  <button class="btn" id="btnProblema">Próximo</button>
+</div>
+
+<div id="secaoErros" class="hidden">
+  <h2>O veículo apresenta algum desses erros?</h2>
+  <div id="errosBtns"></div>
+</div>
+
+<div id="atendimento" class="hidden">
+  <h2>Enviar mensagem via WhatsApp</h2>
+  <a id="btnVanessa" href="#" target="_blank" class="whatsapp-btn">
+    <img src="vanessa.jpg" alt="Vanessa Maia">
+    <div>Atendimento Vanessa Maia</div>
+  </a>
+  <a id="btnWillian" href="#" target="_blank" class="whatsapp-btn">
+    <img src="willian.jpg" alt="Willian Bertuzzi">
+    <div>Atendimento Willian Bertuzzi</div>
+  </a>
+</div>
+
 <script>
 let respostas = { erros: [] };
 
-// Mostrar Seção 2
+// Seção 2 - modelos
 const modelos = ["i2-X2","i3-X3","S6","S8-R8-BR8","H9-H9X","S9-S9X","S10-S10X"];
 const modeloBtns = document.getElementById('modeloBtns');
 const secao2 = document.getElementById('secao2');
+const secaoProblema = document.getElementById('secaoProblema');
+const secaoErros = document.getElementById('secaoErros');
+const btnProblema = document.getElementById('btnProblema');
 
-function showSecao2() { secao2.classList.remove('hidden'); }
+function checkCampos() {
+  const c = document.getElementById('chamado').value;
+  const p = document.getElementById('posto').value;
+  if(c && p) secao2.classList.remove('hidden');
+}
 
+document.getElementById('chamado').addEventListener('input', checkCampos);
+document.getElementById('posto').addEventListener('input', checkCampos);
+
+// Cria botões dos modelos
 modelos.forEach(modelo => {
   let btn = document.createElement('button');
   btn.innerText = modelo;
-  btn.className = "btn";
-  btn.onclick = () => selectModelo(modelo);
+  btn.className = 'btn';
+  btn.onclick = () => {
+    respostas.modelo = modelo;
+    secaoProblema.classList.remove('hidden');
+  };
   modeloBtns.appendChild(btn);
 });
 
-function selectModelo(modelo) {
-  respostas.modelo = modelo;
-  showPerguntaProblema();
-}
+// Botão Próximo do Problema
+btnProblema.onclick = () => {
+  const problema = document.getElementById('problemaInput').value.trim();
+  if(!problema) { alert("Digite o problema."); return; }
+  respostas.problema = problema;
+  secaoErros.classList.remove('hidden');
+  showErros();
+};
 
-function showPerguntaProblema() {
-  if(document.getElementById('problema')) return;
-  let secaoProblema = document.createElement('div');
-  secaoProblema.id = "problema";
-  secaoProblema.innerHTML = `
-    <h2>Qual o problema descrito no chamado ou informado pelo cliente?</h2>
-    <input type="text" id="problemaInput" placeholder="Descreva o problema">
-    <button class="btn" onclick="showErros()">Próximo</button>
-  `;
-  document.body.appendChild(secaoProblema);
-}
+// Seção de erros
+const erros = [
+  {cod:"C010/C018", desc:"Inclinação frontal excessiva"},
+  {cod:"C020/C028", desc:"Inclinação traseira excessiva"},
+  {cod:"C040/C048", desc:"Limitador de velocidade frontal/traseiro ativado"},
+  {cod:"C100/C108", desc:"Bateria traseira/frontal vazia"},
+  {cod:"C200/C208", desc:"Desligamento da bateria traseira/frontal"},
+  {cod:"C400/C408", desc:"Ângulo de rotação excedido"},
+  {cod:"C800/C808", desc:"Baixa voltagem do barramento"},
+  {cod:"E012/E01A/E01B", desc:"Falha na comunicação com o módulo CU"},
+  {cod:"E022/E02A/E02B", desc:"Falha na comunicação com o módulo BSA"},
+  {cod:"E042/E04A/E04B", desc:"Falha na comunicação com o módulo BSA"},
+  {cod:"E082/E08A/E08B", desc:"Falha na comunicação com o módulo UI"},
+  {cod:"E202/E20A/E20B", desc:"Falha no slot TDM"},
+  {cod:"E402/E40A/E40B", desc:"Falha na comunicação remota com o BSA"},
+  {cod:"E802/E80A/E80B", desc:"Falha na comunicação remota com o UI"},
+  {cod:"E013/E01C/E02C", desc:"Falha na comunicação com o módulo BCU"},
+  {cod:"E014/E024/E044", desc:"Falha no sensor de yaw"},
+  {cod:"E084/E104/E204", desc:"Falha nos sensores auxiliares"},
+  {cod:"E404/E40C", desc:"Falha no sensor de detecção do piloto"},
+  {cod:"E804/E80C", desc:"Falha no sensor de alimentação"},
+  {cod:"E015/E025/E045", desc:"Falha nos sensores de alimentação (12V, 5V, 3V)"},
+  {cod:"E085/E105/E205", desc:"Falha no sensor de temperatura do BSA"},
+  {cod:"E105/E205/E405", desc:"Falha interna do BSA"},
+  {cod:"E016/E026/E046", desc:"Falha na temperatura da junção"},
+  {cod:"E086/E106/E206", desc:"Falha no motor de acionamento"},
+  {cod:"E406/E406", desc:"Falha no amplificador de corrente do motor"},
+  {cod:"E806/E806", desc:"Falha no feedback de voltagem do motor"},
+  {cod:"E017/E027/E047", desc:"Falha na consistência da voltagem do motor"},
+  {cod:"E087/E107/E207", desc:"Falha no relé do motor"},
+  {cod:"E407/E407", desc:"Falha na consistência da alimentação do atuador"}
+];
 
-// Seção 03 - erros do veículo
 function showErros() {
-  respostas.chamado = document.getElementById('chamado').value;
-  respostas.posto = document.getElementById('posto').value;
-  respostas.problema = document.getElementById('problemaInput').value;
-
-  const erros = [
-    {cod:"C010/C018", desc:"Inclinação frontal excessiva"},
-    {cod:"C020/C028", desc:"Inclinação traseira excessiva"},
-    {cod:"C040/C048", desc:"Limitador de velocidade frontal/traseiro ativado"},
-    {cod:"C100/C108", desc:"Bateria traseira/frontal vazia"},
-    {cod:"C200/C208", desc:"Desligamento da bateria traseira/frontal"},
-    {cod:"C400/C408", desc:"Ângulo de rotação excedido"},
-    {cod:"C800/C808", desc:"Baixa voltagem do barramento"},
-    {cod:"E012/E01A/E01B", desc:"Falha na comunicação com o módulo CU"},
-    {cod:"E022/E02A/E02B", desc:"Falha na comunicação com o módulo BSA"},
-    {cod:"E042/E04A/E04B", desc:"Falha na comunicação com o módulo BSA"},
-    {cod:"E082/E08A/E08B", desc:"Falha na comunicação com o módulo UI"},
-    {cod:"E202/E20A/E20B", desc:"Falha no slot TDM"},
-    {cod:"E402/E40A/E40B", desc:"Falha na comunicação remota com o BSA"},
-    {cod:"E802/E80A/E80B", desc:"Falha na comunicação remota com o UI"},
-    {cod:"E013/E01C/E02C", desc:"Falha na comunicação com o módulo BCU"},
-    {cod:"E014/E024/E044", desc:"Falha no sensor de yaw"},
-    {cod:"E084/E104/E204", desc:"Falha nos sensores auxiliares"},
-    {cod:"E404/E40C", desc:"Falha no sensor de detecção do piloto"},
-    {cod:"E804/E80C", desc:"Falha no sensor de alimentação"},
-    {cod:"E015/E025/E045", desc:"Falha nos sensores de alimentação (12V, 5V, 3V)"},
-    {cod:"E085/E105/E205", desc:"Falha no sensor de temperatura do BSA"},
-    {cod:"E105/E205/E405", desc:"Falha interna do BSA"},
-    {cod:"E016/E026/E046", desc:"Falha na temperatura da junção"},
-    {cod:"E086/E106/E206", desc:"Falha no motor de acionamento"},
-    {cod:"E406/E406", desc:"Falha no amplificador de corrente do motor"},
-    {cod:"E806/E806", desc:"Falha no feedback de voltagem do motor"},
-    {cod:"E017/E027/E047", desc:"Falha na consistência da voltagem do motor"},
-    {cod:"E087/E107/E207", desc:"Falha no relé do motor"},
-    {cod:"E407/E407", desc:"Falha na consistência da alimentação do atuador"}
-  ];
-
-  let secaoErros = document.createElement('div');
-  secaoErros.id = "erros";
-  secaoErros.innerHTML = `<h2>O veículo apresenta algum desses erros?</h2>`;
-
+  const container = document.getElementById('errosBtns');
+  container.innerHTML = '';
   erros.forEach(e => {
-    let btn = document.createElement('button');
-    btn.className = "btn";
+    const btn = document.createElement('button');
+    btn.className = 'btn';
     btn.innerText = e.cod;
     btn.onclick = () => {
       if(!respostas.erros.includes(e.cod + ": " + e.desc)) {
         respostas.erros.push(e.cod + ": " + e.desc);
+        alert("Selecionado: " + e.cod + " - " + e.desc);
+        showWhatsApp(); // só aparece WhatsApp após selecionar ao menos um erro
       }
-      alert(`Selecionado: ${e.cod} - ${e.desc}`);
     };
-    secaoErros.appendChild(btn);
+    container.appendChild(btn);
   });
-
-  document.body.appendChild(secaoErros);
-  showWhatsAppAtendimento();
 }
 
-// Função que gera os botões de WhatsApp com mensagem pronta
-function showWhatsAppAtendimento() {
-  let div = document.getElementById('atendimento');
-  if(div) div.remove();
-
-  div = document.createElement('div');
-  div.id = "atendimento";
-  div.style.marginTop = "20px";
+function showWhatsApp() {
+  const atendimento = document.getElementById('atendimento');
+  atendimento.classList.remove('hidden');
 
   const mensagem = `
-Chamado: ${respostas.chamado}
-Posto: ${respostas.posto}
+Chamado: ${document.getElementById('chamado').value}
+Posto: ${document.getElementById('posto').value}
 Modelo: ${respostas.modelo}
 Problema: ${respostas.problema}
 Erros: ${respostas.erros.join('; ')}
   `;
 
-  div.innerHTML = `
-    <h2>Enviar mensagem via WhatsApp</h2>
-    <a href="https://wa.me/message/FQBPJTPCQCTKM1?text=${encodeURIComponent(mensagem)}" target="_blank" class="whatsapp-btn">
-      <img src="vanessa.jpg" alt="Vanessa Maia">
-      <div>Atendimento Vanessa Maia</div>
-    </a>
-    <a href="https://wa.me/qr/7JLTXTN3UA73N1?text=${encodeURIComponent(mensagem)}" target="_blank" class="whatsapp-btn">
-      <img src="willian.jpg" alt="Willian Bertuzzi">
-      <div>Atendimento Willian Bertuzzi</div>
-    </a>
-  `;
-
-  document.body.appendChild(div);
-}
-
-// Mostrar Seção 2 quando os campos iniciais estiverem preenchidos
-document.getElementById('chamado').addEventListener('input', checkCampos);
-document.getElementById('posto').addEventListener('input', checkCampos);
-
-function checkCampos() {
-  const c = document.getElementById('chamado').value;
-  const p = document.getElementById('posto').value;
-  if(c && p) showSecao2();
+  document.getElementById('btnVanessa').href = "https://wa.me/message/FQBPJTPCQCTKM1?text=" + encodeURIComponent(mensagem);
+  document.getElementById('btnWillian').href = "https://wa.me/qr/7JLTXTN3UA73N1?text=" + encodeURIComponent(mensagem);
 }
 </script>
 </body>
 </html>
-
-
-
 
 
 
