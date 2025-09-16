@@ -166,7 +166,32 @@ function showWhatsAppAtendimento() {
   div.innerHTML = `
     <h2>Enviar mensagem via WhatsApp</h2>
     <a href="https://wa.me/message/FQBPJTPCQCTKM1?text=${encodeURIComponent(mensagem)}" target="_blank" class="whatsapp-btn">
-      <img src="vanessa.jpg"
+      <img src="vanessa.jpg" alt="Vanessa Maia">
+      <div>Atendimento Vanessa Maia</div>
+    </a>
+    <a href="https://wa.me/qr/7JLTXTN3UA73N1?text=${encodeURIComponent(mensagem)}" target="_blank" class="whatsapp-btn">
+      <img src="willian.jpg" alt="Willian Bertuzzi">
+      <div>Atendimento Willian Bertuzzi</div>
+    </a>
+  `;
+  document.body.appendChild(div);
+}
+
+// Exibe Seção 2 quando campos iniciais forem preenchidos
+document.getElementById('chamado').addEventListener('input', checkCampos);
+document.getElementById('posto').addEventListener('input', checkCampos);
+
+function checkCampos() {
+  const c = document.getElementById('chamado').value;
+  const p = document.getElementById('posto').value;
+  if(c && p) showSecao2();
+}
+</script>
+
+</body>
+</html>
+
+
 
 
 
