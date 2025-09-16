@@ -26,6 +26,9 @@ input[type=text] {
   color: white; border-radius: 5px; cursor: pointer;
   border: none; font-size:1em;
 }
+.checkbox-container {
+  margin:5px 0;
+}
 .whatsapp-btn {
   display:flex; align-items:center; margin-bottom:10px; cursor:pointer;
 }
@@ -34,6 +37,9 @@ input[type=text] {
 }
 .whatsapp-btn div {
   background:#25D366; color:white; padding:10px 20px; border-radius:8px; font-weight:bold;
+}
+#previewMessage {
+  background:#eee; padding:10px; margin:10px 0; border-radius:5px; white-space:pre-wrap;
 }
 </style>
 </head>
@@ -58,8 +64,14 @@ input[type=text] {
 </div>
 
 <div id="secaoErros" class="hidden">
-  <h2>O veículo apresenta algum desses erros?</h2>
-  <div id="errosBtns"></div>
+  <h2>Selecione os erros apresentados pelo veículo:</h2>
+  <div id="errosCheckboxes"></div>
+  <button class="btn" id="btnGerarMensagem">Gerar mensagem</button>
+</div>
+
+<div id="previewSection" class="hidden">
+  <h2>Mensagem para WhatsApp:</h2>
+  <div id="previewMessage"></div>
 </div>
 
 <div id="atendimento" class="hidden">
@@ -109,7 +121,7 @@ document.getElementById('btnProblema').onclick = () => {
   showErros();
 };
 
-// Erros
+// Erros como checkboxes
 const erros = [
   {cod:"C010/C018", desc:"Inclinação frontal excessiva"},
   {cod:"C020/C028", desc:"Inclinação traseira excessiva"},
@@ -139,30 +151,25 @@ const erros = [
   {cod:"E806/E806", desc:"Falha no feedback de voltagem do motor"},
   {cod:"E017/E027/E047", desc:"Falha na consistência da voltagem do motor"},
   {cod:"E087/E107/E207", desc:"Falha no relé do motor"},
-  {cod:"E407/E407", desc:"Falha na consistência da alimentação do atuador"},
-{cod:"NENHUMA DAS OPÇÕES LISTADAS", desc:"Solicite a troca do veículo imediatamente."}
+  {cod:"E407/E407", desc:"Falha na consistência da alimentação do atuador"}
 ];
 
 function showErros(){
-  const container = document.getElementById('errosBtns');
+  const container = document.getElementById('errosCheckboxes');
   container.innerHTML='';
   erros.forEach(e=>{
-    const btn = document.createElement('button');
-    btn.className='btn';
-    btn.innerText=e.cod;
-    btn.onclick=()=>{
-      if(!respostas.erros.includes(e.cod+": "+e.desc)){
-        respostas.erros.push(e.cod+": "+e.desc);
-      }
-      showWhatsApp();
-    };
-    container.appendChild(btn);
+    const div = document.createElement('div');
+    div.className = 'checkbox-container';
+    div.innerHTML = `<input type="checkbox" value="${e.cod}: ${e.desc}" id="${e.cod}"> <label for="${e.cod}">${e.cod}</label>`;
+    container.appendChild(div);
   });
 }
 
-function showWhatsApp(){
-  if(respostas.erros.length===0) return;
-  document.getElementById('atendimento').classList.remove('hidden');
+// Gerar mensagem
+document.getElementById('btnGerarMensagem').onclick = () => {
+  const checked = Array.from(document.querySelectorAll('#errosCheckboxes input[type=checkbox]:checked'));
+  if(checked.length===0){ alert("Selecione ao menos um erro"); return; }
+  respostas.erros = checked.map(c => c.value);
 
   const mensagem = `
 Chamado: ${document.getElementById('chamado').value}
@@ -171,17 +178,22 @@ Modelo: ${respostas.modelo}
 Problema: ${respostas.problema}
 Erros: ${respostas.erros.join('; ')}
 `;
+  document.getElementById('previewMessage').innerText = mensagem;
+  document.getElementById('previewSection').classList.remove('hidden');
+  document.getElementById('atendimento').classList.remove('hidden');
 
+  // Atualizar links WhatsApp
   document.getElementById('btnVanessa').onclick = () => {
     window.open("https://wa.me/5511989477808?text=" + encodeURIComponent(mensagem), "_blank");
   };
   document.getElementById('btnWillian').onclick = () => {
     window.open("https://wa.me/5511956544217?text=" + encodeURIComponent(mensagem), "_blank");
   };
-}
+};
 </script>
 </body>
 </html>
+
 
 
 
