@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Página de Botões</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      text-align: center;
+      background: #f2f2f2;
+      margin: 0;
+      padding: 20px;
+    }
+    h1 {
+      margin-bottom: 20px;
+    }
+    .btn {
+      display: block;
+      width: 90%;
+      margin: 10px auto;
+      padding: 15px;
+      font-size: 18px;
+      border: none;
+      border-radius: 10px;
+      background: #25d366;
+      color: white;
+      text-decoration: none;
+      text-align: center;
+    }
+    .btn.link { background: #007bff; }
+    .btn.page { background: #ff9800; }
+    .btn.auto { background: #4caf50; }
+  </style>
+</head>
+<body>
+  <h1>Página de Botões</h1>
+
+  <!-- Botão para link externo -->
+  <a href="https://www.google.com" class="btn link">Abrir Google</a>
+
+  <!-- Botão para WhatsApp simples -->
+  <a href="https://wa.me/5511999999999" class="btn">WhatsApp Simples</a>
+
+  <!-- Botão para outra página -->
+  <a href="outra.html" class="btn page">Abrir Outra Página</a>
+
+  <!-- Botão com mensagem automática no WhatsApp -->
+  <a href="https://wa.me/5511999999999?text=Olá,+quero+informações+sobre+o+serviço." 
+     class="btn auto">WhatsApp com Mensagem</a>
+
+  <!-- Botão com mensagem montada dinamicamente -->
+  <button class="btn auto" onclick="enviarMsg()">WhatsApp com Dados Selecionados</button>
+
+  <script>
+    function enviarMsg() {
+      let nome = "Matheus"; // exemplo fixo, pode pegar de inputs
+      let servico = "Diagnóstico";
+      let mensagem = `Olá, meu nome é ${nome}. Quero solicitar: ${servico}.`;
+      window.location.href = "https://wa.me/5511999999999?text=" + encodeURIComponent(mensagem);
+    }
+  </script>
+</body>
+</html>
