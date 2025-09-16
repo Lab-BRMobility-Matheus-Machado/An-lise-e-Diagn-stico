@@ -25,10 +25,6 @@
     padding: 10px; background: #25d366;
     color: white; border-radius: 5px; cursor: pointer;
   }
-  .info-box {
-    margin-top: 5px; padding: 10px;
-    background: #e6e6e6; border-radius: 5px;
-  }
   .whatsapp-btn {
     display:flex; align-items:center; text-decoration:none; margin-bottom:10px;
   }
@@ -89,8 +85,8 @@ const secaoErros = document.getElementById('secaoErros');
 const btnProblema = document.getElementById('btnProblema');
 
 function checkCampos() {
-  const c = document.getElementById('chamado').value;
-  const p = document.getElementById('posto').value;
+  const c = document.getElementById('chamado').value.trim();
+  const p = document.getElementById('posto').value.trim();
   if(c && p) secao2.classList.remove('hidden');
 }
 
@@ -118,7 +114,7 @@ btnProblema.onclick = () => {
   showErros();
 };
 
-// Seção de erros
+// Erros
 const erros = [
   {cod:"C010/C018", desc:"Inclinação frontal excessiva"},
   {cod:"C020/C028", desc:"Inclinação traseira excessiva"},
@@ -148,7 +144,8 @@ const erros = [
   {cod:"E806/E806", desc:"Falha no feedback de voltagem do motor"},
   {cod:"E017/E027/E047", desc:"Falha na consistência da voltagem do motor"},
   {cod:"E087/E107/E207", desc:"Falha no relé do motor"},
-  {cod:"E407/E407", desc:"Falha na consistência da alimentação do atuador"}
+  {cod:"E407/E407", desc:"Falha na consistência da alimentação do atuador"},
+{cod:"Nenhuma das opções listadas", desc:"Entre em contato com o Atendimento."}
 ];
 
 function showErros() {
@@ -161,15 +158,15 @@ function showErros() {
     btn.onclick = () => {
       if(!respostas.erros.includes(e.cod + ": " + e.desc)) {
         respostas.erros.push(e.cod + ": " + e.desc);
-        alert("Selecionado: " + e.cod + " - " + e.desc);
-        showWhatsApp(); // só aparece WhatsApp após selecionar ao menos um erro
       }
+      showWhatsApp();
     };
     container.appendChild(btn);
   });
 }
 
 function showWhatsApp() {
+  if(respostas.erros.length === 0) return; // só aparece se tiver ao menos 1 erro
   const atendimento = document.getElementById('atendimento');
   atendimento.classList.remove('hidden');
 
@@ -181,12 +178,18 @@ Problema: ${respostas.problema}
 Erros: ${respostas.erros.join('; ')}
   `;
 
-  document.getElementById('btnVanessa').href = "https://wa.me/message/FQBPJTPCQCTKM1?text=" + encodeURIComponent(mensagem);
-  document.getElementById('btnWillian').href = "https://wa.me/qr/7JLTXTN3UA73N1?text=" + encodeURIComponent(mensagem);
+  document.getElementById('btnVanessa').onclick = () => {
+    window.open("https://wa.me/message/FQBPJTPCQCTKM1?text=" + encodeURIComponent(mensagem), "_blank");
+  };
+  document.getElementById('btnWillian').onclick = () => {
+    window.open("https://wa.me/qr/7JLTXTN3UA73N1?text=" + encodeURIComponent(mensagem), "_blank");
+  };
 }
 </script>
 </body>
 </html>
+
+
 
 
 
