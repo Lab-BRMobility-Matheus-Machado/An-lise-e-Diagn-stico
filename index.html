@@ -27,7 +27,7 @@ input[type=text] {
   border: none; font-size:1em;
 }
 .whatsapp-btn {
-  display:flex; align-items:center; text-decoration:none; margin-bottom:10px;
+  display:flex; align-items:center; margin-bottom:10px;
 }
 .whatsapp-btn img {
   width:50px; height:50px; border-radius:50%; margin-right:10px;
@@ -64,14 +64,14 @@ input[type=text] {
 
 <div id="atendimento" class="hidden">
   <h2>Enviar mensagem via WhatsApp</h2>
-  <a id="btnVanessa" target="_blank" class="whatsapp-btn">
+  <button id="btnVanessa" class="whatsapp-btn">
     <img src="vanessa.jpg" alt="Vanessa Maia">
     <div>Atendimento Vanessa Maia</div>
-  </a>
-  <a id="btnWillian" target="_blank" class="whatsapp-btn">
+  </button>
+  <button id="btnWillian" class="whatsapp-btn">
     <img src="willian.jpg" alt="Willian Bertuzzi">
     <div>Atendimento Willian Bertuzzi</div>
-  </a>
+  </button>
 </div>
 
 <script>
@@ -161,8 +161,7 @@ function showErros(){
 
 function showWhatsApp(){
   if(respostas.erros.length===0) return;
-  const atendimento = document.getElementById('atendimento');
-  atendimento.classList.remove('hidden');
+  document.getElementById('atendimento').classList.remove('hidden');
 
   const mensagem = `
 Chamado: ${document.getElementById('chamado').value}
@@ -172,20 +171,16 @@ Problema: ${respostas.problema}
 Erros: ${respostas.erros.join('; ')}
 `;
 
-  document.getElementById('btnVanessa').href="https://wa.me/message/FQBPJTPCQCTKM1?text="+encodeURIComponent(mensagem);
-  document.getElementById('btnWillian').href="https://wa.me/qr/7JLTXTN3UA73N1?text="+encodeURIComponent(mensagem);
+  document.getElementById('btnVanessa').onclick = () => {
+    window.location.href = "https://wa.me/message/FQBPJTPCQCTKM1?text=" + encodeURIComponent(mensagem);
+  };
+  document.getElementById('btnWillian').onclick = () => {
+    window.location.href = "https://wa.me/qr/7JLTXTN3UA73N1?text=" + encodeURIComponent(mensagem);
+  };
 }
 </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
 
 
 
