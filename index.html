@@ -1,205 +1,386 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Diagnóstico de Erros e Problemas</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      margin: 0;
-      padding: 0;
-      text-align: center;
-      background: #f2f2f2;
-    }
-    header {
-      background: #004aad;
-      color: white;
-      padding: 15px;
-      font-size: 22px;
-      font-weight: bold;
-      text-align: center;
-    }
-    .info {
-      margin: 15px 0;
-      font-size: 16px;
-      font-weight: bold;
-    }
-    .container {
-      margin: 20px;
-    }
-    .question {
-      margin-bottom: 20px;
-      font-size: 18px;
-      font-weight: bold;
-    }
-    .options button {
-      display: block;
-      width: 100%;
-      margin: 8px 0;
-      padding: 12px;
-      font-size: 16px;
-      background: #004aad;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-    }
-    .options button:hover {
-      background: #003080;
-    }
-    textarea {
-      width: 100%;
-      height: 80px;
-      margin-top: 10px;
-      padding: 10px;
-      font-size: 16px;
-      border-radius: 8px;
-      border: 1px solid #ccc;
-    }
-    #continueBtn {
-      margin-top: 15px;
-      display: none;
-      padding: 12px;
-      background: #28a745;
-      color: white;
-      font-size: 16px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      width: 100%;
-    }
-    #whatsappSection {
-      display: none;
-      margin-top: 20px;
-    }
-    .whatsapp-btn {
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      gap: 10px;
-      width: 100%;
-      margin: 10px 0;
-      padding: 12px;
-      font-size: 16px;
-      background: #25d366;
-      color: white;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      text-decoration: none;
-    }
-    .whatsapp-btn img {
-      width: 30px;
-      height: 30px;
-      border-radius: 50%;
-    }
-    footer {
-      background: #004aad;
-      padding: 10px;
-      margin-top: 30px;
-    }
-    footer img {
-      width: 120px;
-      height: auto;
-    }
-  </style>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Diagnóstico BRMobility</title>
+<style>
+  :root{
+    --primary:#1fa3a8; /* azul/turquesa do logo (ajustável) */
+    --dark:#111;
+    --bg:#f7fafb;
+  }
+  html,body{height:100%; margin:0; padding:0; font-family: Arial, sans-serif; background:var(--bg);}
+  body{
+    padding:18px;
+    box-sizing:border-box;
+    /* logo de fundo (marca d'água) */
+    background-image: url('logo novo.jpg');
+    background-repeat:no-repeat;
+    background-position:center top;
+    background-size: 600px auto;
+  }
+  /* sobreposição para escurecer e dar opacidade ao fundo */
+  body::before{
+    content:""; position:fixed; inset:0; pointer-events:none;
+    background:linear-gradient(rgba(255,255,255,0.95), rgba(255,255,255,0.95));
+  }
+  .container{max-width:720px; margin:0 auto; position:relative; z-index:2;}
+  h1{font-size:1.6rem; margin:0 0 6px; color:var(--dark); font-weight:700;}
+  .subtitle{font-size:0.95rem; color:#333; margin:0 0 10px;}
+  .alert{font-size:0.85rem; color:#b33; display:flex; align-items:center; gap:8px; margin-bottom:12px;}
+  .field{margin:10px 0;}
+  input[type="text"], textarea{
+    width:100%; box-sizing:border-box; padding:12px; font-size:1rem; border-radius:8px;
+    border:1px solid #d0d7db; background:white; color:#222;
+  }
+  input::placeholder, textarea::placeholder{ color:#bdbdbd; }
+  .btn{display:inline-block; padding:10px 14px; border-radius:8px; background:var(--primary); color:white; border:none; cursor:pointer; font-weight:600; margin:6px 6px 6px 0;}
+  .small{font-size:0.85rem;}
+  .hidden{display:none;}
+  .sectionTitle{font-size:1.15rem; margin:12px 0 6px; font-weight:700; color:var(--dark);}
+  .choices{display:flex; flex-wrap:wrap; gap:8px; margin:8px 0;}
+  .choiceBtn{background:#0ea6a9; color:white; padding:8px 10px; border-radius:8px; border:none; cursor:pointer; font-weight:600;}
+  .infoBox{background:#fff; border:1px solid #e2e8ea; padding:10px; border-radius:8px; margin-top:8px; color:#222;}
+  .errorCheckbox{display:flex; align-items:center; gap:8px; margin:6px 0;}
+  #previewMessage{background:#fff; border:1px solid #e2e8ea; padding:12px; border-radius:8px; white-space:pre-wrap; font-family:inherit; color:#111;}
+  .whatsapp-btn{display:flex; align-items:center; gap:12px; margin:10px 0; cursor:pointer;}
+  .whatsapp-btn img{width:56px; height:56px; border-radius:8px; object-fit:cover; border:2px solid rgba(0,0,0,0.06);}
+  .whatsappLabel{background:var(--primary); color:#fff; padding:10px 14px; border-radius:8px; font-weight:700;}
+  .muted{color:#666; font-size:0.9rem;}
+  /* responsivo */
+  @media(max-width:420px){
+    body{padding:12px;}
+    h1{font-size:1.3rem;}
+    .whatsapp-btn img{width:48px; height:48px;}
+  }
+</style>
 </head>
 <body>
-  <header>Diagnóstico de Erros e Problemas</header>
+<div class="container" id="app">
+  <!-- Seção 01 -->
+  <h1>Análise e Reparo em Campo Grupo BRMobility</h1>
+  <p class="subtitle">Este site tem o intuito de auxiliar as manuntenções em campo dos nossos Técnicos Externos, oferecendo mais velocidade em diagnóstico e reparos, assim como instruir e capacitar cada vez mais o conhecimento dos veículos do Grupo BRMobility.</p>
+  <p class="alert">⚠️ <span class="small">Esse site não deve ser compartilhado com clientes ou outras pessoas fora do Grupo BRMobility.</span></p>
 
-  <!-- Campos fixos centralizados -->
-  <div class="info">Chamado: 12345</div>
-  <div class="info">Posto: Central SP</div>
-  <div class="info">Patrimônio: 67890</div>
-
-  <div class="container">
-    <div class="question" id="questionText">Pergunta 1: Qual o problema do veículo?</div>
-    <div class="options" id="optionsContainer"></div>
-    <textarea id="customAnswer" placeholder="Digite aqui..." style="display:none;"></textarea>
-    <button id="continueBtn" onclick="showWhatsappOptions()">Continuar</button>
+  <div class="field">
+    <label class="small">Número do chamado</label>
+    <input id="chamado" type="text" placeholder="por exemplo #20991">
+  </div>
+  <div class="field">
+    <label class="small">Nome do posto</label>
+    <input id="posto" type="text" placeholder="por exemplo Shopping BRMobility">
+  </div>
+  <div class="field">
+    <label class="small">Número de patrimônio</label>
+    <input id="patrimonio" type="text" placeholder="por exemplo 0123">
   </div>
 
-  <div id="whatsappSection" class="container">
-    <h3>Escolha um atendente no WhatsApp:</h3>
-    <a id="whatsappVanessa" class="whatsapp-btn" target="_blank">
+  <!-- Seção 02 (aparece só após preencher campos acima) -->
+  <div id="secao02" class="hidden">
+    <div class="sectionTitle">Qual o modelo do veículo?</div>
+    <div id="modelos" class="choices"></div>
+  </div>
+
+  <!-- Pergunta problema -->
+  <div id="secaoProblema" class="hidden">
+    <div class="sectionTitle">Qual o problema descrito no chamado ou informado pelo cliente?</div>
+    <div class="field">
+      <input id="problema" type="text" placeholder="Descreva o problema">
+    </div>
+    <button id="btnProblema" class="btn">Confirmar problema</button>
+  </div>
+
+  <!-- Seção 03 - ERROS (aparece só para i2-X2) -->
+  <div id="secaoErros" class="hidden">
+    <div class="sectionTitle">O veículo apresenta algum desses erros?</div>
+    <div id="errosList"></div>
+    <div id="errosInfo" class="infoBox hidden"></div>
+    <div style="margin-top:10px;">
+      <label class="muted small">Ou escolha "Nenhuma das opções listadas" e descreva:</label><br>
+      <input id="nenhumaCheckbox" type="checkbox"> <span class="small">Nenhuma das opções listadas</span>
+      <div id="descricaoNenhuma" class="hidden" style="margin-top:8px;">
+        <textarea id="descNenhumaTxt" rows="3" placeholder="Descreva o problema..."></textarea>
+      </div>
+    </div>
+    <div style="margin-top:10px;">
+      <div id="resolvidoContainer" class="hidden">
+        <label class="small">Foi possível resolver o chamado?</label><br>
+        <button id="resSim" class="choiceBtn">Sim</button>
+        <button id="resNao" class="choiceBtn">Não</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Gerar e visualizar mensagem -->
+  <div id="previewSection" class="hidden">
+    <div class="sectionTitle">Mensagem para WhatsApp (pré-visualização)</div>
+    <div id="previewMessage"></div>
+  </div>
+
+  <!-- Atendimento - botões WhatsApp só aparecem depois de tudo -->
+  <div id="atendimento" class="hidden">
+    <div class="sectionTitle">Enviar mensagem via WhatsApp</div>
+    <div id="btnVanessa" class="whatsapp-btn">
       <img src="vanessa logo.jpg" alt="Vanessa">
-      Atendimento Vanessa Maia
-    </a>
-    <a id="whatsappWillian" class="whatsapp-btn" target="_blank">
+      <div class="whatsappLabel">Atendimento Vanessa Maia</div>
+    </div>
+    <div id="btnWillian" class="whatsapp-btn">
       <img src="willainlogo.jpg" alt="Willian">
-      Atendimento Willian Bertuzzi
-    </a>
+      <div class="whatsappLabel">Atendimento Willian Bertuzzi</div>
+    </div>
   </div>
+</div>
 
-  <footer>
-    <img src="logo novo.jpg" alt="Logo">
-  </footer>
+<script>
+/* ======= Configuração ======= */
+const WHATSAPP_VANESSA = "5511989477808";
+const WHATSAPP_WILLIAN = "5511956544217";
 
-  <script>
-    const questions = [
-      { text: "Qual o problema do veículo?", options: ["Não liga", "Barulho estranho", "Luz de alerta", "Nenhuma das opções listadas"] },
-      { text: "O problema ocorre sempre ou às vezes?", options: ["Sempre", "Às vezes", "Nenhuma das opções listadas"] },
-      { text: "O veículo já passou por manutenção recente?", options: ["Sim", "Não", "Nenhuma das opções listadas"] }
-    ];
+/* ======= Dados e textos ======= */
+/* lista de erros para i2-X2. cada item contém:
+   code: código (botão)
+   issue: descrição curta (vai para mensagem WhatsApp)
+   info: texto completo (inclui solução) — exibido apenas na página, NÃO enviado ao WhatsApp
+*/
+const ERROS_I2 = [
+  {code:"C010/C018", issue:"Inclinação frontal excessiva", info:"Inclinação frontal excessiva. Solicite a troca do veículo imediatamente."},
+  {code:"C020/C028", issue:"Inclinação traseira excessiva", info:"Inclinação traseira excessiva. Solicite a troca do veículo imediatamente."},
+  {code:"C040/C048", issue:"Limitador de velocidade ativado", info:"Limitador de velocidade frontal/traseiro ativado. Realize o procedimento pelo link: clique aqui. (https://drive.google.com/file/d/1uHcirgVcKM_FAG7NPW4spNOP2jF6cpio/view?usp=drive_link)"},
+  {code:"C100/C108", issue:"Bateria traseira/frontal vazia", info:"Bateria traseira/frontal vazia. Solicite a troca de bateria imediatamente."},
+  {code:"C200/C208", issue:"Desligamento da bateria", info:"Desligamento da bateria traseira/frontal. Solicite a troca de bateria imediatamente."},
+  {code:"C400/C408", issue:"Ângulo de rotação excedido", info:"Ângulo de rotação excedido. Realize a solicitação de pivô mecânico para a troca."},
+  {code:"C800/C808", issue:"Baixa voltagem do barramento", info:"Baixa voltagem do barramento. Solicite imediatamente a troca do veículo."},
+  {code:"E012/E01A/E01B", issue:"Falha comunicação módulo CU", info:"Falha na comunicação com o módulo CU. Solicite imediatamente a troca do veículo."},
+  {code:"E022/E02A/E02B", issue:"Falha comunicação BSA", info:"Falha na comunicação com o módulo BSA. Solicite imediatamente a troca do veículo."},
+  {code:"E042/E04A/E04B", issue:"Falha comunicação BSA (var)", info:"Falha na comunicação com o módulo BSA. Solicite imediatamente a troca do veículo."},
+  {code:"E082/E08A/E08B", issue:"Falha comunicação UI", info:"Falha na comunicação com o módulo UI. Solicite imediatamente a troca do veículo."},
+  {code:"E202/E20A/E20B", issue:"Falha slot TDM", info:"Falha no slot TDM. Solicite imediatamente a troca do veículo."},
+  {code:"E402/E40A/E40B", issue:"Falha remota com BSA", info:"Falha na comunicação remota com o BSA. Solicite imediatamente a troca do veículo."},
+  {code:"E802/E80A/E80B", issue:"Falha remota com UI", info:"Falha na comunicação remota com o UI. Solicite imediatamente a troca do veículo."},
+  {code:"E013/E01C/E02C", issue:"Falha comunicação BCU", info:"Falha na comunicação com o módulo BCU. Solicite imediatamente a troca do veículo."},
+  {code:"E014/E024/E044", issue:"Falha sensor de pivô", info:"Falha no sensor de pivô. Solicite um sensor de pivô para a troca."},
+  {code:"E084/E104/E204", issue:"Falha sensores auxiliares", info:"Falha nos sensores auxiliares. Solicite imediatamente a troca do veículo."},
+  {code:"E404/E40C", issue:"Falha sensor de detecção piloto", info:"Falha no sensor de detecção do piloto. Solicite imediatamente a troca do veículo."},
+  {code:"E804/E80C", issue:"Falha sensor de alimentação", info:"Falha no sensor de alimentação. Solicite um conjunto de placa fonte para a troca."},
+  {code:"E015/E025/E045", issue:"Falha sensores alimentação (12V,5V,3V)", info:"Falha nos sensores de alimentação (12V, 5V, 3V). Solicite imediatamente a troca do veículo."},
+  {code:"E085/E105/E205", issue:"Falha sensor temperatura BSA", info:"Falha no sensor de temperatura do BSA. Solicite um par de baterias para a troca."},
+  {code:"E105/E205/E405", issue:"Falha interna do BSA", info:"Falha interna do BSA. Solicite imediatamente a troca do veículo."},
+  {code:"E016/E026/E046", issue:"Falha temperatura da junção", info:"Falha na temperatura da junção. Solicite imediatamente a troca do veículo."},
+  {code:"E086/E106/E206", issue:"Falha motor de acionamento", info:"Falha no motor de acionamento. Solicite um par de motores para a troca."},
+  {code:"E406/E406", issue:"Falha amplificador corrente motor", info:"Falha no amplificador de corrente do motor. Solicite um par de motores para a troca."},
+  {code:"E806/E806", issue:"Falha feedback voltagem motor", info:"Falha no feedback de voltagem do motor. Solicite um par de motores para a troca."},
+  {code:"E017/E027/E047", issue:"Falha consistência voltagem motor", info:"Falha na consistência da voltagem do motor."},
+  {code:"E087/E107/E207", issue:"Falha relé do motor", info:"Falha no relé do motor. Solicite um par de motores para a troca."},
+  {code:"E407/E407", issue:"Falha alimentação do atuador", info:"Falha na consistência da alimentação do atuador. Solicite imediatamente a troca do veículo."}
+];
 
-    let currentQuestion = 0;
-    let answers = [];
+/* ======= Elementos ======= */
+const chamadoEl = document.getElementById('chamado');
+const postoEl = document.getElementById('posto');
+const patrimonioEl = document.getElementById('patrimonio');
+const secao02El = document.getElementById('secao02');
+const modelosEl = document.getElementById('modelos');
+const secaoProblemaEl = document.getElementById('secaoProblema');
+const problemaEl = document.getElementById('problema');
+const btnProblema = document.getElementById('btnProblema');
+const secaoErrosEl = document.getElementById('secaoErros');
+const errosListEl = document.getElementById('errosList');
+const errosInfoEl = document.getElementById('errosInfo');
+const nenhumaCheckbox = document.getElementById('nenhumaCheckbox');
+const descricaoNenhuma = document.getElementById('descricaoNenhuma');
+const descNenhumaTxt = document.getElementById('descNenhumaTxt');
+const resolvidoContainer = document.getElementById('resolvidoContainer');
+const resSim = document.getElementById('resSim');
+const resNao = document.getElementById('resNao');
+const previewSection = document.getElementById('previewSection');
+const previewMessage = document.getElementById('previewMessage');
+const atendimento = document.getElementById('atendimento');
+const btnVanessa = document.getElementById('btnVanessa');
+const btnWillian = document.getElementById('btnWillian');
 
-    const questionText = document.getElementById("questionText");
-    const optionsContainer = document.getElementById("optionsContainer");
-    const customAnswer = document.getElementById("customAnswer");
-    const continueBtn = document.getElementById("continueBtn");
-    const whatsappSection = document.getElementById("whatsappSection");
+/* ======= Lógica de fluxo ======= */
+/* Mostrar Seção 02 quando os três campos iniciais estiverem preenchidos */
+function checkCamposIniciais(){
+  if(chamadoEl.value.trim() && postoEl.value.trim() && patrimonioEl.value.trim()){
+    secao02El.classList.remove('hidden');
+  } else {
+    secao02El.classList.add('hidden');
+  }
+}
+[chamadoEl, postoEl, patrimonioEl].forEach(el => el.addEventListener('input', checkCamposIniciais));
 
-    function loadQuestion() {
-      questionText.textContent = "Pergunta " + (currentQuestion + 1) + ": " + questions[currentQuestion].text;
-      optionsContainer.innerHTML = "";
-      customAnswer.style.display = "none";
-      continueBtn.style.display = "none";
+/* Monta botões de modelos */
+const modelos = ["i2-X2","i3-X3","S6","S8-R8-BR8","H9-H9X","S9-S9X","S10-S10X"];
+modelos.forEach(m => {
+  const b = document.createElement('button');
+  b.className = 'choiceBtn';
+  b.innerText = m;
+  b.onclick = () => {
+    respostas.modelo = m;
+    // reset possíveis etapas seguintes
+    secaoProblemaEl.classList.remove('hidden');
+    secaoErrosEl.classList.add('hidden');
+    nenhumaCheckbox.checked = false;
+    descricaoNenhuma.classList.add('hidden');
+    errosInfoEl.classList.add('hidden');
+    resolvidoContainer.classList.add('hidden');
+    previewSection.classList.add('hidden');
+    atendimento.classList.add('hidden');
+    respostas.erros = [];
+    respostas.resolvido = null;
+    problemaEl.value = '';
+    descNenhumaTxt.value = '';
+  };
+  modelosEl.appendChild(b);
+});
 
-      questions[currentQuestion].options.forEach(option => {
-        const btn = document.createElement("button");
-        btn.textContent = option;
-        btn.onclick = () => selectOption(option);
-        optionsContainer.appendChild(btn);
-      });
-    }
+/* Confirmar problema */
+btnProblema.addEventListener('click', () => {
+  const p = problemaEl.value.trim();
+  if(!p){ alert("Preencha o problema para continuar."); return; }
+  respostas.problema = p;
+  // para esse pedido, Erros aparecem apenas se modelo for i2-X2
+  if(respostas.modelo === "i2-X2"){
+    montarErrosI2();
+    secaoErrosEl.classList.remove('hidden');
+  } else {
+    // para outros modelos, exibimos opção "Nenhuma das opções listadas" por padrão
+    errosListEl.innerHTML = '<div class="muted small">Lista de erros específica do modelo não disponível aqui. Use "Nenhuma das opções listadas" e descreva.</div>';
+    secaoErrosEl.classList.remove('hidden');
+  }
+});
 
-    function selectOption(option) {
-      if (option === "Nenhuma das opções listadas") {
-        customAnswer.style.display = "block";
-        continueBtn.style.display = "block";
-      } else {
-        answers.push(questions[currentQuestion].text + " " + option);
-        nextQuestion();
+/* Monta erros i2 */
+function montarErrosI2(){
+  errosListEl.innerHTML = '';
+  ERROS_I2.forEach((e, idx) => {
+    const wrapper = document.createElement('div');
+    wrapper.style.marginBottom = "6px";
+    const codeBtn = document.createElement('button');
+    codeBtn.className = 'choiceBtn';
+    codeBtn.innerText = e.code;
+    codeBtn.onclick = () => {
+      // quando clicar exibir info (direita) - solução (não enviada ao WhatsApp)
+      errosInfoEl.classList.remove('hidden');
+      errosInfoEl.innerHTML = `<strong>${e.code}</strong> — ${e.info}`;
+      // registrar erro (mantendo único)
+      if(!respostas.erros.includes(e.code + ": " + e.issue)){
+        respostas.erros.push(e.code + ": " + e.issue);
       }
-    }
+      // mostrar pergunta resolvido
+      resolvidoContainer.classList.remove('hidden');
+      previewSection.classList.add('hidden');
+      atendimento.classList.add('hidden');
+    };
+    wrapper.appendChild(codeBtn);
+    // também exibir descrição curta ao lado
+    const short = document.createElement('span');
+    short.className = 'muted';
+    short.style.marginLeft = "8px";
+    short.innerText = e.issue;
+    wrapper.appendChild(short);
+    errosListEl.appendChild(wrapper);
+  });
+}
 
-    function nextQuestion() {
-      currentQuestion++;
-      if (currentQuestion < questions.length) {
-        loadQuestion();
-      } else {
-        customAnswer.style.display = "block";
-        continueBtn.style.display = "block";
-      }
-    }
+/* Nenhuma das opções listadas */
+nenhumaCheckbox.addEventListener('change', () => {
+  if(nenhumaCheckbox.checked){
+    descricaoNenhuma.classList.remove('hidden');
+    // quando escolher nenhuma, limpar respostas de erros anteriores e esconder resolvido
+    respostas.erros = [];
+    errosInfoEl.classList.add('hidden');
+    resolvidoContainer.classList.add('hidden');
+    previewSection.classList.add('hidden');
+    atendimento.classList.add('hidden');
+  } else {
+    descricaoNenhuma.classList.add('hidden');
+  }
+});
 
-    function showWhatsappOptions() {
-      if (customAnswer.value.trim() !== "") {
-        answers.push(questions[currentQuestion].text + " " + customAnswer.value);
-      }
-      const mensagem = answers.join(" | ");
-      document.getElementById("whatsappVanessa").href = "https://wa.me/5511989477808?text=" + encodeURIComponent(mensagem);
-      document.getElementById("whatsappWillian").href = "https://wa.me/5511956544217?text=" + encodeURIComponent(mensagem);
-      whatsappSection.style.display = "block";
-    }
+/* Resolver - Só aparece quando há erro selecionado (exceto 'nenhuma') */
+resSim.addEventListener('click', () => {
+  respostas.resolvido = "Sim";
+  finalizarFluxo();
+});
+resNao.addEventListener('click', () => {
+  respostas.resolvido = "Não";
+  finalizarFluxo();
+});
 
-    loadQuestion();
-  </script>
+/* Finalizar fluxo: validar, montar mensagem (com negrito nas respostas) e mostrar botões */
+function finalizarFluxo(){
+  // se nenhumaCheckbox marcada -> usar descrição manual
+  if(nenhumaCheckbox.checked){
+    const txt = descNenhumaTxt.value.trim();
+    if(!txt){ alert("Descreva o problema quando selecionar 'Nenhuma das opções listadas'."); return; }
+    respostas.erros = ["Nenhuma das opções listadas: " + txt];
+    // NESSA situação, NÃO mostrar pergunta 'Foi possível resolver' (especificação)
+    respostas.resolvido = null;
+  } else {
+    if(respostas.erros.length === 0){
+      alert("Selecione ao menos um erro ou marque 'Nenhuma das opções listadas'."); return;
+    }
+    // respostas.resolvido já definida por Sim/Não
+  }
+
+  // montar mensagem - todas as respostas em negrito (*) para WhatsApp
+  const chamado = chamadoEl.value.trim();
+  const posto = postoEl.value.trim();
+  const patrimonio = patrimonioEl.value.trim();
+  const modelo = respostas.modelo || "";
+  const problema = respostas.problema || "";
+  const errosTexto = respostas.erros.join('; ');
+
+  // montar mensagem com *negrito* nas respostas
+  let mensagem = "";
+  mensagem += "Chamado: *" + chamado + "*\n";
+  mensagem += "Posto: *" + posto + "*\n";
+  mensagem += "Patrimônio: *" + patrimonio + "*\n";
+  mensagem += "Modelo: *" + modelo + "*\n";
+  mensagem += "Problema: *" + problema + "*\n";
+  mensagem += "Erros: *" + errosTexto + "*\n";
+  if(respostas.resolvido !== null){
+    mensagem += "Foi possível resolver o chamado? *" + respostas.resolvido + "*\n";
+  }
+
+  // exibir preview (não codificado)
+  previewMessage.innerText = mensagem;
+  previewSection.classList.remove('hidden');
+  atendimento.classList.remove('hidden');
+
+  // configurar botões de WhatsApp (abrir com texto codificado). usamos wa.me/NUMERO?text=
+  btnVanessa.onclick = () => {
+    const url = "https://wa.me/" + WHATSAPP_VANESSA + "?text=" + encodeURIComponent(mensagem);
+    window.open(url, "_blank");
+  };
+  btnWillian.onclick = () => {
+    const url = "https://wa.me/" + WHATSAPP_WILLIAN + "?text=" + encodeURIComponent(mensagem);
+    window.open(url, "_blank");
+  };
+
+  // rolar pra preview (UX pequena)
+  setTimeout(()=> previewSection.scrollIntoView({behavior:'smooth', block:'center'}),200);
+}
+
+/* Botão Gerar mensagem (quando usa checkboxes era o fluxo anterior; aqui mantemos compatibilidade) */
+document.getElementById('btnGerarMensagem')?.addEventListener('click', () => {
+  // se existir (em versões anteriores). Mantemos, mas preferimos fluxo com Responder Sim/Não.
+  finalizarFluxo();
+});
+
+/* Inicializa objetos */
+const respostas = { erros: [], modelo:null, problema:null, resolvido:null };
+
+/* Segurança: checagem se JS está ativo (caso de fallback) */
+(function(){
+  // nada extra aqui — página depende de JS.
+})();
+</script>
 </body>
 </html>
+
 
 
 
