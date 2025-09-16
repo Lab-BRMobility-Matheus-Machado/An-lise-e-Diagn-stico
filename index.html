@@ -9,7 +9,6 @@
     font-family: Arial, sans-serif;
     background: #f2f2f2 url('logo-aqui.png') no-repeat center center;
     background-size: cover;
-    background-opacity: 0.1;
     padding: 20px;
   }
   h1 { font-size: 2em; margin-bottom: 10px; }
@@ -29,6 +28,16 @@
   .info-box {
     margin-top: 5px; padding: 10px;
     background: #e6e6e6; border-radius: 5px;
+  }
+  /* Estilo dos botões de WhatsApp com imagem */
+  .whatsapp-btn {
+    display:flex; align-items:center; text-decoration:none; margin-bottom:10px;
+  }
+  .whatsapp-btn img {
+    width:50px; height:50px; border-radius:50%; margin-right:10px;
+  }
+  .whatsapp-btn div {
+    background:#25D366; color:white; padding:10px 20px; border-radius:8px; font-weight:bold;
   }
 </style>
 </head>
@@ -50,15 +59,13 @@ Este site tem o intuito de auxiliar as manuntenções em campo dos nossos Técni
   <div id="modeloBtns"></div>
 </div>
 
-<!-- Seção 02 - perguntas de múltipla escolha -->
 <script>
+// Modelos do veículo
 const modelos = ["i2-X2","i3-X3","S6","S8-R8-BR8","H9-H9X","S9-S9X","S10-S10X"];
 const modeloBtns = document.getElementById('modeloBtns');
 const secao2 = document.getElementById('secao2');
 
-function showSecao2() {
-  secao2.classList.remove('hidden');
-}
+function showSecao2() { secao2.classList.remove('hidden'); }
 
 modelos.forEach(modelo => {
   let btn = document.createElement('button');
@@ -85,6 +92,7 @@ function showPerguntaProblema() {
   document.body.appendChild(secaoProblema);
 }
 
+// Seção 03 - erros do veículo
 function showErros() {
   const erros = [
     {cod:"C010/C018", desc:"Inclinação frontal excessiva"},
@@ -138,21 +146,26 @@ function showErros() {
   });
 
   document.body.appendChild(secaoErros);
-  showBotaoWhatsApp();
+  showWhatsAppAtendimento();
 }
 
-function showBotaoWhatsApp() {
-  let btn = document.createElement('button');
-  btn.className = "btn";
-  btn.innerText = "Enviar WhatsApp";
-  btn.onclick = () => {
-    const chamado = document.getElementById('chamado').value;
-    const posto = document.getElementById('posto').value;
-    let mensagem = `Chamado: ${chamado}\nPosto: ${posto}\nModelo: ${window.selectedModelo}\nProblema: ${document.getElementById('problemaInput').value}\nErros: ${window.errosSelecionados.join('; ')}`;
-    let url = "https://wa.me/5511999999999?text=" + encodeURIComponent(mensagem);
-    window.open(url, "_blank");
-  };
-  document.body.appendChild(btn);
+// Botões finais de WhatsApp com imagem
+function showWhatsAppAtendimento() {
+  let div = document.createElement('div');
+  div.id = "atendimento";
+  div.style.marginTop = "20px";
+  div.innerHTML = `
+    <h2>Enviar mensagem via WhatsApp</h2>
+    <a href="https://wa.me/message/FQBPJTPCQCTKM1" target="_blank" class="whatsapp-btn">
+      <img src="vanessa.jpg" alt="Vanessa Maia">
+      <div>Atendimento Vanessa Maia</div>
+    </a>
+    <a href="https://wa.me/qr/7JLTXTN3UA73N1" target="_blank" class="whatsapp-btn">
+      <img src="willian.jpg" alt="Willian Bertuzzi">
+      <div>Atendimento Willian Bertuzzi</div>
+    </a>
+  `;
+  document.body.appendChild(div);
 }
 
 // Exibe Seção 2 quando campos iniciais forem preenchidos
@@ -168,6 +181,8 @@ function checkCampos() {
 
 </body>
 </html>
+
+
 
 
 
