@@ -45,7 +45,7 @@
 <!-- Seção 01 -->
 <h1>Análise e Reparo em Campo Grupo BRMobility</h1>
 <p style="font-size:1em;">
-Este site tem o intuito de auxiliar as manuntenções em campo dos nossos Técnicos Externos, oferecendo mais velocidade em diagóstico e reparos, assim como instruir e capacitar cada vez mais o conhecimento dos veículos do Grupo BRMobility.
+Este site tem o intuito de auxiliar as manuntenções em campo dos nossos Técnicos Externos, oferecendo mais velocidade em diagnóstico e reparos, assim como instruir e capacitar cada vez mais o conhecimento dos veículos do Grupo BRMobility.
 </p>
 <p class="alert">⚠️ Esse site não deve ser compartilhado com clientes ou outras pessoas que não façam parte do Grupo BRMobility.</p>
 
@@ -59,10 +59,9 @@ Este site tem o intuito de auxiliar as manuntenções em campo dos nossos Técni
 </div>
 
 <script>
-// Armazenar todas as respostas
 let respostas = { erros: [] };
 
-// Modelos do veículo
+// Mostrar Seção 2
 const modelos = ["i2-X2","i3-X3","S6","S8-R8-BR8","H9-H9X","S9-S9X","S10-S10X"];
 const modeloBtns = document.getElementById('modeloBtns');
 const secao2 = document.getElementById('secao2');
@@ -83,6 +82,7 @@ function selectModelo(modelo) {
 }
 
 function showPerguntaProblema() {
+  if(document.getElementById('problema')) return;
   let secaoProblema = document.createElement('div');
   secaoProblema.id = "problema";
   secaoProblema.innerHTML = `
@@ -134,19 +134,16 @@ function showErros() {
   let secaoErros = document.createElement('div');
   secaoErros.id = "erros";
   secaoErros.innerHTML = `<h2>O veículo apresenta algum desses erros?</h2>`;
-  
+
   erros.forEach(e => {
     let btn = document.createElement('button');
     btn.className = "btn";
     btn.innerText = e.cod;
     btn.onclick = () => {
-      let infoBox = document.createElement('div');
-      infoBox.className = "info-box";
-      infoBox.innerText = e.desc;
-      btn.parentNode.appendChild(infoBox);
       if(!respostas.erros.includes(e.cod + ": " + e.desc)) {
         respostas.erros.push(e.cod + ": " + e.desc);
       }
+      alert(`Selecionado: ${e.cod} - ${e.desc}`);
     };
     secaoErros.appendChild(btn);
   });
@@ -155,13 +152,22 @@ function showErros() {
   showWhatsAppAtendimento();
 }
 
-// Botões finais de WhatsApp com imagem e mensagem pronta
+// Função que gera os botões de WhatsApp com mensagem pronta
 function showWhatsAppAtendimento() {
-  let div = document.createElement('div');
+  let div = document.getElementById('atendimento');
+  if(div) div.remove();
+
+  div = document.createElement('div');
   div.id = "atendimento";
   div.style.marginTop = "20px";
-  
-  let mensagem = `Chamado: ${respostas.chamado}\nPosto: ${respostas.posto}\nModelo: ${respostas.modelo}\nProblema: ${respostas.problema}\nErros: ${respostas.erros.join('; ')}`;
+
+  const mensagem = `
+Chamado: ${respostas.chamado}
+Posto: ${respostas.posto}
+Modelo: ${respostas.modelo}
+Problema: ${respostas.problema}
+Erros: ${respostas.erros.join('; ')}
+  `;
 
   div.innerHTML = `
     <h2>Enviar mensagem via WhatsApp</h2>
@@ -174,10 +180,11 @@ function showWhatsAppAtendimento() {
       <div>Atendimento Willian Bertuzzi</div>
     </a>
   `;
+
   document.body.appendChild(div);
 }
 
-// Exibe Seção 2 quando campos iniciais forem preenchidos
+// Mostrar Seção 2 quando os campos iniciais estiverem preenchidos
 document.getElementById('chamado').addEventListener('input', checkCampos);
 document.getElementById('posto').addEventListener('input', checkCampos);
 
@@ -187,9 +194,9 @@ function checkCampos() {
   if(c && p) showSecao2();
 }
 </script>
-
 </body>
 </html>
+
 
 
 
