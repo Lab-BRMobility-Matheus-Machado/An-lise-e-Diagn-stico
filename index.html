@@ -5,35 +5,36 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>Diagnóstico BRMobility</title>
 <style>
-  body {
-    font-family: Arial, sans-serif;
-    background: #f2f2f2 url('logo-aqui.png') no-repeat center center;
-    background-size: cover;
-    padding: 20px;
-  }
-  h1 { font-size: 2em; margin-bottom: 10px; }
-  h2 { font-size: 1.5em; margin-bottom: 5px; }
-  p { font-size: 0.9em; }
-  .alert { font-size: 0.8em; color: red; margin-bottom: 15px; }
-  input[type=text] {
-    width: 90%; padding: 10px; margin: 5px 0;
-    font-size: 1em; border-radius: 5px; border: 1px solid #ccc;
-  }
-  .hidden { display: none; }
-  .btn {
-    display: inline-block; margin: 5px 0;
-    padding: 10px; background: #25d366;
-    color: white; border-radius: 5px; cursor: pointer;
-  }
-  .whatsapp-btn {
-    display:flex; align-items:center; text-decoration:none; margin-bottom:10px;
-  }
-  .whatsapp-btn img {
-    width:50px; height:50px; border-radius:50%; margin-right:10px;
-  }
-  .whatsapp-btn div {
-    background:#25D366; color:white; padding:10px 20px; border-radius:8px; font-weight:bold;
-  }
+body {
+  font-family: Arial, sans-serif;
+  background: #f2f2f2 url('logo-aqui.png') no-repeat center center;
+  background-size: cover;
+  padding: 20px;
+}
+h1 { font-size: 2em; margin-bottom: 10px; }
+h2 { font-size: 1.5em; margin-bottom: 5px; }
+p { font-size: 0.9em; }
+.alert { font-size: 0.8em; color: red; margin-bottom: 15px; }
+input[type=text] {
+  width: 90%; padding: 10px; margin: 5px 0;
+  font-size: 1em; border-radius: 5px; border: 1px solid #ccc;
+}
+.hidden { display: none; }
+.btn {
+  display: inline-block; margin: 5px 0;
+  padding: 10px; background: #25d366;
+  color: white; border-radius: 5px; cursor: pointer;
+  border: none; font-size:1em;
+}
+.whatsapp-btn {
+  display:flex; align-items:center; text-decoration:none; margin-bottom:10px;
+}
+.whatsapp-btn img {
+  width:50px; height:50px; border-radius:50%; margin-right:10px;
+}
+.whatsapp-btn div {
+  background:#25D366; color:white; padding:10px 20px; border-radius:8px; font-weight:bold;
+}
 </style>
 </head>
 <body>
@@ -63,11 +64,11 @@
 
 <div id="atendimento" class="hidden">
   <h2>Enviar mensagem via WhatsApp</h2>
-  <a id="btnVanessa" href="#" target="_blank" class="whatsapp-btn">
+  <a id="btnVanessa" target="_blank" class="whatsapp-btn">
     <img src="vanessa.jpg" alt="Vanessa Maia">
     <div>Atendimento Vanessa Maia</div>
   </a>
-  <a id="btnWillian" href="#" target="_blank" class="whatsapp-btn">
+  <a id="btnWillian" target="_blank" class="whatsapp-btn">
     <img src="willian.jpg" alt="Willian Bertuzzi">
     <div>Atendimento Willian Bertuzzi</div>
   </a>
@@ -76,41 +77,35 @@
 <script>
 let respostas = { erros: [] };
 
-// Seção 2 - modelos
-const modelos = ["i2-X2","i3-X3","S6","S8-R8-BR8","H9-H9X","S9-S9X","S10-S10X"];
-const modeloBtns = document.getElementById('modeloBtns');
-const secao2 = document.getElementById('secao2');
-const secaoProblema = document.getElementById('secaoProblema');
-const secaoErros = document.getElementById('secaoErros');
-const btnProblema = document.getElementById('btnProblema');
-
+// Mostrar Seção 2 quando chamado e posto preenchidos
 function checkCampos() {
   const c = document.getElementById('chamado').value.trim();
   const p = document.getElementById('posto').value.trim();
-  if(c && p) secao2.classList.remove('hidden');
+  if(c && p) document.getElementById('secao2').classList.remove('hidden');
 }
-
 document.getElementById('chamado').addEventListener('input', checkCampos);
 document.getElementById('posto').addEventListener('input', checkCampos);
 
-// Cria botões dos modelos
-modelos.forEach(modelo => {
-  let btn = document.createElement('button');
-  btn.innerText = modelo;
+// Modelos
+const modelos = ["i2-X2","i3-X3","S6","S8-R8-BR8","H9-H9X","S9-S9X","S10-S10X"];
+const modeloBtns = document.getElementById('modeloBtns');
+modelos.forEach(m => {
+  const btn = document.createElement('button');
   btn.className = 'btn';
+  btn.innerText = m;
   btn.onclick = () => {
-    respostas.modelo = modelo;
-    secaoProblema.classList.remove('hidden');
+    respostas.modelo = m;
+    document.getElementById('secaoProblema').classList.remove('hidden');
   };
   modeloBtns.appendChild(btn);
 });
 
-// Botão Próximo do Problema
-btnProblema.onclick = () => {
+// Problema
+document.getElementById('btnProblema').onclick = () => {
   const problema = document.getElementById('problemaInput').value.trim();
-  if(!problema) { alert("Digite o problema."); return; }
+  if(!problema){ alert("Digite o problema"); return; }
   respostas.problema = problema;
-  secaoErros.classList.remove('hidden');
+  document.getElementById('secaoErros').classList.remove('hidden');
   showErros();
 };
 
@@ -135,7 +130,7 @@ const erros = [
   {cod:"E084/E104/E204", desc:"Falha nos sensores auxiliares"},
   {cod:"E404/E40C", desc:"Falha no sensor de detecção do piloto"},
   {cod:"E804/E80C", desc:"Falha no sensor de alimentação"},
-  {cod:"E015/E025/E045", desc:"Falha nos sensores de alimentação (12V, 5V, 3V)"},
+  {cod:"E015/E025/E045", desc:"Falha nos sensores de alimentação (12V,5V,3V)"},
   {cod:"E085/E105/E205", desc:"Falha no sensor de temperatura do BSA"},
   {cod:"E105/E205/E405", desc:"Falha interna do BSA"},
   {cod:"E016/E026/E046", desc:"Falha na temperatura da junção"},
@@ -144,20 +139,19 @@ const erros = [
   {cod:"E806/E806", desc:"Falha no feedback de voltagem do motor"},
   {cod:"E017/E027/E047", desc:"Falha na consistência da voltagem do motor"},
   {cod:"E087/E107/E207", desc:"Falha no relé do motor"},
-  {cod:"E407/E407", desc:"Falha na consistência da alimentação do atuador"},
-{cod:"Nenhuma das opções listadas", desc:"Entre em contato com o Atendimento."}
+  {cod:"E407/E407", desc:"Falha na consistência da alimentação do atuador"}
 ];
 
-function showErros() {
+function showErros(){
   const container = document.getElementById('errosBtns');
-  container.innerHTML = '';
-  erros.forEach(e => {
+  container.innerHTML='';
+  erros.forEach(e=>{
     const btn = document.createElement('button');
-    btn.className = 'btn';
-    btn.innerText = e.cod;
-    btn.onclick = () => {
-      if(!respostas.erros.includes(e.cod + ": " + e.desc)) {
-        respostas.erros.push(e.cod + ": " + e.desc);
+    btn.className='btn';
+    btn.innerText=e.cod;
+    btn.onclick=()=>{
+      if(!respostas.erros.includes(e.cod+": "+e.desc)){
+        respostas.erros.push(e.cod+": "+e.desc);
       }
       showWhatsApp();
     };
@@ -165,8 +159,8 @@ function showErros() {
   });
 }
 
-function showWhatsApp() {
-  if(respostas.erros.length === 0) return; // só aparece se tiver ao menos 1 erro
+function showWhatsApp(){
+  if(respostas.erros.length===0) return;
   const atendimento = document.getElementById('atendimento');
   atendimento.classList.remove('hidden');
 
@@ -176,18 +170,16 @@ Posto: ${document.getElementById('posto').value}
 Modelo: ${respostas.modelo}
 Problema: ${respostas.problema}
 Erros: ${respostas.erros.join('; ')}
-  `;
+`;
 
-  document.getElementById('btnVanessa').onclick = () => {
-    window.open("https://wa.me/message/FQBPJTPCQCTKM1?text=" + encodeURIComponent(mensagem), "_blank");
-  };
-  document.getElementById('btnWillian').onclick = () => {
-    window.open("https://wa.me/qr/7JLTXTN3UA73N1?text=" + encodeURIComponent(mensagem), "_blank");
-  };
+  document.getElementById('btnVanessa').href="https://wa.me/message/FQBPJTPCQCTKM1?text="+encodeURIComponent(mensagem);
+  document.getElementById('btnWillian').href="https://wa.me/qr/7JLTXTN3UA73N1?text="+encodeURIComponent(mensagem);
 }
 </script>
 </body>
 </html>
+
+
 
 
 
