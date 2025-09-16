@@ -1,64 +1,146 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Página de Botões</title>
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      background: #f2f2f2;
-      margin: 0;
-      padding: 20px;
-    }
-    h1 {
-      margin-bottom: 20px;
-    }
-    .btn {
-      display: block;
-      width: 90%;
-      margin: 10px auto;
-      padding: 15px;
-      font-size: 18px;
-      border: none;
-      border-radius: 10px;
-      background: #25d366;
-      color: white;
-      text-decoration: none;
-      text-align: center;
-    }
-    .btn.link { background: #007bff; }
-    .btn.page { background: #ff9800; }
-    .btn.auto { background: #4caf50; }
-  </style>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Diagnóstico BRMobility</title>
+<style>
+  body {
+    font-family: Arial, sans-serif;
+    background: #f2f2f2 url('logo-aqui.png') no-repeat center center;
+    background-size: cover;
+    background-opacity: 0.1;
+    padding: 20px;
+  }
+  h1 { font-size: 2em; margin-bottom: 10px; }
+  h2 { font-size: 1.5em; margin-bottom: 5px; }
+  p { font-size: 0.9em; }
+  .alert { font-size: 0.8em; color: red; margin-bottom: 15px; }
+  input[type=text] {
+    width: 90%; padding: 10px; margin: 5px 0;
+    font-size: 1em; border-radius: 5px; border: 1px solid #ccc;
+  }
+  .hidden { display: none; }
+  .btn {
+    display: inline-block; margin: 5px 0;
+    padding: 10px; background: #25d366;
+    color: white; border-radius: 5px; cursor: pointer;
+  }
+  .info-box {
+    margin-top: 5px; padding: 10px;
+    background: #e6e6e6; border-radius: 5px;
+  }
+</style>
 </head>
 <body>
-  <h1>Página de Botões</h1>
 
-  <!-- Botão para link externo -->
-  <a href="https://www.google.com" class="btn link">Abrir Google</a>
+<!-- Seção 01 -->
+<h1>Análise e Reparo em Campo Grupo BRMobility</h1>
+<p style="font-size:1em;">
+Este site tem o intuito de auxiliar as manuntenções em campo dos nossos Técnicos Externos, oferecendo mais velocidade em diagóstico e reparos, assim como instruir e capacitar cada vez mais o conhecimento dos veículos do Grupo BRMobility.
+</p>
+<p class="alert">⚠️ Esse site não deve ser compartilhado com clientes ou outras pessoas que não façam parte do Grupo BRMobility.</p>
 
-  <!-- Botão para WhatsApp simples -->
-  <a href="https://wa.me/5511999999999" class="btn">WhatsApp Simples</a>
+<input type="text" id="chamado" placeholder="por exemplo #20991">
+<input type="text" id="posto" placeholder="por exemplo Shopping BRMobility">
 
-  <!-- Botão para outra página -->
-  <a href="outra.html" class="btn page">Abrir Outra Página</a>
+<!-- Seção 02 -->
+<div id="secao2" class="hidden">
+  <h2>Qual o modelo do veículo?</h2>
+  <div id="modeloBtns"></div>
+</div>
 
-  <!-- Botão com mensagem automática no WhatsApp -->
-  <a href="https://wa.me/5511999999999?text=Olá,+quero+informações+sobre+o+serviço." 
-     class="btn auto">WhatsApp com Mensagem</a>
+<!-- Seção 02 - perguntas de múltipla escolha -->
+<script>
+const modelos = ["i2-X2","i3-X3","S6","S8-R8-BR8","H9-H9X","S9-S9X","S10-S10X"];
+const modeloBtns = document.getElementById('modeloBtns');
+const secao2 = document.getElementById('secao2');
 
-  <!-- Botão com mensagem montada dinamicamente -->
-  <button class="btn auto" onclick="enviarMsg()">WhatsApp com Dados Selecionados</button>
+function showSecao2() {
+  secao2.classList.remove('hidden');
+}
 
-  <script>
-    function enviarMsg() {
-      let nome = "Matheus"; // exemplo fixo, pode pegar de inputs
-      let servico = "Diagnóstico";
-      let mensagem = `Olá, meu nome é ${nome}. Quero solicitar: ${servico}.`;
-      window.location.href = "https://wa.me/5511999999999?text=" + encodeURIComponent(mensagem);
-    }
-  </script>
+modelos.forEach(modelo => {
+  let btn = document.createElement('button');
+  btn.innerText = modelo;
+  btn.className = "btn";
+  btn.onclick = () => selectModelo(modelo);
+  modeloBtns.appendChild(btn);
+});
+
+function selectModelo(modelo) {
+  window.selectedModelo = modelo;
+  alert("Você selecionou: " + modelo);
+  showPerguntaProblema();
+}
+
+function showPerguntaProblema() {
+  let secaoProblema = document.createElement('div');
+  secaoProblema.id = "problema";
+  secaoProblema.innerHTML = `
+    <h2>Qual o problema descrito no chamado ou informado pelo cliente?</h2>
+    <input type="text" id="problemaInput" placeholder="Descreva o problema">
+    <button class="btn" onclick="showErros()">Próximo</button>
+  `;
+  document.body.appendChild(secaoProblema);
+}
+
+function showErros() {
+  const problemaInput = document.getElementById('problemaInput').value;
+  const erros = [
+    {cod:"C010/C018", desc:"Inclinação frontal excessiva"},
+    {cod:"C020/C028", desc:"Inclinação traseira excessiva"},
+    {cod:"C040/C048", desc:"Limitador de velocidade frontal/traseiro ativado"},
+    {cod:"C100/C108", desc:"Bateria traseira/frontal vazia"}
+    // ... continue adicionando os erros conforme necessário
+  ];
+
+  let secaoErros = document.createElement('div');
+  secaoErros.id = "erros";
+  secaoErros.innerHTML = `<h2>O veículo apresenta algum desses erros?</h2>`;
+  erros.forEach(e => {
+    let btn = document.createElement('button');
+    btn.className = "btn";
+    btn.innerText = e.cod;
+    btn.onclick = () => {
+      let infoBox = document.createElement('div');
+      infoBox.className = "info-box";
+      infoBox.innerText = e.desc;
+      btn.parentNode.appendChild(infoBox);
+      if(!window.errosSelecionados) window.errosSelecionados = [];
+      window.errosSelecionados.push(e.cod + ": " + e.desc);
+    };
+    secaoErros.appendChild(btn);
+  });
+
+  document.body.appendChild(secaoErros);
+  showBotaoWhatsApp();
+}
+
+function showBotaoWhatsApp() {
+  let btn = document.createElement('button');
+  btn.className = "btn";
+  btn.innerText = "Enviar WhatsApp";
+  btn.onclick = () => {
+    const chamado = document.getElementById('chamado').value;
+    const posto = document.getElementById('posto').value;
+    let mensagem = `Chamado: ${chamado}\nPosto: ${posto}\nModelo: ${window.selectedModelo}\nProblema: ${document.getElementById('problemaInput').value}\nErros: ${window.errosSelecionados.join('; ')}`;
+    let url = "https://wa.me/5511999999999?text=" + encodeURIComponent(mensagem);
+    window.open(url, "_blank");
+  };
+  document.body.appendChild(btn);
+}
+
+// Exibe Seção 2 quando campos iniciais forem preenchidos
+document.getElementById('chamado').addEventListener('input', checkCampos);
+document.getElementById('posto').addEventListener('input', checkCampos);
+
+function checkCampos() {
+  const c = document.getElementById('chamado').value;
+  const p = document.getElementById('posto').value;
+  if(c && p) showSecao2();
+}
+</script>
+
 </body>
 </html>
