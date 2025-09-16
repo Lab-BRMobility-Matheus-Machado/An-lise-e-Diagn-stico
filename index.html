@@ -29,7 +29,6 @@
     margin-top: 5px; padding: 10px;
     background: #e6e6e6; border-radius: 5px;
   }
-  /* Estilo dos botões de WhatsApp com imagem */
   .whatsapp-btn {
     display:flex; align-items:center; text-decoration:none; margin-bottom:10px;
   }
@@ -60,6 +59,9 @@ Este site tem o intuito de auxiliar as manuntenções em campo dos nossos Técni
 </div>
 
 <script>
+// Armazenar todas as respostas
+let respostas = { erros: [] };
+
 // Modelos do veículo
 const modelos = ["i2-X2","i3-X3","S6","S8-R8-BR8","H9-H9X","S9-S9X","S10-S10X"];
 const modeloBtns = document.getElementById('modeloBtns');
@@ -76,8 +78,7 @@ modelos.forEach(modelo => {
 });
 
 function selectModelo(modelo) {
-  window.selectedModelo = modelo;
-  alert("Você selecionou: " + modelo);
+  respostas.modelo = modelo;
   showPerguntaProblema();
 }
 
@@ -94,6 +95,10 @@ function showPerguntaProblema() {
 
 // Seção 03 - erros do veículo
 function showErros() {
+  respostas.chamado = document.getElementById('chamado').value;
+  respostas.posto = document.getElementById('posto').value;
+  respostas.problema = document.getElementById('problemaInput').value;
+
   const erros = [
     {cod:"C010/C018", desc:"Inclinação frontal excessiva"},
     {cod:"C020/C028", desc:"Inclinação traseira excessiva"},
@@ -139,8 +144,9 @@ function showErros() {
       infoBox.className = "info-box";
       infoBox.innerText = e.desc;
       btn.parentNode.appendChild(infoBox);
-      if(!window.errosSelecionados) window.errosSelecionados = [];
-      window.errosSelecionados.push(e.cod + ": " + e.desc);
+      if(!respostas.erros.includes(e.cod + ": " + e.desc)) {
+        respostas.erros.push(e.cod + ": " + e.desc);
+      }
     };
     secaoErros.appendChild(btn);
   });
@@ -149,38 +155,20 @@ function showErros() {
   showWhatsAppAtendimento();
 }
 
-// Botões finais de WhatsApp com imagem
+// Botões finais de WhatsApp com imagem e mensagem pronta
 function showWhatsAppAtendimento() {
   let div = document.createElement('div');
   div.id = "atendimento";
   div.style.marginTop = "20px";
+  
+  let mensagem = `Chamado: ${respostas.chamado}\nPosto: ${respostas.posto}\nModelo: ${respostas.modelo}\nProblema: ${respostas.problema}\nErros: ${respostas.erros.join('; ')}`;
+
   div.innerHTML = `
     <h2>Enviar mensagem via WhatsApp</h2>
-    <a href="https://wa.me/message/FQBPJTPCQCTKM1" target="_blank" class="whatsapp-btn">
-      <img src="vanessa.jpg" alt="Vanessa Maia">
-      <div>Atendimento Vanessa Maia</div>
-    </a>
-    <a href="https://wa.me/qr/7JLTXTN3UA73N1" target="_blank" class="whatsapp-btn">
-      <img src="willian.jpg" alt="Willian Bertuzzi">
-      <div>Atendimento Willian Bertuzzi</div>
-    </a>
-  `;
-  document.body.appendChild(div);
-}
+    <a href="https://wa.me/message/FQBPJTPCQCTKM1?text=${encodeURIComponent(mensagem)}" target="_blank" class="whatsapp-btn">
+      <img src="vanessa.jpg"
 
-// Exibe Seção 2 quando campos iniciais forem preenchidos
-document.getElementById('chamado').addEventListener('input', checkCampos);
-document.getElementById('posto').addEventListener('input', checkCampos);
 
-function checkCampos() {
-  const c = document.getElementById('chamado').value;
-  const p = document.getElementById('posto').value;
-  if(c && p) showSecao2();
-}
-</script>
-
-</body>
-</html>
 
 
 
