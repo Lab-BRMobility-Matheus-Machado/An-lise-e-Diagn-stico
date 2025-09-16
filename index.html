@@ -27,7 +27,7 @@ input[type=text] {
   border: none; font-size:1em;
 }
 .whatsapp-btn {
-  display:flex; align-items:center; margin-bottom:10px;
+  display:flex; align-items:center; margin-bottom:10px; cursor:pointer;
 }
 .whatsapp-btn img {
   width:50px; height:50px; border-radius:50%; margin-right:10px;
@@ -64,14 +64,14 @@ input[type=text] {
 
 <div id="atendimento" class="hidden">
   <h2>Enviar mensagem via WhatsApp</h2>
-  <button id="btnVanessa" class="whatsapp-btn">
+  <div id="btnVanessa" class="whatsapp-btn">
     <img src="vanessa.jpg" alt="Vanessa Maia">
     <div>Atendimento Vanessa Maia</div>
-  </button>
-  <button id="btnWillian" class="whatsapp-btn">
+  </div>
+  <div id="btnWillian" class="whatsapp-btn">
     <img src="willian.jpg" alt="Willian Bertuzzi">
     <div>Atendimento Willian Bertuzzi</div>
-  </button>
+  </div>
 </div>
 
 <script>
@@ -173,10 +173,10 @@ Erros: ${respostas.erros.join('; ')}
 `;
 
   document.getElementById('btnVanessa').onclick = () => {
-    window.location.href = "https://wa.me/message/FQBPJTPCQCTKM1?text=" + encodeURIComponent(mensagem);
+    window.open("https://wa.me/5511989477808?text=" + encodeURIComponent(mensagem), "_blank");
   };
   document.getElementById('btnWillian').onclick = () => {
-    window.location.href = "https://wa.me/qr/7JLTXTN3UA73N1?text=" + encodeURIComponent(mensagem);
+    window.open("https://wa.me/5511956544217?text=" + encodeURIComponent(mensagem), "_blank");
   };
 }
 </script>
