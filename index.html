@@ -117,14 +117,6 @@
       resize: none;
     }
 
-    #whatsappSection button {
-      background-color: #25D366;
-    }
-
-    #whatsappSection button:hover {
-      background-color: #1DA851;
-    }
-
     footer {
       text-align: center;
       margin-top: 50px;
@@ -143,7 +135,7 @@
       margin: 10px auto;
       max-width: 600px;
       font-size: 0.95em;
-      display: none;
+      display: block;
     }
 
     a {
@@ -187,7 +179,7 @@
     </div>
 
     <div id="erroSection" class="hidden">
-      <h3>O veículo apresenta algum desses Erros? O erro aparece no display do controle remoto.</h3>
+      <h3 id="erroTitulo">O veículo apresenta algum desses Erros?</h3>
       <div class="button-group" id="erroButtons"></div>
       <div id="erroDescricao" class="problem-input hidden">
         <h3>Descreva o problema:</h3>
@@ -201,9 +193,10 @@
         </div>
       </div>
       <div id="whatsappSection" class="problem-input hidden">
-        <h3>Finalizar e enviar via WhatsApp</h3>
+        <h3>Escolha o analista para envio via WhatsApp</h3>
         <div class="button-group">
-          <button class="vehicle-button" onclick="enviarWhatsApp()">Enviar</button>
+          <button class="vehicle-button" onclick="enviarWhatsApp('5511989477808')">Enviar para Vanessa</button>
+          <button class="vehicle-button" onclick="enviarWhatsApp('5511956544217')">Enviar para Willian</button>
         </div>
       </div>
     </div>
@@ -212,195 +205,150 @@
       <img src="logotipo empresa.jpg" alt="Logo BRMobility">
     </footer>
   </div>
-<script>
-  const chamado = document.getElementById('chamado');
-  const posto = document.getElementById('posto');
-  const patrimonio = document.getElementById('patrimonio');
-  const vehicleSection = document.getElementById('vehicleSection');
-  const problemInput = document.getElementById('problemInput');
-  const erroSection = document.getElementById('erroSection');
-  const erroButtons = document.getElementById('erroButtons');
-  const erroDescricao = document.getElementById('erroDescricao');
-  const descricaoErro = document.getElementById('descricaoErro');
-  const resolvidoSection = document.getElementById('resolvidoSection');
-  const whatsappSection = document.getElementById('whatsappSection');
 
-  let modeloSelecionado = '';
-  let erroSelecionado = '';
-  let resolvido = '';
+  <script>
+    const chamado = document.getElementById('chamado');
+    const posto = document.getElementById('posto');
+    const patrimonio = document.getElementById('patrimonio');
+    const vehicleSection = document.getElementById('vehicleSection');
+    const problemInput = document.getElementById('problemInput');
+    const erroSection = document.getElementById('erroSection');
+    const erroButtons = document.getElementById('erroButtons');
+    const erroDescricao = document.getElementById('erroDescricao');
+    const descricaoErro = document.getElementById('descricaoErro');
+    const resolvidoSection = document.getElementById('resolvidoSection');
+    const whatsappSection = document.getElementById('whatsappSection');
+    const erroTitulo = document.getElementById('erroTitulo');
 
-  const erros = {
-    "C010/C018": "Inclinação frontal excessiva. Solicite a troca do veículo imediatamente.",
-    "C020/C028": "Inclinação traseira excessiva. Solicite a troca do veículo imediatamente.",
-    "C040/C048": 'Limitador de velocidade frontal/traseiro ativado. Realize o procedimento pelo link: <a href="https://drive.google.com/file/d/1uHcirgVcKM_FAG7NPW4spNOP2jF6cpio/view?usp=drive_link" target="_blank">clique aqui</a>.',
-    "C100/C108": "Bateria traseira/frontal vazia. Solicite a troca de bateria imediatamente.",
-    "C200/C208": "Desligamento da bateria traseira/frontal. Solicite a troca de bateria imediatamente.",
-    "C400/C408": "Ângulo de rotação excedido. Realize a solicitação de pivô mecânico para a troca.",
-    "C800/C808": "Baixa voltagem do barramento. Solicite imediatamente a troca do veículo.",
-    "E012/E01A/E01B": "Falha na comunicação com o módulo CU. Solicite imediatamente a troca do veículo.",
-    "E022/E02A/E02B": "Falha na comunicação com o módulo BSA. Solicite imediatamente a troca do veículo.",
-    "E042/E04A/E04B": "Falha na comunicação com o módulo BSA. Solicite imediatamente a troca do veículo.",
-    "E082/E08A/E08B": "Falha na comunicação com o módulo UI. Solicite imediatamente a troca do veículo.",
-    "E202/E20A/E20B": "Falha no slot TDM. Solicite imediatamente a troca do veículo.",
-    "E402/E40A/E40B": "Falha na comunicação remota com o BSA. Solicite imediatamente a troca do veículo.",
-    "E802/E80A/E80B": "Falha na comunicação remota com o UI. Solicite imediatamente a troca do veículo.",
-    "E013/E01C/E02C": "Falha na comunicação com o módulo BCU. Solicite imediatamente a troca do veículo.",
-    "E014/E024/E044": "Falha no sensor de pivô. Solicite um sensor de pivô para a troca.",
-    "E084/E104/E204": "Falha nos sensores auxiliares. Solicite imediatamente a troca do veículo.",
-    "E404/E40C": "Falha no sensor de detecção do piloto. Solicite imediatamente a troca do veículo.",
-    "E804/E80C": "Falha no sensor de alimentação. Solicite um conjunto de placa fonte para a troca.",
-    "E015/E025/E045": "Falha nos sensores de alimentação (12V, 5V, 3V). Solicite imediatamente a troca do veículo.",
-    "E085/E105/E205": "Falha no sensor de temperatura do BSA. Solicite um par de baterias para a troca.",
-    "E105/E205/E405": "Falha interna do BSA. Solicite imediatamente a troca do veículo.",
-    "E016/E026/E046": "Falha na temperatura da junção. Solicite imediatamente a troca do veículo.",
-    "E086/E106/E206": "Falha no motor de acionamento. Solicite um par de motores para a troca.",
-    "E406/E406": "Falha no amplificador de corrente do motor. Solicite um par de motores para a troca.",
-    "E806/E806": "Falha no feedback de voltagem do motor. Solicite um par de motores para a troca.",
-    "E017/E027/E047": "Falha na consistência da voltagem do motor.",
-    "E087/E107/E207": "Falha no relé do motor. Solicite um par de motores para a troca.",
-    "E407/E407": "Falha na consistência da alimentação do atuador. Solicite imediatamente a troca do veículo.",
-    "Nenhuma das opções listadas": "Descreva o problema."
-  };
+    let modeloSelecionado = '';
+    let erroSelecionado = '';
+    let resolvido = '';
 
-  function checkInputs() {
-    if (chamado.value.trim() && posto.value.trim() && patrimonio.value.trim()) {
-      vehicleSection.classList.remove('hidden');
-    }
-  }
+    const erros_i2x2 = {
+      "C010/C018": "Inclinação frontal excessiva. Solicite a troca do veículo imediatamente.",
+      "C020/C028": "Inclinação traseira excessiva. Solicite a troca do veículo imediatamente.",
+      "C040/C048": 'Limitador de velocidade ativado. <a href="https://drive.google.com/file/d/1uHcirgVcKM_FAG7NPW4spNOP2jF6cpio/view?usp=drive_link" target="_blank">Clique aqui</a>.',
+      "C100/C108": "Bateria vazia. Solicite a troca de bateria imediatamente.",
+      "C200/C208": "Desligamento da bateria traseira/frontal. Solicite a troca de bateria imediatamente.",
+      "C400/C408": "Ângulo de rotação excedido. Realize a solicitação de pivô mecânico para a troca.",
+      "C800/C808": "Baixa voltagem do barramento. Solicite imediatamente a troca do veículo.",
+      "E012/E01A/E01B": "Falha na comunicação com o módulo CU. Solicite imediatamente a troca do veículo.",
+      "E022/E02A/E02B": "Falha na comunicação com o módulo BSA. Solicite imediatamente a troca do veículo.",
+      "E042/E04A/E04B": "Falha na comunicação com o módulo BSA. Solicite imediatamente a troca do veículo.",
+      "E082/E08A/E08B": "Falha na comunicação com o módulo UI. Solicite imediatamente a troca do veículo.",
+      "E202/E20A/E20B": "Falha no slot TDM. Solicite imediatamente a troca do veículo.",
+      "E402/E40A/E40B": "Falha na comunicação remota com o BSA. Solicite imediatamente a troca do veículo.",
+      "E802/E80A/E80B": "Falha na comunicação remota com o UI. Solicite imediatamente a troca do veículo.",
+      "E013/E01C/E02C": "Falha na comunicação com o módulo BCU. Solicite imediatamente a troca do veículo.",
+      "E014/E024/E044": "Falha no sensor de pivô. Solicite um sensor de pivô para a troca.",
+      "E084/E104/E204": "Falha nos sensores auxiliares. Solicite imediatamente a troca do veículo.",
+      "E404/E40C": "Falha no sensor de detecção do piloto. Solicite imediatamente a troca do veículo.",
+      "E804/E80C": "Falha no sensor de alimentação. Solicite um conjunto de placa fonte para a troca.",
+      "E015/E025/E045": "Falha nos sensores de alimentação (12V, 5V, 3V). Solicite imediatamente a troca do veículo.",
+      "E085/E105/E205": "Falha no sensor de temperatura do BSA. Solicite um par de baterias para a troca.",
+      "E105/E205/E405": "Falha interna do BSA. Solicite imediatamente a troca do veículo.",
+      "E016/E026/E046": "Falha na temperatura da junção. Solicite imediatamente a troca do veículo.",
+      "E086/E106/E206": "Falha no motor de acionamento. Solicite um par de motores para a troca.",
+      "E406/E406": "Falha no amplificador de corrente do motor. Solicite um par de motores para a troca.",
+      "E806/E806": "Falha no feedback de voltagem do motor. Solicite um par de motores para a troca.",
+      "E017/E027/E047": "Falha na consistência da voltagem do motor.",
+      "E087/E107/E207": "Falha no relé do motor. Solicite um par de motores para a troca.",
+      "E407/E407": "Falha na consistência da alimentação do atuador. Solicite imediatamente a troca do veículo.",
+      "Nenhuma das opções listadas": "Descreva o problema."
+    };
 
-  chamado.addEventListener('input', checkInputs);
-  posto.addEventListener('input', checkInputs);
-  patrimonio.addEventListener('input', checkInputs);
+    const erros_i3x3 = {
+      "Veículo não liga": "Realizar o Reset do veículo e testá-lo. Verificar baterias do controle remoto (cada uma deve ter ~2,5V, total > 7,5V). Se abaixo, solicitar troca. Verificar baterias do veículo (>54V). Se tudo normal e não ligar, solicitar troca do veículo.",
+      "Veículo com baixa autonomia": "Verificar tensão do carregador (deve estar 81,5V ou mais). Se abaixo, solicitar troca do carregador. Se carregador estiver bom, solicitar troca de baterias do veículo.",
+      "Veículo não carrega": "Verificar tensão do carregador (>81,5V). Se abaixo, solicitar troca do carregador. Se carregador estiver bom, solicitar troca do veículo.",
+      "Veículo com rodas travando": "Solicitar troca do veículo.",
+      "Veículo aceso mas não liga": "Realizar reset. Verificar baterias do controle remoto (cada uma ~2,5V, total > 7,5V). Se abaixo, solicitar troca. Se não funcionar, solicitar troca do veículo.",
+      "Carregador não funciona": "Solicitar troca de carregador.",
+      "Veículo trepidando": "Verificar integridade do chassi e couplings.",
+      "Veículo puxando/girando": "Realizar calibração de postura com controle remoto original.",
+      "Controle Remoto não funciona": 'Verificar carga da bateria do controle e realizar pareamento com controle remoto auxiliar. <a href="https://drive.google.com/file/d/16v-38oSKjsfVL9yQnxwbRFtX-6Uf1Fja/view?usp=drive_link" target="_blank">Clique aqui</a>.',
+      "Veículo não acelara": 'Realizar ajuste de velocidade com controle remoto original. <a href="https://drive.google.com/file/d/16xl1z4yneIkh3JyjbaL8c0XnuSHmrGy2/view?usp=drive_link" target="_blank">Clique aqui</a>.',
+      "Veículo muito pra frente/pra trás": 'Realizar calibração de postura com controle remoto original. <a href="https://drive.google.com/file/d/172xePg7Ko2ZNJNlACqlLhETxmGec20Lt/view?usp=drive_link" target="_blank">Clique aqui</a>.',
+      "Nenhuma das opções listadas": "Descreva o problema."
+    };
 
-  function selectModel(modelo) {
-    modeloSelecionado = modelo;
-    problemInput.classList.remove('hidden');
-    if (modelo === 'i2-X2') {
-      erroSection.classList.remove('hidden');
-      renderErroButtons();
-    }
-  }
-
-  function renderErroButtons() {
-    erroButtons.innerHTML = '';
-    Object.keys(erros).forEach(codigo => {
-      const btn = document.createElement('button');
-      btn.className = 'vehicle-button';
-      btn.textContent = codigo;
-      btn.onclick = () => showErroInfo(codigo);
-      erroButtons.appendChild(btn);
-    });
-  }
-
-  function showErroInfo(codigo) {
-    erroSelecionado = codigo;
-    erroDescricao.classList.add('hidden');
-    resolvidoSection.classList.add('hidden');
-    whatsappSection.classList.add('hidden');
-
-    const infoBox = document.querySelector('.info-box');
-    if (infoBox) infoBox.remove();
-
-    const box = document.createElement('div');
-    box.className = 'info-box';
-    box.innerHTML = erros[codigo];
-    erroSection.appendChild(box);
-
-    if (codigo === 'Nenhuma das opções listadas') {
-      erroDescricao.classList.remove('hidden');
-    } else {
-      resolvidoSection.classList.remove('hidden');
-    }
-
-    whatsappSection.classList.remove('hidden');
-  }
-
-  function setResolvido(resposta) {
-    resolvido = resposta;
-  }
-
-  function enviarWhatsApp() {
-    const problema = document.getElementById('problema').value.trim();
-    const descricao = descricaoErro.value.trim();
-
-    let mensagem = `*Chamado:* *${chamado.value.trim()}*\n`;
-    mensagem += `*Posto:* *${posto.value.trim()}*\n`;
-    mensagem += `*Patrimônio:* *${patrimonio.value.trim()}*\n`;
-    mensagem += `*Modelo:* *${modeloSelecionado}*\n`;
-    mensagem += `*Problema informado:* *${problema}*\n`;
-    if (erroSelecionado) {
-      mensagem += `*Erro:* *${erroSelecionado}*\n`;
-      if (erroSelecionado === 'Nenhuma das opções listadas') {
-        mensagem += `*Descrição:* *${descricao}*\n`;
-      } else {
-        mensagem += `*Resolvido:* *${resolvido}*\n`;
+    function checkInputs() {
+      if (chamado.value.trim() && posto.value.trim() && patrimonio.value.trim()) {
+        vehicleSection.classList.remove('hidden');
       }
     }
 
-    const url = `https://wa.me/?text=${encodeURIComponent(mensagem)}`;
-    window.open(url, '_blank');
-  }
-const erros_i3x3 = {
-  "Veículo não liga": "Realizar o Reset do veículo e testá-lo. Verificar baterias do controle remoto (cada uma deve ter ~2,5V, total > 7,5V). Se abaixo, solicitar troca. Verificar baterias do veículo (>54V). Se tudo normal e não ligar, solicitar troca do veículo.",
-  "Veículo com baixa autonomia": "Verificar tensão do carregador (deve estar 81,5V ou mais). Se abaixo, solicitar troca do carregador. Se carregador estiver bom, solicitar troca de baterias do veículo.",
-  "Veículo não carrega": "Verificar tensão do carregador (>81,5V). Se abaixo, solicitar troca do carregador. Se carregador estiver bom, solicitar troca do veículo.",
-  "Veículo com rodas travando": "Solicitar troca do veículo.",
-  "Veículo aceso mas não liga": "Realizar reset. Verificar baterias do controle remoto (cada uma ~2,5V, total > 7,5V). Se abaixo, solicitar troca. Se não funcionar, solicitar troca do veículo.",
-  "Carregador não funciona": "Solicitar troca de carregador.",
-  "Veículo trepidando": "Verificar integridade do chassi e couplings.",
-  "Veículo puxando/girando": "Realizar calibração de postura com controle remoto original.",
-  "Controle Remoto não funciona": 'Verificar carga da bateria do controle e realizar pareamento com controle remoto auxiliar. <a href="https://drive.google.com/file/d/16v-38oSKjsfVL9yQnxwbRFtX-6Uf1Fja/view?usp=drive_link" target="_blank">Clique aqui</a>.',
-  "Veículo não acelara": 'Realizar ajuste de velocidade com controle remoto original. <a href="https://drive.google.com/file/d/16xl1z4yneIkh3JyjbaL8c0XnuSHmrGy2/view?usp=drive_link" target="_blank">Clique aqui</a>.',
-  "Veículo muito pra frente/pra trás": 'Realizar calibração de postura com controle remoto original. <a href="https://drive.google.com/file/d/172xePg7Ko2ZNJNlACqlLhETxmGec20Lt/view?usp=drive_link" target="_blank">Clique aqui</a>.',
-  "Nenhuma das opções listadas": "Descreva o problema."
-};
+    chamado.addEventListener('input', checkInputs);
+    posto.addEventListener('input', checkInputs);
+    patrimonio.addEventListener('input', checkInputs);
 
-function selectModel(modelo) {
-  modeloSelecionado = modelo;
-  problemInput.classList.remove('hidden');
+    function selectModel(modelo) {
+      modeloSelecionado = modelo;
+      problemInput.classList.remove('hidden');
+      erroSection.classList.remove('hidden');
+      erroButtons.innerHTML = '';
+      erroDescricao.classList.add('hidden');
+      resolvidoSection.classList.add('hidden');
+      whatsappSection.classList.add('hidden');
+      document.querySelectorAll('.info-box').forEach(e => e.remove());
 
-  if (modelo === 'i2-X2') {
-    erroSection.classList.remove('hidden');
-    renderErroButtons(erros);
-  } else if (modelo === 'i3-X3') {
-    erroSection.classList.remove('hidden');
-    renderErroButtons(erros_i3x3);
-  }
-}
+      if (modelo === 'i2-X2') {
+        erroTitulo.textContent = "O veículo apresenta algum desses Erros?";
+        renderErroButtons(erros_i2x2);
+      } else if (modelo === 'i3-X3') {
+        erroTitulo.textContent = "O veículo apresenta algum desses problemas?";
+        renderErroButtons(erros_i3x3);
+      } else {
+        erroSection.classList.add('hidden');
+      }
+    }
 
-function renderErroButtons(erroSet) {
-  erroButtons.innerHTML = '';
-  Object.keys(erroSet).forEach(codigo => {
-    const btn = document.createElement('button');
-    btn.className = 'vehicle-button';
-    btn.textContent = codigo;
-    btn.onclick = () => showErroInfo(codigo, erroSet);
-    erroButtons.appendChild(btn);
-  });
-}
+    function renderErroButtons(erroSet) {
+      Object.keys(erroSet).forEach(codigo => {
+        const btn = document.createElement('button');
+        btn.className = 'vehicle-button';
+        btn.textContent = codigo;
+        btn.onclick = () => showErroInfo(codigo, erroSet);
+        erroButtons.appendChild(btn);
+      });
+    }
 
-function showErroInfo(codigo, erroSet) {
-  erroSelecionado = codigo;
-  erroDescricao.classList.add('hidden');
-  resolvidoSection.classList.add('hidden');
-  whatsappSection.classList.add('hidden');
+    function showErroInfo(codigo, erroSet) {
+      erroSelecionado = codigo;
+      erroDescricao.classList.add('hidden');
+      resolvidoSection.classList.add('hidden');
+      whatsappSection.classList.add('hidden');
+      document.querySelectorAll('.info-box').forEach(e => e.remove());
 
-  const infoBox = document.querySelector('.info-box');
-  if (infoBox) infoBox.remove();
+      const box = document.createElement('div');
+      box.className = 'info-box';
+      box.innerHTML = erroSet[codigo];
+      erroSection.appendChild(box);
 
-  const box = document.createElement('div');
-  box.className = 'info-box';
-  box.innerHTML = erroSet[codigo];
-  erroSection.appendChild(box);
+      if (codigo === 'Nenhuma das opções listadas') {
+        erroDescricao.classList.remove('hidden');
+      } else {
+        resolvidoSection.classList.remove('hidden');
+      }
+    }
 
-  if (codigo === 'Nenhuma das opções listadas') {
-    erroDescricao.classList.remove('hidden');
-  } else {
-    resolvidoSection.classList.remove('hidden');
-  }
+    function setResolvido(resposta) {
+      resolvido = resposta;
+      whatsappSection.classList.remove('hidden');
+    }
 
-  whatsappSection.classList.remove('hidden');
-}
-</script>
+    function enviarWhatsApp(numero) {
+      const problema = document.getElementById('problema').value.trim();
+      const descricao = descricaoErro.value.trim();
+
+      let mensagem = `*Chamado:* *${chamado.value.trim()}*\n`;
+      mensagem += `*Posto:* *${posto.value.trim()}*\n`;
+      mensagem += `*Patrimônio:* *${patrimonio.value.trim()}*\n`;
+      mensagem += `*Modelo:* *${modeloSelecionado}*\n`;
+      mensagem += `*Problema informado:* *${problema}*\n`;
+      if (erroSelecionado) {
+        mensagem += `*Erro:* *${erroSelecionado}*\n`;
+        if (erroSelecionado === 'Nenhuma das opções listadas') {
+          mensagem += `*Descrição:* *
 
 
