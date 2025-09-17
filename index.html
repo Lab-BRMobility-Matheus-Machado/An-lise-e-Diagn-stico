@@ -15,7 +15,7 @@
     padding:18px;
     box-sizing:border-box;
     /* logo de fundo (marca d'água) */
-    background-image: url('logotipo novo.jpg');
+    background-image: url('logo novo.jpg');
     background-repeat:no-repeat;
     background-position:center top;
     background-size: 600px auto;
@@ -333,16 +333,6 @@ function finalizarFluxo(){
   const problema = respostas.problema || "";
   const errosTexto = respostas.erros.join('; ');
 
-  // montar mensagem com *negrito* nas respostas
-  let mensagem = "";
-  mensagem += "Chamado: *" + chamado + "*\n";
-  mensagem += "Posto: *" + posto + "*\n";
-  mensagem += "Patrimônio: *" + patrimonio + "*\n";
-  mensagem += "Modelo: *" + modelo + "*\n";
-  mensagem += "Problema: *" + problema + "*\n";
-  mensagem += "Erros: *" + errosTexto + "*\n";
-  if(respostas.resolvido !== null){
-    mensagem += "Foi possível resolver o chamado? *" + respostas.resolvido + "*\n";
   }
 
   // exibir preview (não codificado)
