@@ -72,7 +72,8 @@
       display: none;
     }
 
-    .vehicle-section h3 {
+    .vehicle-section h3,
+    #erroSection h3 {
       text-align: center;
       font-size: 1.8em;
       margin-top: 40px;
@@ -117,6 +118,14 @@
       resize: none;
     }
 
+    #whatsappSection button {
+      background-color: #25D366;
+    }
+
+    #whatsappSection button:hover {
+      background-color: #1DA851;
+    }
+
     footer {
       text-align: center;
       margin-top: 50px;
@@ -131,6 +140,7 @@
 </head>
 <body>
   <div class="overlay">
+    <!-- Seção 01 -->
     <h1>Análise e Reparo em Campo Grupo BRMobility</h1>
     <h2>Este site tem o intuito de auxiliar as manutenções em campo dos nossos Técnicos Externos, oferecendo mais velocidade em diagnóstico e reparos, assim como instruir e capacitar cada vez mais o conhecimento dos veículos do Grupo BRMobility.</h2>
     <div class="alert">Esse site não deve ser compartilhado com clientes ou outras pessoas que não façam parte do Grupo BRMobility.</div>
@@ -164,35 +174,41 @@
       </div>
     </div>
 
+    <!-- Seção 03 -->
+    <div id="erroSection" class="hidden">
+      <h3>O veículo apresenta algum desses Erros? O erro aparece no display do controle remoto.</h3>
+      <div class="button-group" id="erroButtons"></div>
+
+      <div id="erroDescricao" class="problem-input hidden">
+        <h3>Descreva o problema:</h3>
+        <textarea id="descricaoErro" placeholder="Descreva aqui o problema..."></textarea>
+      </div>
+
+      <div id="resolvidoSection" class="problem-input hidden">
+        <h3>Foi possível resolver o chamado?</h3>
+        <div class="button-group">
+          <button class="vehicle-button" onclick="setResolvido('Sim')">Sim</button>
+          <button class="vehicle-button" onclick="setResolvido('Não')">Não</button>
+        </div>
+      </div>
+
+      <div id="whatsappSection" class="problem-input hidden">
+        <h3>Finalizar e enviar via WhatsApp</h3>
+        <div class="button-group">
+          <button class="vehicle-button" onclick="enviarWhatsApp()">Enviar</button>
+        </div>
+      </div>
+    </div>
+
     <footer>
       <img src="logotipo empresa.jpg" alt="Logo BRMobility">
     </footer>
   </div>
 
-  <script>
-    const chamado = document.getElementById('chamado');
-    const posto = document.getElementById('posto');
-    const patrimonio = document.getElementById('patrimonio');
-    const vehicleSection = document.getElementById('vehicleSection');
-    const problemInput = document.getElementById('problemInput');
-
-    function checkInputs() {
-      if (chamado.value.trim() && posto.value.trim() && patrimonio.value.trim()) {
-        vehicleSection.classList.remove('hidden');
-      }
-    }
-
-    chamado.addEventListener('input', checkInputs);
-    posto.addEventListener('input', checkInputs);
-    patrimonio.addEventListener('input', checkInputs);
-
-    function selectModel(modelo) {
-      sessionStorage.setItem('modeloVeiculo', modelo);
-      problemInput.classList.remove('hidden');
-    }
-  </script>
+  <!-- JavaScript será enviado na próxima parte -->
 </body>
 </html>
+
 
 
 
