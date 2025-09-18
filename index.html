@@ -1,971 +1,834 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="pt-BR">
 <head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Análise e Reparo em Campo - Grupo BRMobility</title>
-  <style>
-    :root{
-      --primary: #0b57a4;
-      --accent: #f2b705;
-      --bg-overlay: rgba(255,255,255,0.96);
-      --card-radius: 14px;
-      --btn-radius: 12px;
-      --max-width: 820px;
-      --gap: 12px;
-    }
-    html,body{
-      height:100%;
-      margin:0;
-      font-family: -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-      -webkit-font-smoothing:antialiased;
-      -moz-osx-font-smoothing:grayscale;
-      background: #f4f6f8;
-      color:#111;
-    }
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
+<title>Análise e Reparo em Campo — BRMobility</title>
+<style>
+  :root{
+    --primary:#0b57a4;
+    --accent:#f2b705;
+    --bg-overlay: rgba(255,255,255,0.95);
+    --card-radius:14px;
+    --max-width:820px;
+    --footer-height:96px;
+  }
+  html,body{
+    height:100%;
+    margin:0;
+    font-family: -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    -webkit-font-smoothing:antialiased;
+    background: #f4f6f8;
+  }
 
-    /* Page layout - footer at the end, never overlays content */
-    .site {
-      min-height:100vh;
-      display:flex;
-      flex-direction:column;
-      align-items:center;
-      gap:16px;
-      padding:18px;
-      box-sizing:border-box;
-    }
+  /* Background logo fixed and fully visible */
+  .bg-fixed {
+    position:fixed;
+    inset:0;
+    pointer-events:none;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    z-index:0;
+  }
+  .bg-fixed img{
+    max-width:90%;
+    max-height:90%;
+    object-fit:contain;
+    opacity:0.12; /* subtle watermark */
+  }
 
-    .content {
-      width:100%;
-      max-width:var(--max-width);
-      display:flex;
-      flex-direction:column;
-      gap:var(--gap);
-    }
+  /* App container */
+  .app {
+    position:relative;
+    z-index:1;
+    min-height:100vh;
+    box-sizing:border-box;
+    padding:20px;
+    padding-bottom: calc(var(--footer-height) + 24px); /* space for fixed footer */
+    display:flex;
+    align-items:flex-start;
+    justify-content:center;
+  }
+  .wrap{
+    width:100%;
+    max-width:var(--max-width);
+    display:flex;
+    flex-direction:column;
+    gap:16px;
+  }
 
-    /* Card style */
-    .card {
-      background:var(--bg-overlay);
-      border-radius:var(--card-radius);
-      padding:16px;
-      box-shadow:0 8px 20px rgba(0,0,0,0.08);
-      box-sizing:border-box;
-    }
+  .card{
+    background:var(--bg-overlay);
+    border-radius:var(--card-radius);
+    padding:16px;
+    box-shadow:0 8px 24px rgba(0,0,0,0.08);
+  }
 
-    /* First section centered */
-    .centered {
-      text-align:center;
-    }
-    h1 { margin:6px 0; font-size:22px; line-height:1.05; }
-    p.subtitle { margin:6px 0 10px 0; font-size:14px; color:#222; }
+  /* first section center */
+  .center{text-align:center;}
+  h1{margin:6px 0; font-size:22px; line-height:1.05;}
+  p.subtitle{margin:6px 0 12px; font-size:14px; color:#222;}
 
-    .alert {
-      font-size:13px;
-      color:#b22222;
-      display:flex;
-      align-items:center;
-      gap:8px;
-      justify-content:center;
-      margin-bottom:8px;
-    }
+  .alert{
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    gap:8px;
+    color:#b22222;
+    font-size:13px;
+  }
 
-    .field {
-      width:100%;
-      display:block;
-      margin:8px 0;
-    }
+  input[type="text"], textarea, select{
+    width:100%;
+    padding:12px;
+    border-radius:10px;
+    border:1px solid #dcdcdc;
+    font-size:15px;
+    box-sizing:border-box;
+    background:white;
+  }
+  textarea{ min-height:100px; resize:vertical; }
 
-    input[type="text"], textarea, select {
-      width:100%;
-      padding:12px 14px;
-      border-radius:10px;
-      border:1px solid #d7d7d7;
-      font-size:15px;
-      box-sizing:border-box;
-      background:white;
-    }
-    textarea { min-height:100px; resize:vertical; }
+  .btn{
+    width:100%;
+    padding:12px;
+    border-radius:12px;
+    border:none;
+    font-weight:700;
+    cursor:pointer;
+    font-size:15px;
+    box-sizing:border-box;
+  }
+  .btn-primary{ background:var(--primary); color:white; }
+  .btn-accent{ background:var(--accent); color:#111; }
 
-    .btn {
-      padding:12px;
-      border-radius:12px;
-      border:none;
-      cursor:pointer;
-      font-weight:700;
-      font-size:15px;
-      width:100%;
-      box-sizing:border-box;
-    }
-    .btn-primary { background:var(--primary); color:white; }
-    .btn-accent { background:var(--accent); color:#111; }
+  .options{ display:flex; flex-direction:column; gap:10px; }
+  .option-btn{
+    text-align:left;
+    padding:12px;
+    border-radius:10px;
+    border:1px solid #e6e6e6;
+    background:white;
+    cursor:pointer;
+    font-size:15px;
+  }
+  .option-btn.active{ border-color:var(--primary); box-shadow:0 6px 18px rgba(11,87,164,0.06); }
 
-    .options { display:flex; flex-direction:column; gap:10px; }
+  .solution{
+    margin-top:8px;
+    padding:10px;
+    border-radius:8px;
+    background:white;
+    border:1px solid #eee;
+    display:none;
+    font-size:14px;
+  }
 
-    .option-btn {
-      text-align:left;
-      padding:12px;
-      border-radius:10px;
-      border:1px solid #e3e3e3;
-      background:white;
-      cursor:pointer;
-      font-size:15px;
-    }
-    .option-btn.active { border-color:var(--primary); box-shadow:0 4px 12px rgba(11,87,164,0.08); }
+  .small{ font-size:13px; color:#444; }
 
-    .solution {
-      margin-top:8px;
-      padding:10px;
-      background:#fff;
-      border-radius:10px;
-      border:1px solid #eee;
-      display:none; /* hidden until option clicked */
-      font-size:14px;
-    }
+  /* fixed footer (won't overlay because padding-bottom reserved) */
+  footer.fixed-footer{
+    position:fixed;
+    left:0;
+    bottom:0;
+    width:100%;
+    height:var(--footer-height);
+    display:flex;
+    align-items:center;
+    justify-content:center;
+    background:rgba(255,255,255,0.98);
+    border-top:1px solid #e6e6e6;
+    z-index:2;
+    box-sizing:border-box;
+    padding:12px;
+  }
+  footer.fixed-footer img{ max-height:72px; width:auto; object-fit:contain; }
 
-    .small-note { font-size:13px; color:#444; margin-top:6px; }
-
-    /* contact row */
-    .contacts {
-      display:flex;
-      gap:10px;
-      flex-direction:column;
-    }
-    @media(min-width:520px){
-      .contacts { flex-direction:row; }
-    }
-    .contact-btn{
-      display:flex;
-      align-items:center;
-      gap:10px;
-      padding:10px;
-      border-radius:10px;
-      border:1px solid #ddd;
-      background:white;
-      cursor:pointer;
-      font-weight:700;
-      justify-content:center;
-    }
-    .contact-img{ width:36px; height:36px; object-fit:contain; border-radius:6px; }
-
-    footer.site-footer {
-      width:100%;
-      max-width:var(--max-width);
-      margin:8px auto 24px auto;
-      padding:12px;
-      border-radius:12px;
-      box-shadow:0 6px 18px rgba(0,0,0,0.04);
-      background:white;
-      display:flex;
-      align-items:center;
-      justify-content:center;
-      box-sizing:border-box;
-    }
-    footer.site-footer img{ width:100%; max-width:420px; height:auto; object-fit:contain; }
-
-    /* hide helper */
-    .hidden { display:none !important; }
-
-    /* visual spacer to ensure footer not overlayed */
-    .spacer { height:8px; }
-
-  </style>
+  /* responsive tweaks */
+  @media(max-width:520px){
+    h1{ font-size:20px; }
+    .bg-fixed img{ max-width:95%; }
+  }
+</style>
 </head>
 <body>
-  <div class="site">
-    <div class="content" id="app">
-
-      <!-- FIRST: header card centered -->
-      <div class="card centered" id="card-1">
-        <header>
-          <h1>Análise e Reparo em Campo Grupo BRMobility</h1>
-          <p class="subtitle">Este site tem o intuito de auxiliar as manutenções em campo dos nossos Técnicos Externos, oferecendo mais velocidade em diagnóstico e reparos, assim como instruir e capacitar cada vez mais o conhecimento dos veículos do Grupo BRMobility.</p>
-          <div class="alert">⚠ <span>Esse site não deve ser compartilhado com clientes ou pessoas externas ao Grupo BRMobility.</span></div>
-        </header>
-
-        <div style="margin-top:8px;">
-          <input id="inputChamado" class="field" type="text" placeholder="por exemplo #20991" />
-          <input id="inputPosto" class="field" type="text" placeholder="por exemplo Shopping BRMobility" />
-          <input id="inputPatrimonio" class="field" type="text" placeholder="por exemplo 0123" />
-          <div class="small-note">Preencha os campos acima para prosseguir.</div>
-          <button id="btnToModel" class="btn btn-primary hidden" style="margin-top:12px;">Próximo: Modelo do veículo</button>
-        </div>
-      </div>
-
-      <!-- MODEL SELECTION -->
-      <div class="card hidden" id="card-modelo">
-        <h2 style="margin:0 0 10px 0; text-align:center;">Qual o modelo do veículo?</h2>
-        <div class="options" id="modelosList">
-          <!-- dynamically created -->
-        </div>
-      </div>
-
-      <!-- PROBLEM DESCRIPTION -->
-      <div class="card hidden" id="card-desc">
-        <h2 style="margin:0 0 8px 0;">Qual o problema descrito no chamado ou informado pelo cliente?</h2>
-        <textarea id="inputDescricao" placeholder="Descreva o problema..."></textarea>
-        <div class="small-note">Preencha para prosseguir.</div>
-      </div>
-
-      <!-- i2-X2 ERRORS -->
-      <div class="card hidden" id="card-i2">
-        <h2 style="margin:0 0 8px 0;">O veículo apresenta algum desses Erros? (aparece no display remoto)</h2>
-        <div class="options" id="i2-options"></div>
-
-        <div id="i2-describe" class="hidden" style="margin-top:8px;">
-          <textarea id="i2-describe-txt" placeholder="Descreva o problema..."></textarea>
-        </div>
-
-        <div id="i2-resolved" class="hidden" style="margin-top:10px;">
-          <div style="font-weight:700; margin-bottom:6px;">Foi possível resolver o chamado?</div>
-          <div style="display:flex; gap:8px;">
-            <button class="btn btn-accent" onclick="setResolved('i2','Sim')">Sim</button>
-            <button class="btn" onclick="setResolved('i2','Não')">Não</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- i3-X3 -->
-      <div class="card hidden" id="card-i3">
-        <h2 style="margin:0 0 8px 0;">O veículo apresenta algum desses problemas?</h2>
-        <div class="options" id="i3-options"></div>
-
-        <div id="i3-describe" class="hidden" style="margin-top:8px;">
-          <textarea id="i3-describe-txt" placeholder="Descreva o problema..."></textarea>
-        </div>
-
-        <div id="i3-resolved" class="hidden" style="margin-top:10px;">
-          <div style="font-weight:700; margin-bottom:6px;">Foi possível resolver o chamado?</div>
-          <div style="display:flex; gap:8px;">
-            <button class="btn btn-accent" onclick="setResolved('i3','Sim')">Sim</button>
-            <button class="btn" onclick="setResolved('i3','Não')">Não</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- S6 -->
-      <div class="card hidden" id="card-s6">
-        <h2 style="margin:0 0 8px 0;">O veículo apresenta algum desses problemas? (S6)</h2>
-        <div class="options" id="s6-options"></div>
-
-        <div id="s6-describe" class="hidden" style="margin-top:8px;">
-          <textarea id="s6-describe-txt" placeholder="Descreva o problema..."></textarea>
-        </div>
-
-        <div id="s6-resolved" class="hidden" style="margin-top:10px;">
-          <div style="font-weight:700; margin-bottom:6px;">Foi possível resolver o chamado?</div>
-          <div style="display:flex; gap:8px;">
-            <button class="btn btn-accent" onclick="setResolved('s6','Sim')">Sim</button>
-            <button class="btn" onclick="setResolved('s6','Não')">Não</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- S8 / R8 / BR8 (Erros 1-47) -->
-      <div class="card hidden" id="card-s8">
-        <h2 style="margin:0 0 8px 0;">S8-R8-BR8 - Códigos de erro (1 a 47)</h2>
-        <div style="margin-bottom:8px;" class="small-note">Caso haja um código, digite-o abaixo (somente número). Se não identificar, coloque 0 para listar todas as opções.</div>
-        <input id="s8-code" type="text" placeholder="Ex: 32 ou 0" />
-        <div id="s8-list" class="options" style="margin-top:10px;"></div>
-
-        <div id="s8-describe" class="hidden" style="margin-top:8px;">
-          <textarea id="s8-describe-txt" placeholder="Descreva o problema..."></textarea>
-        </div>
-
-        <div id="s8-resolved" class="hidden" style="margin-top:10px;">
-          <div style="font-weight:700; margin-bottom:6px;">Foi possível resolver o chamado?</div>
-          <div style="display:flex; gap:8px;">
-            <button class="btn btn-accent" onclick="setResolved('s8','Sim')">Sim</button>
-            <button class="btn" onclick="setResolved('s8','Não')">Não</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- S9 -->
-      <div class="card hidden" id="card-s9">
-        <h2 style="margin:0 0 8px 0;">S9-S9X - Problemas</h2>
-        <div class="options" id="s9-options"></div>
-        <div id="s9-describe" class="hidden" style="margin-top:8px;">
-          <textarea id="s9-describe-txt" placeholder="Descreva o problema..."></textarea>
-        </div>
-        <div id="s9-resolved" class="hidden" style="margin-top:10px;">
-          <div style="font-weight:700; margin-bottom:6px;">Foi possível resolver o chamado?</div>
-          <div style="display:flex; gap:8px;">
-            <button class="btn btn-accent" onclick="setResolved('s9','Sim')">Sim</button>
-            <button class="btn" onclick="setResolved('s9','Não')">Não</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- S10 -->
-      <div class="card hidden" id="card-s10">
-        <h2 style="margin:0 0 8px 0;">S10-S10X - Observações e Erros</h2>
-        <div class="small-note">Observações: Display do Veículo; Aplicativo. (Mostrado ao selecionar S10)</div>
-        <div class="options" id="s10-options"></div>
-        <div id="s10-describe" class="hidden" style="margin-top:8px;">
-          <textarea id="s10-describe-txt" placeholder="Descreva o problema..."></textarea>
-        </div>
-        <div id="s10-resolved" class="hidden" style="margin-top:10px;">
-          <div style="font-weight:700; margin-bottom:6px;">Foi possível resolver o chamado?</div>
-          <div style="display:flex; gap:8px;">
-            <button class="btn btn-accent" onclick="setResolved('s10','Sim')">Sim</button>
-            <button class="btn" onclick="setResolved('s10','Não')">Não</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- H9 -->
-      <div class="card hidden" id="card-h9">
-        <h2 style="margin:0 0 8px 0;">H9-H9X - Problemas</h2>
-        <div class="options" id="h9-options"></div>
-        <div id="h9-describe" class="hidden" style="margin-top:8px;">
-          <textarea id="h9-describe-txt" placeholder="Descreva o problema..."></textarea>
-        </div>
-        <div id="h9-resolved" class="hidden" style="margin-top:10px;">
-          <div style="font-weight:700; margin-bottom:6px;">Foi possível resolver o chamado?</div>
-          <div style="display:flex; gap:8px;">
-            <button class="btn btn-accent" onclick="setResolved('h9','Sim')">Sim</button>
-            <button class="btn" onclick="setResolved('h9','Não')">Não</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- IMAGE UPLOAD -->
-      <div class="card hidden" id="card-image">
-        <h2 style="margin:0 0 8px 0;">Upload de imagem (opcional)</h2>
-        <input id="file-input" type="file" accept="image/*" />
-        <div id="preview" class="small-note hidden"></div>
-        <div class="small-note" style="margin-top:8px;">Se o navegador aceitar compartilhamento de arquivos (Web Share API), a imagem poderá ser enviada diretamente pelo botão de envio. Caso contrário, a imagem deverá ser anexada manualmente no WhatsApp após abrir o chat.</div>
-      </div>
-
-      <!-- FINAL: Faltou algo? -->
-      <div class="card hidden" id="card-final">
-        <h2 style="margin:0 0 8px 0;">Faltou algo nesse site de diagnóstico?</h2>
-        <textarea id="final-extra" placeholder="Se sim, descreva aqui... (opcional)"></textarea>
-        <div class="small-note" style="margin-top:8px;">Quando tudo estiver preenchido os contatos aparecerão para envio.</div>
-      </div>
-
-      <!-- ACTIONS: Contacts/buttons -->
-      <div class="card hidden" id="card-actions">
-        <h2 style="margin:0 0 8px 0;">Enviar via WhatsApp</h2>
-        <div class="contacts">
-          <button class="contact-btn" id="btn-vanessa">
-            <img class="contact-img" src="logotipo vanessa.jpg" alt="Vanessa" />
-            Analista de Relacionamento<br/>Vanessa Rodrigues<br/><small>+55 11 98947-7808</small>
-          </button>
-          <button class="contact-btn" id="btn-willian">
-            <img class="contact-img" src="logotipo willian.jpg" alt="Willian" />
-            Analista de Relacionamento<br/>Willian Bertuzzi<br/><small>+55 11 95654-4217</small>
-          </button>
-        </div>
-        <div style="margin-top:10px;" class="small-note">Ao clicar em um contato: no celular o app do WhatsApp abrirá com a mensagem pronta (se seu navegador permitir anexar imagem automaticamente, ela será enviada via compartilhamento nativo). Caso não seja possível anexar automaticamente, abra o chat e anexe a imagem manualmente.</div>
-      </div>
-
-    </div>
-
-    <!-- Footer with large logo spanning mobile width -->
-    <footer class="site-footer" id="site-footer">
-      <img src="logotipo empresa.jpg" alt="BRMobility" />
-    </footer>
-
+  <!-- Background watermark/logo fixed and centered -->
+  <div class="bg-fixed" aria-hidden="true">
+    <!-- place your 'logotipo empresa.jpg' file in the same folder as this HTML -->
+    <img src="logotipo empresa.jpg" alt="BRMobility Logo" />
   </div>
 
-  <script>
-    /* ---------- Data from prompt (solutions) ---------- */
+  <div class="app">
+    <div class="wrap">
 
-    const i2Errors = [
-      {code:'C010/C018', text:'Inclinação frontal excessiva. Solicite a troca do veículo imediatamente.'},
-      {code:'C020/C028', text:'Inclinação traseira excessiva. Solicite a troca do veículo imediatamente.'},
-      {code:'C040/C048', text:'Limitador de velocidade frontal/traseiro ativado. Realize o procedimento pelo link: clique aqui (https://drive.google.com/file/d/1uHcirgVcKM_FAG7NPW4spNOP2jF6cpio/view?usp=drive_link)'},
-      {code:'C100/C108', text:'Bateria traseira/frontal vazia. Solicite a troca de bateria imediatamente.'},
-      {code:'C200/C208', text:'Desligamento da bateria traseira/frontal. Solicite a troca de bateria imediatamente.'},
-      {code:'C400/C408', text:'Ângulo de rotação excedido. Realize a solicitação de pivô mecânico para a troca.'},
-      {code:'C800/C808', text:'Baixa voltagem do barramento. Solicite imediatamente a troca do veículo.'},
-      {code:'E012/E01A/E01B', text:'Falha na comunicação com o módulo CU. Solicite imediatamente a troca do veículo.'},
-      {code:'E022/E02A/E02B', text:'Falha na comunicação com o módulo BSA. Solicite imediatamente a troca do veículo.'},
-      {code:'E042/E04A/E04B', text:'Falha na comunicação com o módulo BSA. Solicite imediatamente a troca do veículo.'},
-      {code:'E082/E08A/E08B', text:'Falha na comunicação com o módulo UI. Solicite imediatamente a troca do veículo.'},
-      {code:'E202/E20A/E20B', text:'Falha no slot TDM. Solicite imediatamente a troca do veículo.'},
-      {code:'E402/E40A/E40B', text:'Falha na comunicação remota com o BSA. Solicite imediatamente a troca do veículo.'},
-      {code:'E802/E80A/E80B', text:'Falha na comunicação remota com o UI. Solicite imediatamente a troca do veículo.'},
-      {code:'E013/E01C/E02C', text:'Falha na comunicação com o módulo BCU. Solicite imediatamente a troca do veículo.'},
-      {code:'E014/E024/E044', text:'Falha no sensor de pivô. Solicite um sensor de pivô para a troca.'},
-      {code:'E084/E104/E204', text:'Falha nos sensores auxiliares. Solicite imediatamente a troca do veículo.'},
-      {code:'E404/E40C', text:'Falha no sensor de detecção do piloto. Solicite imediatamente a troca do veículo.'},
-      {code:'E804/E80C', text:'Falha no sensor de alimentação. Solicite um conjunto de placa fonte para a troca.'},
-      {code:'E015/E025/E045', text:'Falha nos sensores de alimentação (12V, 5V, 3V). Solicite imediatamente a troca do veículo.'},
-      {code:'E085/E105/E205', text:'Falha no sensor de temperatura do BSA. Solicite um par de baterias para a troca.'},
-      {code:'E105/E205/E405', text:'Falha interna do BSA. Solicite imediatamente a troca do veículo.'},
-      {code:'E016/E026/E046', text:'Falha na temperatura da junção. Solicite imediatamente a troca do veículo.'},
-      {code:'E086/E106/E206', text:'Falha no motor de acionamento. Solicite um par de motores para a troca.'},
-      {code:'E406/E406', text:'Falha no amplificador de corrente do motor. Solicite um par de motores para a troca.'},
-      {code:'E806/E806', text:'Falha no feedback de voltagem do motor. Solicite um par de motores para a troca.'},
-      {code:'E017/E027/E047', text:'Falha na consistência da voltagem do motor.'},
-      {code:'E087/E107/E207', text:'Falha no relé do motor. Solicite um par de motores para a troca.'},
-      {code:'E407/E407', text:'Falha na consistência da alimentação do atuador. Solicite imediatamente a troca do veículo.'},
-      {code:'Nenhuma', text:'Nenhuma das opções listadas. Descreva o problema.'}
-    ];
+      <!-- 1) Header card -->
+      <section class="card center" id="card-1">
+        <h1>Análise e Reparo em Campo — Grupo BRMobility</h1>
+        <p class="subtitle">Este site tem o intuito de auxiliar as manutenções em campo dos nossos Técnicos Externos, oferecendo mais velocidade em diagnóstico e reparos, assim como instruir e capacitar cada vez mais o conhecimento dos veículos do Grupo BRMobility.</p>
+        <div class="alert">⚠ <span>Esse site não deve ser compartilhado com clientes ou pessoas externas ao Grupo BRMobility.</span></div>
 
-    const i3Problems = [
-      {label:'Veículo não liga', text:'Realizar o Reset do veículo e testá-lo. Verificar baterias do controle remoto (cada uma ~2,5V, total >7,5V). Verificar baterias do veículo (>54V). Se tudo ok e não ligar, solicitar troca do veículo.'},
-      {label:'Veículo com baixa autonomia', text:'Verificar tensão do carregador (>=81,5V). Se ok, solicitar troca de baterias do veículo.'},
-      {label:'Veículo não carrega', text:'Verificar tensão do carregador (>=81,5V). Se ok, solicitar troca do veículo.'},
-      {label:'Veículo com rodas travando', text:'Solicitar troca do veículo.'},
-      {label:'Veículo aceso mas não liga', text:'Realizar reset; verificar baterias do controle; se ok, solicitar troca do veículo.'},
-      {label:'Carregador não funciona', text:'Solicitar troca de carregador.'},
-      {label:'Veículo trepidando', text:'Verificar integridade do chassi e couplings.'},
-      {label:'Veículo puxando/girando', text:'Realizar calibração de postura com controle remoto original.'},
-      {label:'Controle Remoto não funciona', text:'Verificar integridade de carga da bateria do controle e realizar procedimento de pareamento. (link: https://drive.google.com/file/d/16v-38oSKjsfVL9yQnxwbRFtX-6Uf1Fja/view?usp=drive_link)'},
-      {label:'Veículo não acelera', text:'Realizar ajuste de velocidade pelo controle remoto original. (link: https://drive.google.com/file/d/16xl1z4yneIkh3JyjbaL8c0XnuSHmrGy2/view?usp=drive_link)'},
-      {label:'Veículo muito pra frente/pra trás', text:'Realizar calibração de postura com o controle remoto original. (link: https://drive.google.com/file/d/172xePg7Ko2ZNJNlACqlLhETxmGec20Lt/view?usp=drive_link)'},
-      {label:'Nenhuma', text:'Nenhuma das opções listadas. Descreva o problema.'}
-    ];
+        <div style="margin-top:12px; display:flex; flex-direction:column; gap:10px;">
+          <input id="field-chamado" type="text" placeholder="por exemplo #20991" autocomplete="off" />
+          <input id="field-posto" type="text" placeholder="por exemplo Shopping BRMobility" autocomplete="off" />
+          <input id="field-patrimonio" type="text" placeholder="por exemplo 0123" autocomplete="off" />
+          <div class="small">Preencha os 3 campos acima para prosseguir.</div>
+          <button id="btn-to-model" class="btn btn-primary" style="display:none; margin-top:8px;">Próximo: Modelo do veículo</button>
+        </div>
+      </section>
 
-    const s6Problems = [
-      {label:'Veículo não liga', text:'Solicitar imediatamente a troca do veículo.'},
-      {label:'Veículo apitando', text:'Solicitar imediatamente a troca do veículo.'},
-      {label:'Veículo não carrega', text:'Verificar conector de carga (GX14 3 vias Macho), e carregador (66-67.5V). Se necessário, solicitar troca.'},
-      {label:'Veículo andando sozinho', text:'Verificar integridade do tapete/assoalho; instruir o condutor sobre modo acompanhante.'},
-      {label:'Veículo desligando sozinho', text:'Solicitar troca de bateria. (link: https://drive.google.com/file/d/18tKva_egKDP7MeAm7ObcsHbafMtJe0Fi/view?usp=drive_link)'},
-      {label:'Veículo girando', text:'Realizar calibração de postura. (link: https://drive.google.com/file/d/19kLMW1rWbcsAxmkPGM_woMHKQ0uir6oM/view?usp=drive_link)'},
-      {label:'Veículo com rodas travadas', text:'Solicitar imediatamente a troca do veículo.'},
-      {label:'Display quebrado', text:'Solicitar troca de display.'},
-      {label:'Nenhuma', text:'Nenhuma das opções listadas. Descreva o problema.'}
-    ];
+      <!-- 2) Model selection -->
+      <section class="card" id="card-model" style="display:none;">
+        <h2 style="margin:0 0 10px 0; text-align:center;">Qual o modelo do veículo?</h2>
+        <div class="options" id="models-list"></div>
+      </section>
 
-    const s9Problems = [
-      {label:'Veículo não liga', text:'Verificar tensão de bateria (>44V). Se morta, substituir; se ok, solicitar troca da placa mãe.'},
-      {label:'Veículo não desliga', text:'Testar continuidade do botão on-off. Se ok, solicitar troca da placa mãe.'},
-      {label:'Veículo não reconhece condutor', text:'Verificar assoalho e calibração; se ok, solicitar troca da placa mãe.'},
-      {label:'Veículo não carrega', text:'Solicitar troca do veículo imediatamente.'},
-      {label:'Veículo com rodas travadas', text:'Solicitar troca do veículo imediatamente.'},
-      {label:'Veículo desligando sozinho', text:'Solicitar troca de bateria do veículo.'},
-      {label:'Nenhuma', text:'Nenhuma das opções listadas. Descreva o problema.'}
-    ];
+      <!-- 3) Problem description (appears after model selected) -->
+      <section class="card" id="card-desc" style="display:none;">
+        <h2 style="margin:0 0 10px 0;">Qual o problema descrito no chamado ou informado pelo cliente?</h2>
+        <textarea id="field-descricao" placeholder="Descreva o problema..."></textarea>
+        <div class="small">Preencha para prosseguir.</div>
+      </section>
 
-    const s10Problems = [
-      {label:'Erro 1 - chave inglesa 1 vez', text:'Falha na Bateria (sobre tensão). Solicitar troca de bateria.'},
-      {label:'Erro 2 - chave inglesa 2 vezes', text:'Falha no Sensor de Pivô. Solicitar troca do sensor.'},
-      {label:'Erro 3 - chave inglesa 4 vezes', text:'Falha no Motor Direito. Solicitar troca do veículo.'},
-      {label:'Erro 4 - chave inglesa 5 vezes', text:'Falha no Motor Esquerdo. Solicitar troca do veículo.'},
-      {label:'Erro 5 - chave inglesa 7 vezes', text:'Falha no Sensor de Pé (identificar qual sensor não é possível pelo painel).'},
-      {label:'Nenhuma', text:'Nenhuma das opções listadas. Descreva o problema.'}
-    ];
+      <!-- 4) Model-specific cards -->
+      <!-- i2-X2 -->
+      <section class="card" id="card-i2" style="display:none;">
+        <h2 style="margin:0 0 8px 0;">Erros — i2-X2</h2>
+        <div class="options" id="i2-list"></div>
+        <div id="i2-describe" style="display:none; margin-top:8px;">
+          <textarea id="i2-custom" placeholder="Descreva o problema..."></textarea>
+        </div>
+        <div id="i2-resolved" style="display:none; margin-top:10px;">
+          <div style="font-weight:700; margin-bottom:6px;">Foi possível resolver o chamado?</div>
+          <div style="display:flex; gap:8px;">
+            <button class="btn btn-accent" onclick="markResolved('Sim')">Sim</button>
+            <button class="btn" onclick="markResolved('Não')">Não</button>
+          </div>
+        </div>
+      </section>
 
-    const h9Problems = [
-      {label:'Veículo não liga', text:'Solicitar troca do veículo imediatamente.'},
-      {label:'Veículo não desliga', text:'Solicitar troca do veículo imediatamente.'},
-      {label:'Veículo não reconhece condutor', text:'Solicitar troca do veículo imediatamente.'},
-      {label:'Veículo não carrega', text:'Solicitar troca do veículo imediatamente.'},
-      {label:'Veículo com rodas travadas', text:'Solicitar troca do veículo imediatamente.'},
-      {label:'Veículo desligando sozinho', text:'Solicitar troca do veículo imediatamente.'},
-      {label:'Nenhuma', text:'Nenhuma das opções listadas. Descreva o problema.'}
-    ];
+      <!-- i3-X3 -->
+      <section class="card" id="card-i3" style="display:none;">
+        <h2 style="margin:0 0 8px 0;">Problemas — i3-X3</h2>
+        <div class="options" id="i3-list"></div>
+        <div id="i3-describe" style="display:none; margin-top:8px;">
+          <textarea id="i3-custom" placeholder="Descreva o problema..."></textarea>
+        </div>
+        <div id="i3-resolved" style="display:none; margin-top:10px;">
+          <div style="font-weight:700; margin-bottom:6px;">Foi possível resolver o chamado?</div>
+          <div style="display:flex; gap:8px;">
+            <button class="btn btn-accent" onclick="markResolved('Sim')">Sim</button>
+            <button class="btn" onclick="markResolved('Não')">Não</button>
+          </div>
+        </div>
+      </section>
 
-    /* S8 errors 1..47 as described in prompt */
-    const s8Errors = [
-      {n:1, text:'Falha no Sensor Hall direito. Solicite a troca da placa Drive do veículo.'},
-      {n:2, text:'Falha no Sensor Hall esquerdo. Solicite a troca da placa Drive do veículo.'},
-      {n:3, text:'Falha no Encoder do Motor direito. Solicite a troca do veículo.'},
-      {n:4, text:'Falha no Encoder do Motor esquerdo. Solicite a troca do veículo.'},
-      {n:5, text:'Falha no Sensor de corrente do Motor direito. Solicite a troca do veículo.'},
-      {n:6, text:'Falha no Sensor de corrente do Motor esquerdo. Solicite a troca do veículo.'},
-      {n:7, text:'Falha no Mosfet de potência do Motor direito da placa Drive. Solicite a troca da placa Drive do veículo.'},
-      {n:8, text:'Falha no Mosfet de potência do motor esquerdo da placa Drive. Solicite a troca da placa Drive do veículo.'},
-      {n:9, text:'Falha no Mosfet inferior de potência do motor esquerdo da placa Drive. Solicite a troca da placa Drive do veículo.'},
-      {n:10, text:'Falha no Mosfet superior de potência do motor esquerdo da placa Drive. Solicite a troca da placa Drive do veículo.'},
-      {n:11, text:'Falha no Mosfet inferior de potência do motor direito da placa Drive. Solicite a troca da placa Drive do veículo.'},
-      {n:12, text:'Falha no Mosfet superior de potência do motor direito da placa Drive. Solicite a troca da placa Drive do veículo.'},
-      {n:13, text:'Falha no Motor direito. Solicite a troca do veículo.'},
-      {n:14, text:'Falha no Motor esquerdo. Solicite a troca do veículo.'},
-      {n:15, text:'Falha no Mosfet de potência geral. Solicite a troca da placa Drive do veículo.'},
-      {n:16, text:'Falha no Firmware. Solicite a troca da placa Drive do veículo.'},
-      {n:17, text:'Falha no Firmware. Solicite a troca da placa Drive do veículo.'},
-      {n:18, text:'Falha no Firmware. Solicite a troca da placa Drive do veículo.'},
-      {n:19, text:'Falha no Firmware. Solicite a troca da placa Drive do veículo.'},
-      {n:20, text:'Falha no Sensor Giroscópio. Solicite a troca da placa de Controle do veículo.'},
-      {n:21, text:'Falha na comunicação da Memoria EPROM. Solicite a troca da placa de Controle do veículo.'},
-      {n:22, text:'Falha no Sensor Giroscópio. Solicite a troca da placa de Controle do veículo.'},
-      {n:23, text:'Falha na inicialização da Memoria EPROM. Solicite a troca da placa de Controle do veículo.'},
-      {n:24, text:'Falha de Firmware da Memoria EPROM. Solicite a troca da placa de Controle do veículo.'},
-      {n:25, text:'Falha na calibração de postura. Realize a calibração de postura (link: https://drive.google.com/file/d/1EQ8Oi2MSb75m4Gh1mXrnKSdZUhh26AGJ/view?usp=drive_link)'},
-      {n:26, text:'Falha na inicialização do Sensor Giroscópio. Solicite a troca da placa de Controle do veículo.'},
-      {n:27, text:'Falha no Firmware do Sensor Giroscópio. Solicite a troca da placa de Controle do veículo.'},
-      {n:28, text:'Falha no Firmware do Sensor Giroscópio. Solicite a troca da placa de Controle do veículo.'},
-      {n:29, text:'Falha no Firmware do Sensor Giroscópio. Solicite a troca da placa de Controle do veículo.'},
-      {n:30, text:'Falha de comunicação entre placa Drive e placa de Controle do veículo. Solicite a troca do veículo imediatamente.'},
-      {n:31, text:'Falha na comunicação do Painel com a placa de Controle. Solicite um conjunto de Placa de controle e Painel para a troca.'},
-      {n:32, text:'Falha no funcionamento do Sensor AHRS. Solicite a troca da placa de Controle do veículo.'},
-      {n:33, text:'Falha no funcionamento do Sensor AHRS. Solicite a troca da placa de Controle do veículo.'},
-      {n:34, text:'Falha no Sensor de pivô. Solicite a troca do Sensor de Pivô e placa de Controle.'},
-      {n:35, text:'Falha no Mosfet da placa de alimentação. Solicite a troca da placa de alimentação do veículo.'},
-      {n:36, text:'Falha na bateria. Solicite a troca da bateria e da placa de alimentação do veículo.'},
-      {n:37, text:'Falha na bateria. Solicite a troca da bateria e da placa de alimentação do veículo.'},
-      {n:38, text:'Falha na bateria. Solicite a troca da bateria do veículo.'},
-      {n:39, text:'Falha na bateria. Solicite a troca da bateria do veículo.'},
-      {n:40, text:'Falha no Sensor de Pé. Solicite a troca do veículo.'},
-      {n:41, text:'Falha na placa de pareamento. Solicite a troca da placa do veículo.'},
-      {n:42, text:'Falha na placa de pareamento. Solicite a troca da placa do veículo.'},
-      {n:43, text:'Falha no carregador. Solicite a troca do carregador do veículo.'},
-      {n:44, text:'Falha no Firmware do veículo. Solicite a troca imediatamente.'},
-      {n:45, text:'Falha por colisão. Realize a reinicialização do veículo e calibração de postura (link: https://drive.google.com/file/d/1EQ8Oi2MSb75m4Gh1mXrnKSdZUhh26AGJ/view?usp=drive_link)'},
-      {n:46, text:'Falha na atualização do Firmware. Solicite a troca do veículo imediatamente.'},
-      {n:47, text:'Falha na atualização do Firmware. Solicite a troca do veículo imediatamente.'},
-      {n:0, text:'Listar todas as opções.'}
-    ];
+      <!-- S6 -->
+      <section class="card" id="card-s6" style="display:none;">
+        <h2 style="margin:0 0 8px 0;">Problemas — S6</h2>
+        <div class="options" id="s6-list"></div>
+        <div id="s6-describe" style="display:none; margin-top:8px;">
+          <textarea id="s6-custom" placeholder="Descreva o problema..."></textarea>
+        </div>
+        <div id="s6-resolved" style="display:none; margin-top:10px;">
+          <div style="font-weight:700; margin-bottom:6px;">Foi possível resolver o chamado?</div>
+          <div style="display:flex; gap:8px;">
+            <button class="btn btn-accent" onclick="markResolved('Sim')">Sim</button>
+            <button class="btn" onclick="markResolved('Não')">Não</button>
+          </div>
+        </div>
+      </section>
 
-    /* ---------- App state ---------- */
-    const state = {
-      chamado:'',
-      posto:'',
-      patrimonio:'',
-      modelo:'',
-      descricao:'',
-      modelSelection:'', // for options like error code or problem label
-      customDescribe:'',
-      resolved:false,
-      file:null,
-      finalExtra:''
-    };
+      <!-- S8 (1..47) -->
+      <section class="card" id="card-s8" style="display:none;">
+        <h2 style="margin:0 0 8px 0;">S8-R8-BR8 — Código de erro</h2>
+        <div class="small">Se souber o número, digite abaixo (1-47). Caso não identifique, digite 0 para listar todas as opções.</div>
+        <input id="s8-code" type="text" placeholder="Ex: 32 ou 0" style="margin-top:8px;" />
+        <div class="options" id="s8-list" style="margin-top:10px;"></div>
+        <div id="s8-describe" style="display:none; margin-top:8px;">
+          <textarea id="s8-custom" placeholder="Descreva o problema..."></textarea>
+        </div>
+        <div id="s8-resolved" style="display:none; margin-top:10px;">
+          <div style="font-weight:700; margin-bottom:6px;">Foi possível resolver o chamado?</div>
+          <div style="display:flex; gap:8px;">
+            <button class="btn btn-accent" onclick="markResolved('Sim')">Sim</button>
+            <button class="btn" onclick="markResolved('Não')">Não</button>
+          </div>
+        </div>
+      </section>
 
-    /* Utility: show element */
-    function show(el){ el.classList.remove('hidden'); }
-    function hide(el){ el.classList.add('hidden'); }
+      <!-- S9 -->
+      <section class="card" id="card-s9" style="display:none;">
+        <h2 style="margin:0 0 8px 0;">S9-S9X — Problemas</h2>
+        <div class="options" id="s9-list"></div>
+        <div id="s9-describe" style="display:none; margin-top:8px;">
+          <textarea id="s9-custom" placeholder="Descreva o problema..."></textarea>
+        </div>
+        <div id="s9-resolved" style="display:none; margin-top:10px;">
+          <div style="font-weight:700; margin-bottom:6px;">Foi possível resolver o chamado?</div>
+          <div style="display:flex; gap:8px;">
+            <button class="btn btn-accent" onclick="markResolved('Sim')">Sim</button>
+            <button class="btn" onclick="markResolved('Não')">Não</button>
+          </div>
+        </div>
+      </section>
 
-    /* Init */
-    document.addEventListener('DOMContentLoaded', ()=>{
-      // fields
-      const chamado = document.getElementById('inputChamado');
-      const posto = document.getElementById('inputPosto');
-      const patrimonio = document.getElementById('inputPatrimonio');
-      const btnModel = document.getElementById('btnToModel');
-      const cardModel = document.getElementById('card-modelo');
+      <!-- S10 -->
+      <section class="card" id="card-s10" style="display:none;">
+        <h2 style="margin:0 0 8px 0;">S10-S10X — Observações e Erros</h2>
+        <div class="small">Observações: Display do Veículo; Aplicativo.</div>
+        <div class="options" id="s10-list" style="margin-top:8px;"></div>
+        <div id="s10-describe" style="display:none; margin-top:8px;">
+          <textarea id="s10-custom" placeholder="Descreva o problema..."></textarea>
+        </div>
+        <div id="s10-resolved" style="display:none; margin-top:10px;">
+          <div style="font-weight:700; margin-bottom:6px;">Foi possível resolver o chamado?</div>
+          <div style="display:flex; gap:8px;">
+            <button class="btn btn-accent" onclick="markResolved('Sim')">Sim</button>
+            <button class="btn" onclick="markResolved('Não')">Não</button>
+          </div>
+        </div>
+      </section>
 
-      chamado.addEventListener('input', checkFirst);
-      posto.addEventListener('input', checkFirst);
-      patrimonio.addEventListener('input', checkFirst);
-      btnModel.addEventListener('click', ()=>{
-        show(cardModel);
-        cardModel.scrollIntoView({behavior:'smooth', block:'center'});
-      });
+      <!-- H9 -->
+      <section class="card" id="card-h9" style="display:none;">
+        <h2 style="margin:0 0 8px 0;">H9-H9X — Problemas</h2>
+        <div class="options" id="h9-list"></div>
+        <div id="h9-describe" style="display:none; margin-top:8px;">
+          <textarea id="h9-custom" placeholder="Descreva o problema..."></textarea>
+        </div>
+        <div id="h9-resolved" style="display:none; margin-top:10px;">
+          <div style="font-weight:700; margin-bottom:6px;">Foi possível resolver o chamado?</div>
+          <div style="display:flex; gap:8px;">
+            <button class="btn btn-accent" onclick="markResolved('Sim')">Sim</button>
+            <button class="btn" onclick="markResolved('Não')">Não</button>
+          </div>
+        </div>
+      </section>
 
-      // render models list
-      const modelos = ['i2-X2','i3-X3','S6','S8-R8-BR8','H9-H9X','S9-S9X','S10-S10X'];
-      const modelosList = document.getElementById('modelosList');
-      modelos.forEach(m => {
-        const btn = document.createElement('button');
-        btn.className = 'option-btn';
-        btn.textContent = m;
-        btn.onclick = function(){ selectModel(m, this); };
-        modelosList.appendChild(btn);
-      });
+      <!-- Image upload -->
+      <section class="card" id="card-image" style="display:none;">
+        <h2 style="margin:0 0 8px 0;">Upload de imagem (opcional)</h2>
+        <input id="file-input" type="file" accept="image/*" />
+        <div id="preview" class="small" style="display:none; margin-top:8px;"></div>
+        <div class="small" style="margin-top:8px;">Se o navegador permitir, a imagem será enviada via compartilhamento nativo ao WhatsApp; caso contrário, anexe manualmente ao abrir o chat.</div>
+      </section>
 
-      // render i2 options
-      const i2optionsCont = document.getElementById('i2-options');
-      i2Errors.forEach(err=>{
-        const btn = document.createElement('button');
-        btn.className = 'option-btn';
-        btn.textContent = err.code;
-        btn.onclick = function(){ selectI2(err, this); };
-        i2optionsCont.appendChild(btn);
+      <!-- Final extra -->
+      <section class="card" id="card-final-extra" style="display:none;">
+        <h2 style="margin:0 0 8px 0;">Faltou algo nesse site de diagnóstico?</h2>
+        <textarea id="field-final-extra" placeholder="Se sim, descreva aqui... (opcional)"></textarea>
+        <div class="small" style="margin-top:8px;">Após preencher, os contatos aparecerão para envio.</div>
+      </section>
 
-        const sol = document.createElement('div');
-        sol.className = 'solution';
-        i2optionsCont.appendChild(sol);
-      });
+      <!-- Actions: contacts -->
+      <section class="card" id="card-contacts" style="display:none;">
+        <h2 style="margin:0 0 8px 0;">Enviar via WhatsApp</h2>
+        <div style="display:flex; gap:10px; flex-direction:column;">
+          <button class="btn btn-accent" id="btn-vanessa">
+            <img src="logotipo vanessa.jpg" alt="Vanessa" style="height:28px; vertical-align:middle; margin-right:8px;" />Analista de Relacionamento — Vanessa Rodrigues<br/><small>+55 11 98947-7808</small>
+          </button>
+          <button class="btn btn-accent" id="btn-willian">
+            <img src="logotipo willian.jpg" alt="Willian" style="height:28px; vertical-align:middle; margin-right:8px;" />Analista de Relacionamento — Willian Bertuzzi<br/><small>+55 11 95654-4217</small>
+          </button>
+        </div>
+        <div class="small" style="margin-top:10px;">Ao clicar em um contato o WhatsApp será aberto com a mensagem pronta. Se necessário anexe a imagem manualmente.</div>
+      </section>
 
-      // i3, s6, s9, s10, h9 lists
-      renderOptionsList('i3-options', i3Problems, selectI3);
-      renderOptionsList('s6-options', s6Problems, selectS6);
-      renderOptionsList('s9-options', s9Problems, selectS9);
-      renderOptionsList('s10-options', s10Problems, selectS10);
-      renderOptionsList('h9-options', h9Problems, selectH9);
+    </div>
+  </div>
 
-      // s8 list area will be populated dynamically
-      document.getElementById('s8-code').addEventListener('change', handleS8Code);
-      document.getElementById('s8-code').addEventListener('keyup', function(e){
-        if(e.key === 'Enter') handleS8Code();
-      });
+  <!-- Fixed footer -->
+  <footer class="fixed-footer" aria-hidden="true">
+    <img src="logotipo empresa.jpg" alt="BRMobility" />
+  </footer>
 
-      // file input
-      const fileInput = document.getElementById('file-input');
-      fileInput.addEventListener('change', function(e){
-        const f = e.target.files[0];
-        if(f){
-          state.file = f;
-          const preview = document.getElementById('preview');
-          const reader = new FileReader();
-          reader.onload = function(ev){
-            preview.innerHTML = '<img src="'+ev.target.result+'" style="max-width:100%; border-radius:10px;"/>';
-            preview.classList.remove('hidden');
-          };
-          reader.readAsDataURL(f);
-        } else {
-          state.file = null;
-        }
-        evaluateFinal();
-      });
+<script>
+/* ---------- Data from prompt (solutions + lists) ---------- */
+const MODELS = ['i2-X2','i3-X3','S6','S8-R8-BR8','H9-H9X','S9-S9X','S10-S10X'];
 
-      // final extra
-      document.getElementById('final-extra').addEventListener('input', function(e){
-        state.finalExtra = e.target.value.trim();
-      });
+const i2Errors = [
+  {code:'C010/C018', text:'Inclinação frontal excessiva. Solicite a troca do veículo imediatamente.'},
+  {code:'C020/C028', text:'Inclinação traseira excessiva. Solicite a troca do veículo imediatamente.'},
+  {code:'C040/C048', text:'Limitador de velocidade frontal/traseiro ativado. Realize o procedimento pelo link: clique aqui (https://drive.google.com/file/d/1uHcirgVcKM_FAG7NPW4spNOP2jF6cpio/view?usp=drive_link)'},
+  {code:'C100/C108', text:'Bateria traseira/frontal vazia. Solicite a troca de bateria imediatamente.'},
+  {code:'C200/C208', text:'Desligamento da bateria traseira/frontal. Solicite a troca de bateria imediatamente.'},
+  {code:'C400/C408', text:'Ângulo de rotação excedido. Realize a solicitação de pivô mecânico para a troca.'},
+  {code:'C800/C808', text:'Baixa voltagem do barramento. Solicite imediatamente a troca do veículo.'},
+  {code:'E012/E01A/E01B', text:'Falha na comunicação com o módulo CU. Solicite imediatamente a troca do veículo.'},
+  {code:'E022/E02A/E02B', text:'Falha na comunicação com o módulo BSA. Solicite imediatamente a troca do veículo.'},
+  {code:'E042/E04A/E04B', text:'Falha na comunicação com o módulo BSA. Solicite imediatamente a troca do veículo.'},
+  {code:'E082/E08A/E08B', text:'Falha na comunicação com o módulo UI. Solicite imediatamente a troca do veículo.'},
+  {code:'E202/E20A/E20B', text:'Falha no slot TDM. Solicite imediatamente a troca do veículo.'},
+  {code:'E402/E40A/E40B', text:'Falha na comunicação remota com o BSA. Solicite imediatamente a troca do veículo.'},
+  {code:'E802/E80A/E80B', text:'Falha na comunicação remota com o UI. Solicite imediatamente a troca do veículo.'},
+  {code:'E013/E01C/E02C', text:'Falha na comunicação com o módulo BCU. Solicite imediatamente a troca do veículo.'},
+  {code:'E014/E024/E044', text:'Falha no sensor de pivô. Solicite um sensor de pivô para a troca.'},
+  {code:'E084/E104/E204', text:'Falha nos sensores auxiliares. Solicite imediatamente a troca do veículo.'},
+  {code:'E404/E40C', text:'Falha no sensor de detecção do piloto. Solicite imediatamente a troca do veículo.'},
+  {code:'E804/E80C', text:'Falha no sensor de alimentação. Solicite um conjunto de placa fonte para a troca.'},
+  {code:'E015/E025/E045', text:'Falha nos sensores de alimentação (12V, 5V, 3V). Solicite imediatamente a troca do veículo.'},
+  {code:'E085/E105/E205', text:'Falha no sensor de temperatura do BSA. Solicite um par de baterias para a troca.'},
+  {code:'E105/E205/E405', text:'Falha interna do BSA. Solicite imediatamente a troca do veículo.'},
+  {code:'E016/E026/E046', text:'Falha na temperatura da junção. Solicite imediatamente a troca do veículo.'},
+  {code:'E086/E106/E206', text:'Falha no motor de acionamento. Solicite um par de motores para a troca.'},
+  {code:'E406/E406', text:'Falha no amplificador de corrente do motor. Solicite um par de motores para a troca.'},
+  {code:'E806/E806', text:'Falha no feedback de voltagem do motor. Solicite um par de motores para a troca.'},
+  {code:'E017/E027/E047', text:'Falha na consistência da voltagem do motor.'},
+  {code:'E087/E107/E207', text:'Falha no relé do motor. Solicite um par de motores para a troca.'},
+  {code:'E407/E407', text:'Falha na consistência da alimentação do atuador. Solicite imediatamente a troca do veículo.'},
+  {code:'Nenhuma', text:'Nenhuma das opções listadas. Descreva o problema.'}
+];
 
-      // contact buttons
-      document.getElementById('btn-vanessa').addEventListener('click', ()=> sendToContact('5511989477808'));
-      document.getElementById('btn-willian').addEventListener('click', ()=> sendToContact('5511956544217'));
+const i3Problems = [
+  {label:'Veículo não liga', text:'Realizar o Reset do veículo e testá-lo. Verificar baterias do controle remoto (cada uma ~2,5V, total >7,5V). Verificar baterias do veículo (>54V). Se tudo ok e não ligar, solicitar troca do veículo.'},
+  {label:'Veículo com baixa autonomia', text:'Verificar tensão do carregador (>=81,5V). Se ok, solicitar troca de baterias do veículo.'},
+  {label:'Veículo não carrega', text:'Verificar tensão do carregador (>=81,5V). Se ok, solicitar troca do veículo.'},
+  {label:'Veículo com rodas travando', text:'Solicitar troca do veículo.'},
+  {label:'Veículo aceso mas não liga', text:'Realizar reset; verificar baterias do controle; se ok, solicitar troca do veículo.'},
+  {label:'Carregador não funciona', text:'Solicitar troca de carregador.'},
+  {label:'Veículo trepidando', text:'Verificar integridade do chassi e couplings.'},
+  {label:'Veículo puxando/girando', text:'Realizar calibração de postura com controle remoto original.'},
+  {label:'Controle Remoto não funciona', text:'Verificar integridade de carga da bateria do controle e realizar procedimento de pareamento. (link: https://drive.google.com/file/d/16v-38oSKjsfVL9yQnxwbRFtX-6Uf1Fja/view?usp=drive_link)'},
+  {label:'Veículo não acelera', text:'Realizar ajuste de velocidade pelo controle remoto original. (link: https://drive.google.com/file/d/16xl1z4yneIkh3JyjbaL8c0XnuSHmrGy2/view?usp=drive_link)'},
+  {label:'Veículo muito pra frente/pra trás', text:'Realizar calibração de postura com o controle remoto original. (link: https://drive.google.com/file/d/172xePg7Ko2ZNJNlACqlLhETxmGec20Lt/view?usp=drive_link)'},
+  {label:'Nenhuma', text:'Nenhuma das opções listadas. Descreva o problema.'}
+];
 
+const s6Problems = [
+  {label:'Veículo não liga', text:'Solicitar imediatamente a troca do veículo.'},
+  {label:'Veículo apitando', text:'Solicitar imediatamente a troca do veículo.'},
+  {label:'Veículo não carrega', text:'Verificar conector de carga (GX14 3 vias Macho), e carregador (66-67.5V). Se necessário solicitar troca.'},
+  {label:'Veículo andando sozinho', text:'Verificar integridade do tapete/assoalho; instruir condutor sobre modo acompanhante.'},
+  {label:'Veículo desligando sozinho', text:'Solicitar troca de bateria. (link: https://drive.google.com/file/d/18tKva_egKDP7MeAm7ObcsHbafMtJe0Fi/view?usp=drive_link)'},
+  {label:'Veículo girando', text:'Realizar calibração de postura. (link: https://drive.google.com/file/d/19kLMW1rWbcsAxmkPGM_woMHKQ0uir6oM/view?usp=drive_link)'},
+  {label:'Veículo com rodas travadas', text:'Solicitar imediatamente a troca do veículo.'},
+  {label:'Display quebrado', text:'Solicitar troca de display.'},
+  {label:'Nenhuma', text:'Nenhuma das opções listadas. Descreva o problema.'}
+];
+
+const s8Errors = [
+  {n:1, text:'Falha no Sensor Hall direito. Solicite a troca da placa Drive do veículo.'},
+  {n:2, text:'Falha no Sensor Hall esquerdo. Solicite a troca da placa Drive do veículo.'},
+  {n:3, text:'Falha no Encoder do Motor direito. Solicite a troca do veículo.'},
+  {n:4, text:'Falha no Encoder do Motor esquerdo. Solicite a troca do veículo.'},
+  {n:5, text:'Falha no Sensor de corrente do Motor direito. Solicite a troca do veículo.'},
+  {n:6, text:'Falha no Sensor de corrente do Motor esquerdo. Solicite a troca do veículo.'},
+  {n:7, text:'Falha no Mosfet de potência do Motor direito da placa Drive. Solicite a troca da placa Drive do veículo.'},
+  {n:8, text:'Falha no Mosfet de potência do motor esquerdo da placa Drive. Solicite a troca da placa Drive do veículo.'},
+  {n:9, text:'Falha no Mosfet inferior de potência do motor esquerdo da placa Drive. Solicite a troca da placa Drive do veículo.'},
+  {n:10, text:'Falha no Mosfet superior de potência do motor esquerdo da placa Drive. Solicite a troca da placa Drive do veículo.'},
+  {n:11, text:'Falha no Mosfet inferior de potência do motor direito da placa Drive. Solicite a troca da placa Drive do veículo.'},
+  {n:12, text:'Falha no Mosfet superior de potência do motor direito da placa Drive. Solicite a troca da placa Drive do veículo.'},
+  {n:13, text:'Falha no Motor direito. Solicite a troca do veículo.'},
+  {n:14, text:'Falha no Motor esquerdo. Solicite a troca do veículo.'},
+  {n:15, text:'Falha no Mosfet de potência geral. Solicite a troca da placa Drive do veículo.'},
+  {n:16, text:'Falha no Firmware. Solicite a troca da placa Drive do veículo.'},
+  {n:17, text:'Falha no Firmware. Solicite a troca da placa Drive do veículo.'},
+  {n:18, text:'Falha no Firmware. Solicite a troca da placa Drive do veículo.'},
+  {n:19, text:'Falha no Firmware. Solicite a troca da placa Drive do veículo.'},
+  {n:20, text:'Falha no Sensor Giroscópio. Solicite a troca da placa de Controle do veículo.'},
+  {n:21, text:'Falha na comunicação da Memoria EPROM. Solicite a troca da placa de Controle do veículo.'},
+  {n:22, text:'Falha no Sensor Giroscópio. Solicite a troca da placa de Controle do veículo.'},
+  {n:23, text:'Falha na inicialização da Memoria EPROM. Solicite a troca da placa de Controle do veículo.'},
+  {n:24, text:'Falha de Firmware da Memoria EPROM. Solicite a troca da placa de Controle do veículo.'},
+  {n:25, text:'Falha na calibração de postura. Realize a calibração de postura (link: https://drive.google.com/file/d/1EQ8Oi2MSb75m4Gh1mXrnKSdZUhh26AGJ/view?usp=drive_link)'},
+  {n:26, text:'Falha na inicialização do Sensor Giroscópio. Solicite a troca da placa de Controle do veículo.'},
+  {n:27, text:'Falha no Firmware do Sensor Giroscópio. Solicite a troca da placa de Controle do veículo.'},
+  {n:28, text:'Falha no Firmware do Sensor Giroscópio. Solicite a troca da placa de Controle do veículo.'},
+  {n:29, text:'Falha no Firmware do Sensor Giroscópio. Solicite a troca da placa de Controle do veículo.'},
+  {n:30, text:'Falha de comunicação entre placa Drive e placa de Controle do veículo. Solicite a troca do veículo imediatamente.'},
+  {n:31, text:'Falha na comunicação do Painel com a placa de Controle. Solicite um conjunto de Placa de controle e Painel para a troca.'},
+  {n:32, text:'Falha no funcionamento do Sensor AHRS. Solicite a troca da placa de Controle do veículo.'},
+  {n:33, text:'Falha no funcionamento do Sensor AHRS. Solicite a troca da placa de Controle do veículo.'},
+  {n:34, text:'Falha no Sensor de pivô. Solicite a troca do Sensor de Pivô e placa de Controle.'},
+  {n:35, text:'Falha no Mosfet da placa de alimentação. Solicite a troca da placa de alimentação do veículo.'},
+  {n:36, text:'Falha na bateria. Solicite a troca da bateria e da placa de alimentação do veículo.'},
+  {n:37, text:'Falha na bateria. Solicite a troca da bateria e da placa de alimentação do veículo.'},
+  {n:38, text:'Falha na bateria. Solicite a troca da bateria do veículo.'},
+  {n:39, text:'Falha na bateria. Solicite a troca da bateria do veículo.'},
+  {n:40, text:'Falha no Sensor de Pé. Solicite a troca do veículo.'},
+  {n:41, text:'Falha na placa de pareamento. Solicite a troca da placa do veículo.'},
+  {n:42, text:'Falha na placa de pareamento. Solicite a troca da placa do veículo.'},
+  {n:43, text:'Falha no carregador. Solicite a troca do carregador do veículo.'},
+  {n:44, text:'Falha no Firmware do veículo. Solicite a troca imediatamente.'},
+  {n:45, text:'Falha por colisão. Realize a reinicialização do veículo e calibração de postura (link: https://drive.google.com/file/d/1EQ8Oi2MSb75m4Gh1mXrnKSdZUhh26AGJ/view?usp=drive_link)'},
+  {n:46, text:'Falha na atualização do Firmware. Solicite a troca do veículo imediatamente.'},
+  {n:47, text:'Falha na atualização do Firmware. Solicite a troca do veículo imediatamente.'}
+];
+
+const s9Problems = [
+  {label:'Veículo não liga', text:'Verificar tensão de bateria (>44V). Se morta, substituir; se ok, solicitar troca da placa mãe.'},
+  {label:'Veículo não desliga', text:'Testar continuidade do botão on-off. Se ok, solicitar troca da placa mãe.'},
+  {label:'Veículo não reconhece condutor', text:'Verificar assoalho e calibração; se ok, solicitar troca da placa mãe.'},
+  {label:'Veículo não carrega', text:'Solicitar troca do veículo imediatamente.'},
+  {label:'Veículo com rodas travadas', text:'Solicitar troca do veículo imediatamente.'},
+  {label:'Veículo desligando sozinho', text:'Solicitar troca de bateria do veículo.'},
+  {label:'Nenhuma', text:'Nenhuma das opções listadas. Descreva o problema.'}
+];
+
+const s10Problems = [
+  {label:'Erro 1 - chave inglesa 1 vez', text:'Falha na Bateria (sobre tensão). Solicitar troca de bateria.'},
+  {label:'Erro 2 - chave inglesa 2 vezes', text:'Falha no Sensor de Pivô. Solicitar troca do sensor.'},
+  {label:'Erro 3 - chave inglesa 4 vezes', text:'Falha no Motor Direito. Solicitar troca do veículo.'},
+  {label:'Erro 4 - chave inglesa 5 vezes', text:'Falha no Motor Esquerdo. Solicite a troca do veículo.'},
+  {label:'Erro 5 - chave inglesa 7 vezes', text:'Falha no Sensor de Pé (Não identifica qual dos 4 sensores há a falha).'},
+  {label:'Nenhuma', text:'Nenhuma das opções listadas. Descreva o problema.'}
+];
+
+const h9Problems = [
+  {label:'Veículo não liga', text:'Solicitar troca do veículo imediatamente.'},
+  {label:'Veículo não desliga', text:'Solicitar troca do veículo imediatamente.'},
+  {label:'Veículo não reconhece condutor', text:'Solicitar troca do veículo imediatamente.'},
+  {label:'Veículo não carrega', text:'Solicitar troca do veículo imediatamente.'},
+  {label:'Veículo com rodas travadas', text:'Solicitar troca do veículo imediatamente.'},
+  {label:'Veículo desligando sozinho', text:'Solicitar troca do veículo imediatamente.'},
+  {label:'Nenhuma', text:'Nenhuma das opções listadas. Descreva o problema.'}
+];
+
+/* ---------- STATE ---------- */
+const state = {
+  chamado:'',
+  posto:'',
+  patrimonio:'',
+  modelo:'',
+  descricao:'',
+  selection:'', // e.g. error code or problem label
+  customDescribe:'',
+  resolved:'',
+  file:null,
+  finalExtra:''
+};
+
+/* ---------- HELPERS ---------- */
+function el(id){ return document.getElementById(id); }
+function show(elm){ elm.style.display = ''; }
+function hide(elm){ elm.style.display = 'none'; }
+function createOptionButton(text, onclick){ const b = document.createElement('button'); b.className='option-btn'; b.type='button'; b.textContent = text; b.onclick = onclick; return b; }
+
+/* ---------- INIT UI ---------- */
+document.addEventListener('DOMContentLoaded', ()=>{
+  // initial fields
+  ['field-chamado','field-posto','field-patrimonio'].forEach(id=>{
+    el(id).addEventListener('input', checkInitialFields);
+  });
+  el('btn-to-model').addEventListener('click', ()=>{
+    show(el('card-model'));
+    el('card-model').scrollIntoView({behavior:'smooth', block:'center'});
+  });
+
+  // render models list
+  const modelsList = el('models-list');
+  MODELS.forEach(m=>{
+    const btn = createOptionButton(m, ()=>{
+      selectModel(m, btn);
     });
+    modelsList.appendChild(btn);
+  });
 
-    /* checkbox for initial fields */
-    function checkFirst(){
-      state.chamado = document.getElementById('inputChamado').value.trim();
-      state.posto = document.getElementById('inputPosto').value.trim();
-      state.patrimonio = document.getElementById('inputPatrimonio').value.trim();
-      const btn = document.getElementById('btnToModel');
-      if(state.chamado && state.posto && state.patrimonio){
-        btn.classList.remove('hidden');
-      } else {
-        btn.classList.add('hidden');
+  // render i2 list
+  const i2list = el('i2-list');
+  i2Errors.forEach(err=>{
+    const b = createOptionButton(err.code, ()=> selectI2(err, b) );
+    i2list.appendChild(b);
+    const s = document.createElement('div'); s.className='solution'; i2list.appendChild(s);
+  });
+
+  // other lists
+  renderList('i3-list', i3Problems, selectI3);
+  renderList('s6-list', s6Problems, selectS6);
+  renderList('s9-list', s9Problems, selectS9);
+  renderList('s10-list', s10Problems, selectS10);
+  renderList('h9-list', h9Problems, selectH9);
+
+  // s8 code handler
+  el('s8-code').addEventListener('change', handleS8Input);
+  el('s8-code').addEventListener('keyup', (e)=>{ if(e.key==='Enter') handleS8Input(); });
+
+  // file input preview
+  el('file-input').addEventListener('change', (e)=>{
+    const f = e.target.files[0];
+    state.file = f || null;
+    const preview = el('preview');
+    if(f){
+      const reader = new FileReader();
+      reader.onload = (ev)=>{
+        preview.innerHTML = '<img src="'+ev.target.result+'" style="max-width:100%; border-radius:8px;" />';
+        preview.style.display = '';
+      };
+      reader.readAsDataURL(f);
+    }else{
+      preview.innerHTML=''; preview.style.display='none';
+    }
+    evaluateFinal();
+  });
+
+  // final extra listener
+  el('field-final-extra').addEventListener('input', (e)=>{ state.finalExtra = e.target.value.trim(); evaluateFinal(); });
+
+  // contact buttons
+  el('btn-vanessa').addEventListener('click', ()=> sendWhats('5511989477808'));
+  el('btn-willian').addEventListener('click', ()=> sendWhats('5511956544217'));
+});
+
+function checkInitialFields(){
+  state.chamado = el('field-chamado').value.trim();
+  state.posto = el('field-posto').value.trim();
+  state.patrimonio = el('field-patrimonio').value.trim();
+  if(state.chamado && state.posto && state.patrimonio){
+    el('btn-to-model').style.display = '';
+  } else {
+    el('btn-to-model').style.display = 'none';
+  }
+}
+
+/* ---------- MODEL SELECTION ---------- */
+function selectModel(model, btn){
+  state.modelo = model;
+  // mark active
+  document.querySelectorAll('#models-list .option-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  // show description card
+  show(el('card-desc'));
+  el('card-desc').scrollIntoView({behavior:'smooth', block:'center'});
+  // once description is filled, show model-specific cards
+  el('field-descricao').addEventListener('input', function onDesc(){
+    state.descricao = this.value.trim();
+    if(state.descricao){
+      // show corresponding model card(s)
+      switch(state.modelo){
+        case 'i2-X2': show(el('card-i2')); break;
+        case 'i3-X3': show(el('card-i3')); break;
+        case 'S6': show(el('card-s6')); break;
+        case 'S8-R8-BR8': show(el('card-s8')); break;
+        case 'H9-H9X': show(el('card-h9')); break;
+        case 'S9-S9X': show(el('card-s9')); break;
+        case 'S10-S10X': show(el('card-s10')); break;
+        default: break;
       }
+      show(el('card-image'));
+      // scroll to the first relevant card of model
+      const id = 'card-' + state.modelo.split('-')[0].toLowerCase();
+      const target = el(id);
+      if(target) target.scrollIntoView({behavior:'smooth', block:'center'});
+      // remove listener to avoid duplicate triggers
+      el('field-descricao').removeEventListener('input', onDesc);
     }
+  });
+}
 
-    function selectModel(model, el){
-      state.modelo = model;
-      // mark active
-      document.querySelectorAll('#modelosList .option-btn').forEach(b=>b.classList.remove('active'));
-      el.classList.add('active');
+/* ---------- Render helper ---------- */
+function renderList(containerId, list, handler){
+  const cont = el(containerId);
+  list.forEach(item=>{
+    const btn = createOptionButton(item.label || item.n, ()=> handler(item, btn));
+    cont.appendChild(btn);
+    const s = document.createElement('div'); s.className='solution'; cont.appendChild(s);
+  });
+}
 
-      // show next: descricao
-      show(document.getElementById('card-desc'));
-      document.getElementById('card-desc').scrollIntoView({behavior:'smooth', block:'center'});
+/* ---------- Selection handlers ---------- */
+function markActiveAndShowSolution(btn, solutionText){
+  // unmark siblings; show solution in the next .solution sibling
+  const parent = btn.parentElement;
+  parent.querySelectorAll('.option-btn').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active');
+  let next = btn.nextElementSibling;
+  while(next && !next.classList.contains('solution')) next = next.nextElementSibling;
+  if(next){
+    next.innerHTML = '<strong>Informação:</strong> ' + solutionText;
+    next.style.display = 'block';
+    next.scrollIntoView({behavior:'smooth', block:'center'});
+  }
+}
 
-      // set up listener for description
-      document.getElementById('inputDescricao').addEventListener('input', function(){
-        state.descricao = this.value.trim();
-        if(state.descricao){
-          // show model-specific card
-          if(state.modelo === 'i2-X2') show(document.getElementById('card-i2'));
-          if(state.modelo === 'i3-X3') show(document.getElementById('card-i3'));
-          if(state.modelo === 'S6') show(document.getElementById('card-s6'));
-          if(state.modelo === 'S8-R8-BR8') show(document.getElementById('card-s8'));
-          if(state.modelo === 'H9-H9X') show(document.getElementById('card-h9'));
-          if(state.modelo === 'S9-S9X') show(document.getElementById('card-s9'));
-          if(state.modelo === 'S10-S10X') show(document.getElementById('card-s10'));
-          // always show image upload after selecting a specific issue appears
-          show(document.getElementById('card-image'));
+function selectI2(err, btn){
+  markActiveAndShowSolution(btn, err.text);
+  state.selection = err.code;
+  if(err.code === 'Nenhuma'){
+    show(el('i2-describe'));
+    el('i2-custom').addEventListener('input', function onInput(){ state.customDescribe = this.value.trim(); if(state.customDescribe) show(el('i2-resolved')); });
+  } else {
+    hide(el('i2-describe'));
+    show(el('i2-resolved'));
+  }
+  evaluateFinal();
+}
 
-          // scroll to the relevant card
-          const target = document.getElementById('card-' + (state.modelo.split('-')[0].toLowerCase()));
-          if(target) target.scrollIntoView({behavior:'smooth', block:'center'});
-        }
-      }, {once:true}); // one-time binding is fine because description may be edited later
+function selectI3(item, btn){
+  markActiveAndShowSolution(btn, item.text);
+  state.selection = item.label;
+  if(item.label === 'Nenhuma'){
+    show(el('i3-describe'));
+    el('i3-custom').addEventListener('input', function onInput(){ state.customDescribe = this.value.trim(); if(state.customDescribe) show(el('i3-resolved')); });
+  } else {
+    hide(el('i3-describe'));
+    show(el('i3-resolved'));
+  }
+  evaluateFinal();
+}
+
+function selectS6(item, btn){
+  markActiveAndShowSolution(btn, item.text);
+  state.selection = item.label;
+  if(item.label === 'Nenhuma'){
+    show(el('s6-describe'));
+    el('s6-custom').addEventListener('input', function onInput(){ state.customDescribe = this.value.trim(); if(state.customDescribe) show(el('s6-resolved')); });
+  } else {
+    hide(el('s6-describe'));
+    show(el('s6-resolved'));
+  }
+  evaluateFinal();
+}
+
+function selectS9(item, btn){ markActiveAndShowSolution(btn, item.text); state.selection = item.label; if(item.label==='Nenhuma'){ show(el('s9-describe')); el('s9-custom').addEventListener('input', ()=>{ state.customDescribe = el('s9-custom').value.trim(); if(state.customDescribe) show(el('s9-resolved')); }); } else { hide(el('s9-describe')); show(el('s9-resolved')); } evaluateFinal(); }
+function selectS10(item, btn){ markActiveAndShowSolution(btn, item.text); state.selection = item.label; if(item.label==='Nenhuma'){ show(el('s10-describe')); el('s10-custom').addEventListener('input', ()=>{ state.customDescribe = el('s10-custom').value.trim(); if(state.customDescribe) show(el('s10-resolved')); }); } else { hide(el('s10-describe')); show(el('s10-resolved')); } evaluateFinal(); }
+function selectH9(item, btn){ markActiveAndShowSolution(btn, item.text); state.selection = item.label; if(item.label==='Nenhuma'){ show(el('h9-describe')); el('h9-custom').addEventListener('input', ()=>{ state.customDescribe = el('h9-custom').value.trim(); if(state.customDescribe) show(el('h9-resolved')); }); } else { hide(el('h9-describe')); show(el('h9-resolved')); } evaluateFinal(); }
+
+/* ---------- S8 handling ---------- */
+function handleS8Input(){
+  const val = el('s8-code').value.trim();
+  const list = el('s8-list');
+  list.innerHTML = '';
+  if(!val) return;
+  const num = parseInt(val,10);
+  if(!isNaN(num) && num>=1 && num<=47){
+    const e = s8Errors.find(x=>x.n===num);
+    if(e){
+      const b = createOptionButton('Erro ' + e.n, ()=> selectS8(e,b));
+      b.classList.add('active');
+      list.appendChild(b);
+      const s = document.createElement('div'); s.className='solution'; s.innerHTML='<strong>Informação:</strong> '+e.text; s.style.display='block'; list.appendChild(s);
+      state.selection = 'Erro ' + e.n;
+      show(el('s8-resolved'));
     }
+  } else if(num === 0){
+    // list all options
+    s8Errors.forEach(e=>{
+      if(e.n===0) return;
+      const b = createOptionButton('Erro ' + e.n, ()=> selectS8(e,b));
+      list.appendChild(b);
+      const s = document.createElement('div'); s.className='solution'; list.appendChild(s);
+    });
+  } else {
+    const note = document.createElement('div'); note.className='small'; note.textContent = 'Insira um número entre 1 e 47, ou 0 para listar todas as opções.'; list.appendChild(note);
+  }
+  evaluateFinal();
+}
 
-    /* Generic renderer for small lists */
-    function renderOptionsList(containerId, list, handler){
-      const cont = document.getElementById(containerId);
-      list.forEach(item => {
-        const btn = document.createElement('button');
-        btn.className = 'option-btn';
-        btn.textContent = item.label || item.n || item.label;
-        btn.onclick = function(){ handler(item, this); };
-        cont.appendChild(btn);
+function selectS8(e, btn){
+  markActiveAndShowSolution(btn, e.text);
+  state.selection = 'Erro ' + e.n;
+  if(e.n === 0){
+    show(el('s8-describe'));
+    el('s8-custom').addEventListener('input', ()=>{ state.customDescribe = el('s8-custom').value.trim(); if(state.customDescribe) show(el('s8-resolved')); });
+  } else {
+    hide(el('s8-describe'));
+    show(el('s8-resolved'));
+  }
+  evaluateFinal();
+}
 
-        const sol = document.createElement('div');
-        sol.className = 'solution';
-        cont.appendChild(sol);
-      });
-    }
+/* ---------- Resolved ---------- */
+function markResolved(val){
+  state.resolved = val;
+  evaluateFinal();
+}
 
-    /* ---------- Selection handlers ---------- */
-    function selectI2(err, btn){
-      // mark active; find the solution box that follows this button in DOM
-      markActiveAndShowSolution(btn, err.text);
+/* ---------- Evaluate final readiness ---------- */
+function evaluateFinal(){
+  // basic fields
+  state.chamado = el('field-chamado').value.trim();
+  state.posto = el('field-posto').value.trim();
+  state.patrimonio = el('field-patrimonio').value.trim();
+  state.descricao = el('field-descricao').value.trim();
 
-      state.modelSelection = err.code;
-      if(err.code === 'Nenhuma'){
-        show(document.getElementById('i2-describe'));
-        document.getElementById('i2-describe-txt').addEventListener('input', function(){
-          state.customDescribe = this.value.trim();
-          if(state.customDescribe) show(document.getElementById('i2-resolved'));
-        });
-      } else {
-        hide(document.getElementById('i2-describe'));
-        show(document.getElementById('i2-resolved'));
+  if(!state.chamado || !state.posto || !state.patrimonio) return;
+  if(!state.modelo || !state.descricao) return;
+
+  // model-specific checks: selection or customDescribe must exist
+  let modelOk = true;
+  if(['i2-X2','i3-X3','S6','S8-R8-BR8','S9-S9X','S10-S10X','H9-H9X'].includes(state.modelo)){
+    modelOk = !!state.selection || !!state.customDescribe;
+  }
+
+  // resolved requirement: if resolved set (for those which asked), must be set
+  let resolvedNeeded = ['i2-X2','i3-X3','S6','S8-R8-BR8','S9-S9X','S10-S10X','H9-H9X'].includes(state.modelo);
+  let resolvedOk = !resolvedNeeded || !!state.resolved;
+
+  if(modelOk && resolvedOk){
+    show(el('card-final-extra'));
+    show(el('card-contacts'));
+    show(el('card-image'));
+    el('card-contacts').scrollIntoView({behavior:'smooth', block:'center'});
+  }
+}
+
+/* ---------- Build WhatsApp message (answers bold) ---------- */
+function buildWhatsLines(){
+  const lines = [];
+  lines.push(['Chamado:', state.chamado]);
+  lines.push(['Posto:', state.posto]);
+  lines.push(['Patrimônio:', state.patrimonio]);
+  lines.push(['Modelo:', state.modelo]);
+  lines.push(['Descrição do chamado:', state.descricao]);
+  if(state.selection) lines.push(['Seleção:', state.selection]);
+  if(state.customDescribe) lines.push(['Descrição adicional:', state.customDescribe]);
+  lines.push(['Chamado resolvido:', state.resolved ? state.resolved : '-']);
+  lines.push(['Imagem enviada:', state.file ? 'Sim' : 'Não']);
+  if(state.finalExtra) lines.push(['Faltou algo:', state.finalExtra]);
+
+  // Format: Label + space + *value*
+  const waLines = lines.map(l => `${l[0]} *${l[1] || ''}*` );
+  return waLines;
+}
+
+/* ---------- Send via Web Share API or wa.me fallback ---------- */
+async function sendWhats(number){
+  // refresh some dynamic state values before sending
+  state.finalExtra = el('field-final-extra').value.trim() || state.finalExtra;
+  // ensure selection from various inputs if present
+  if(el('i2-custom')) state.customDescribe = state.customDescribe || el('i2-custom').value.trim();
+  if(el('s8-custom')) state.customDescribe = state.customDescribe || el('s8-custom').value.trim();
+  const waLines = buildWhatsLines();
+  const message = waLines.join('\\n');
+
+  // If we have an image and browser supports share with files, try it
+  if(state.file && navigator.canShare && navigator.canShare({ files: [state.file] })){
+    try{
+      await navigator.share({ files: [state.file], text: message, title: 'Chamado BRMobility' });
+      // after share, open chat (optional confirmation)
+      const openChat = confirm('Compartilhamento concluído. Deseja abrir o WhatsApp para confirmar/acompanhar?');
+      if(openChat){
+        window.open('https://wa.me/' + number + '?text=' + encodeURIComponent(message), '_blank');
       }
-      evaluateFinal();
+      return;
+    } catch(err){
+      console.warn('Share API falhou ou cancelado', err);
+      // fallback to wa.me below
     }
+  }
+  // Fallback: open wa.me with text only (user must attach image manually if needed)
+  const url = 'https://wa.me/' + number + '?text=' + encodeURIComponent(message);
+  window.open(url, '_blank');
+}
 
-    function selectI3(item, btn){
-      markActiveAndShowSolution(btn, item.text);
-      state.modelSelection = item.label;
-      if(item.label === 'Nenhuma'){
-        show(document.getElementById('i3-describe'));
-        document.getElementById('i3-describe-txt').addEventListener('input', function(){
-          state.customDescribe = this.value.trim();
-          if(state.customDescribe) show(document.getElementById('i3-resolved'));
-        });
-      } else {
-        hide(document.getElementById('i3-describe'));
-        show(document.getElementById('i3-resolved'));
-      }
-      evaluateFinal();
-    }
+/* ---------- Utility: wire up list renderers for i3, s6, etc ---------- */
+function renderList(id, items, handler){
+  const cont = el(id);
+  items.forEach(item=>{
+    const b = createOptionButton(item.label || item.n, ()=> handler(item, b));
+    cont.appendChild(b);
+    const s = document.createElement('div'); s.className='solution'; cont.appendChild(s);
+  });
+}
 
-    function selectS6(item, btn){
-      markActiveAndShowSolution(btn, item.text);
-      state.modelSelection = item.label;
-      if(item.label === 'Nenhuma'){
-        show(document.getElementById('s6-describe'));
-        document.getElementById('s6-describe-txt').addEventListener('input', function(){
-          state.customDescribe = this.value.trim();
-          if(state.customDescribe) show(document.getElementById('s6-resolved'));
-        });
-      } else {
-        hide(document.getElementById('s6-describe'));
-        show(document.getElementById('s6-resolved'));
-      }
-      evaluateFinal();
-    }
+/* Keep functions available for handlers defined earlier */
+window.renderList = renderList;
 
-    function selectS9(item, btn){
-      markActiveAndShowSolution(btn, item.text);
-      state.modelSelection = item.label;
-      if(item.label === 'Nenhuma'){
-        show(document.getElementById('s9-describe'));
-        document.getElementById('s9-describe-txt').addEventListener('input', function(){
-          state.customDescribe = this.value.trim();
-          if(state.customDescribe) show(document.getElementById('s9-resolved'));
-        });
-      } else {
-        hide(document.getElementById('s9-describe'));
-        show(document.getElementById('s9-resolved'));
-      }
-      evaluateFinal();
-    }
-
-    function selectS10(item, btn){
-      markActiveAndShowSolution(btn, item.text);
-      state.modelSelection = item.label;
-      if(item.label === 'Nenhuma'){
-        show(document.getElementById('s10-describe'));
-        document.getElementById('s10-describe-txt').addEventListener('input', function(){
-          state.customDescribe = this.value.trim();
-          if(state.customDescribe) show(document.getElementById('s10-resolved'));
-        });
-      } else {
-        hide(document.getElementById('s10-describe'));
-        show(document.getElementById('s10-resolved'));
-      }
-      evaluateFinal();
-    }
-
-    function selectH9(item, btn){
-      markActiveAndShowSolution(btn, item.text);
-      state.modelSelection = item.label;
-      if(item.label === 'Nenhuma'){
-        show(document.getElementById('h9-describe'));
-        document.getElementById('h9-describe-txt').addEventListener('input', function(){
-          state.customDescribe = this.value.trim();
-          if(state.customDescribe) show(document.getElementById('h9-resolved'));
-        });
-      } else {
-        hide(document.getElementById('h9-describe'));
-        show(document.getElementById('h9-resolved'));
-      }
-      evaluateFinal();
-    }
-
-    /* helper: mark active and show corresponding solution box */
-    function markActiveAndShowSolution(btn, solutionText){
-      // remove active from siblings
-      const container = btn.parentElement;
-      Array.from(container.querySelectorAll('.option-btn')).forEach(b=>b.classList.remove('active'));
-      btn.classList.add('active');
-      // find next solution box sibling for this button
-      let next = btn.nextElementSibling;
-      while(next && !next.classList.contains('solution')){
-        next = next.nextElementSibling;
-      }
-      if(next){
-        next.innerHTML = '<strong>Informação:</strong> ' + solutionText;
-        next.style.display = 'block';
-        next.scrollIntoView({behavior:'smooth', block:'center'});
-      }
-    }
-
-    /* S8 handlers */
-    function handleS8Code(){
-      const val = document.getElementById('s8-code').value.trim();
-      const listCont = document.getElementById('s8-list');
-      listCont.innerHTML = '';
-      if(!val) return;
-      const n = parseInt(val,10);
-      if(!isNaN(n) && n>=1 && n<=47){
-        // find matching
-        const e = s8Errors.find(x=>x.n===n);
-        if(e){
-          // create single option preselected
-          const btn = document.createElement('button');
-          btn.className = 'option-btn active';
-          btn.textContent = 'Erro ' + n;
-          btn.onclick = function(){ selectS8(e, this); };
-          listCont.appendChild(btn);
-          const sol = document.createElement('div');
-          sol.className = 'solution';
-          sol.innerHTML = '<strong>Informação:</strong> ' + e.text;
-          sol.style.display = 'block';
-          listCont.appendChild(sol);
-          state.modelSelection = 'Erro ' + n;
-          show(document.getElementById('s8-resolved'));
-        }
-      } else if (n === 0){
-        // list all options
-        s8Errors.filter(x=>x.n!==0).forEach(e=>{
-          const btn = document.createElement('button');
-          btn.className = 'option-btn';
-          btn.textContent = 'Erro ' + e.n;
-          btn.onclick = function(){ selectS8(e, this); };
-          listCont.appendChild(btn);
-          const sol = document.createElement('div');
-          sol.className = 'solution';
-          listCont.appendChild(sol);
-        });
-      } else {
-        // invalid - show message
-        const note = document.createElement('div');
-        note.className = 'small-note';
-        note.textContent = 'Insira um número entre 1 e 47, ou 0 para listar todas as opções.';
-        listCont.appendChild(note);
-      }
-      evaluateFinal();
-    }
-
-    function selectS8(e, btn){
-      // mark active and show solution
-      markActiveAndShowSolution(btn, e.text);
-      state.modelSelection = 'Erro ' + e.n;
-      if(e.n === 0){
-        // none - show describe
-        show(document.getElementById('s8-describe'));
-        document.getElementById('s8-describe-txt').addEventListener('input', function(){
-          state.customDescribe = this.value.trim();
-          if(state.customDescribe) show(document.getElementById('s8-resolved'));
-        });
-      } else {
-        hide(document.getElementById('s8-describe'));
-        show(document.getElementById('s8-resolved'));
-      }
-      evaluateFinal();
-    }
-
-    /* Set resolved for a section */
-    function setResolved(section, value){
-      state.resolved = value;
-      evaluateFinal();
-    }
-
-    /* Check if all required fields and selections are done to show final action */
-    function evaluateFinal(){
-      // basic fields
-      const basicOk = state.chamado || document.getElementById('inputChamado').value.trim();
-      const postoOk = state.posto || document.getElementById('inputPosto').value.trim();
-      const patrOk = state.patrimonio || document.getElementById('inputPatrimonio').value.trim();
-      const modeloOk = state.modelo;
-      const descOk = state.descricao || document.getElementById('inputDescricao').value.trim();
-
-      // model-specific requirement: modelSelection must be set or customDescribe for "Nenhuma"
-      let modelSpecificOk = false;
-      if(!modeloOk || !descOk || !basicOk || !postoOk || !patrOk) {
-        modelSpecificOk = false;
-      } else {
-        // if model has explicit selection requirement
-        if(modeloOk === 'i2-X2' || modeloOk==='i3-X3' || modeloOk==='S6' || modeloOk==='S8-R8-BR8' || modeloOk==='S9-S9X' || modeloOk==='S10-S10X' || modeloOk==='H9-H9X'){
-          modelSpecificOk = !!state.modelSelection || !!state.customDescribe;
-        } else {
-          modelSpecificOk = true;
-        }
-      }
-
-      // resolved check: if we asked "Foi possível..." then resolved must be set
-      let resolvedNeeded = (modeloOk === 'i2-X2' || modeloOk==='i3-X3' || modeloOk==='S6' || modeloOk==='S8-R8-BR8' || modeloOk==='S9-S9X' || modeloOk==='S10-S10X' || modeloOk==='H9-H9X');
-      let resolvedOk = !resolvedNeeded || (resolvedNeeded && state.resolved);
-
-      if(basicOk && postoOk && patrOk && modeloOk && descOk && modelSpecificOk && resolvedOk){
-        show(document.getElementById('card-final'));
-        show(document.getElementById('card-actions'));
-        // ensure image card visible
-        show(document.getElementById('card-image'));
-        document.getElementById('card-actions').scrollIntoView({behavior:'smooth', block:'center'});
-      }
-    }
-
-    /* Build message for WhatsApp: only include answers (in bold), not the solution texts */
-    function buildMessageLines(){
-      const chamado = document.getElementById('inputChamado').value.trim() || state.chamado;
-      const posto = document.getElementById('inputPosto').value.trim() || state.posto;
-      const patrimonio = document.getElementById('inputPatrimonio').value.trim() || state.patrimonio;
-      const modelo = state.modelo || '';
-      const descricao = document.getElementById('inputDescricao').value.trim() || state.descricao;
-      const finalExtra = document.getElementById('final-extra').value.trim() || state.finalExtra;
-
-      const lines = [];
-      lines.push(['Chamado:', chamado]);
-      lines.push(['Posto:', posto]);
-      lines.push(['Patrimônio:', patrimonio]);
-      lines.push(['Modelo:', modelo]);
-      lines.push(['Descrição do chamado:', descricao]);
-
-      if(state.modelSelection){
-        lines.push(['Seleção:', state.modelSelection]);
-      }
-      if(state.customDescribe){
-        lines.push(['Descrição adicional:', state.customDescribe]);
-      }
-      lines.push(['Chamado resolvido:', state.resolved ? state.resolved : '-']);
-      lines.push(['Imagem enviada:', state.file ? 'Sim' : 'Não']);
-      if(finalExtra) lines.push(['Faltou algo:', finalExtra]);
-
-      // convert to WhatsApp format: label + space + *value*
-      const waLines = lines.map(l => l[0] + ' ' + '*' + l[1] + '*');
-      return waLines;
-    }
-
-    /* Send to contact number; handle file sharing if possible */
-    async function sendToContact(number){
-      const waLines = buildMessageLines();
-      const message = waLines.join('\\n');
-      // If we have a file and the browser supports sharing files, prefer Web Share API (allows attachments)
-      if(state.file && navigator.canShare && navigator.canShare({files:[state.file]})){
-        try{
-          await navigator.share({ text: message, files:[state.file], title: 'Chamado BRMobility' });
-          // After share, still open the chat to the specific contact with message text (image already shared by share sheet if chosen)
-          const openChat = confirm('Compartilhamento concluído. Deseja abrir o chat direto com o contato para confirmar o envio? (abrirá WhatsApp)');
-          if(openChat){
-            const url = 'https://wa.me/' + number + '?text=' + encodeURIComponent(waLines.join('\\n'));
-            window.open(url, '_blank');
-          }
-          return;
-        }catch(err){
-          console.warn('Share failed or canceled', err);
-          // proceed to fallback below
-        }
-      }
-
-      // Fallback: open wa.me (text only) - user must attach image manually if needed
-      const url = 'https://wa.me/' + number + '?text=' + encodeURIComponent(waLines.join('\\n'));
-      window.open(url, '_blank');
-    }
-
-    async function sendToContactWrapper(number){
-      // wrapper to be called by buttons
-      sendToContact(number);
-    }
-
-    /* attach to UI */
-    function sendToContact(number){ sendToContactWrapper(number); }
-
-  </script>
+</script>
 </body>
 </html>
+
+
 
