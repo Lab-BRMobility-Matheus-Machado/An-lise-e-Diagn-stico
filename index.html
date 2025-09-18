@@ -6,9 +6,9 @@
 <title>Análise e Reparo em Campo — BRMobility</title>
 <style>
   :root{
-    --primary:#0b57a4;
+    --primary:#0b57a4; /* tom de azul do logotipo */
     --accent:#f2b705;
-    --bg-overlay: rgba(255,255,255,0.95);
+    --bg-overlay: rgba(255,255,255,0.96);
     --card-radius:14px;
     --max-width:820px;
     --footer-height:96px;
@@ -19,9 +19,10 @@
     font-family: -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
     -webkit-font-smoothing:antialiased;
     background: #f4f6f8;
+    color:#111;
   }
 
-  /* Background logo fixed and fully visible */
+  /* Background logo fixed and centered as watermark */
   .bg-fixed {
     position:fixed;
     inset:0;
@@ -35,7 +36,7 @@
     max-width:90%;
     max-height:90%;
     object-fit:contain;
-    opacity:0.12; /* subtle watermark */
+    opacity:0.10; /* subtle watermark */
   }
 
   /* App container */
@@ -65,10 +66,9 @@
     box-shadow:0 8px 24px rgba(0,0,0,0.08);
   }
 
-  /* first section center */
   .center{text-align:center;}
   h1{margin:6px 0; font-size:22px; line-height:1.05;}
-  p.subtitle{margin:6px 0 12px; font-size:14px; color:#222;}
+  p.subtitle{margin:6px 0 12px 0; font-size:14px; color:#222;}
 
   .alert{
     display:flex;
@@ -101,7 +101,8 @@
     box-sizing:border-box;
   }
   .btn-primary{ background:var(--primary); color:white; }
-  .btn-accent{ background:var(--accent); color:#111; }
+  .btn-accent{ background:var(--primary); color:white; } /* contact buttons also blue */
+  .btn-small{ padding:8px 12px; font-size:14px; border-radius:8px; display:inline-block; }
 
   .options{ display:flex; flex-direction:column; gap:10px; }
   .option-btn{
@@ -155,7 +156,6 @@
 <body>
   <!-- Background watermark/logo fixed and centered -->
   <div class="bg-fixed" aria-hidden="true">
-    <!-- place your 'logotipo empresa.jpg' file in the same folder as this HTML -->
     <img src="logotipo empresa.jpg" alt="BRMobility Logo" />
   </div>
 
@@ -190,7 +190,7 @@
         <div class="small">Preencha para prosseguir.</div>
       </section>
 
-      <!-- 4) Model-specific cards -->
+      <!-- 4) Model-specific cards (i2, i3, s6, s8, s9, s10, h9) -->
       <!-- i2-X2 -->
       <section class="card" id="card-i2" style="display:none;">
         <h2 style="margin:0 0 8px 0;">Erros — i2-X2</h2>
@@ -344,13 +344,13 @@
   </footer>
 
 <script>
-/* ---------- Data from prompt (solutions + lists) ---------- */
+/* ---------- Data (solutions + urls) ---------- */
 const MODELS = ['i2-X2','i3-X3','S6','S8-R8-BR8','H9-H9X','S9-S9X','S10-S10X'];
 
 const i2Errors = [
   {code:'C010/C018', text:'Inclinação frontal excessiva. Solicite a troca do veículo imediatamente.'},
   {code:'C020/C028', text:'Inclinação traseira excessiva. Solicite a troca do veículo imediatamente.'},
-  {code:'C040/C048', text:'Limitador de velocidade frontal/traseiro ativado. Realize o procedimento pelo link: clique aqui (https://drive.google.com/file/d/1uHcirgVcKM_FAG7NPW4spNOP2jF6cpio/view?usp=drive_link)'},
+  {code:'C040/C048', text:'Limitador de velocidade frontal/traseiro ativado. Realize o procedimento no manual.' , url:'https://drive.google.com/file/d/1uHcirgVcKM_FAG7NPW4spNOP2jF6cpio/view?usp=drive_link'},
   {code:'C100/C108', text:'Bateria traseira/frontal vazia. Solicite a troca de bateria imediatamente.'},
   {code:'C200/C208', text:'Desligamento da bateria traseira/frontal. Solicite a troca de bateria imediatamente.'},
   {code:'C400/C408', text:'Ângulo de rotação excedido. Realize a solicitação de pivô mecânico para a troca.'},
@@ -388,10 +388,10 @@ const i3Problems = [
   {label:'Veículo aceso mas não liga', text:'Realizar reset; verificar baterias do controle; se ok, solicitar troca do veículo.'},
   {label:'Carregador não funciona', text:'Solicitar troca de carregador.'},
   {label:'Veículo trepidando', text:'Verificar integridade do chassi e couplings.'},
-  {label:'Veículo puxando/girando', text:'Realizar calibração de postura com controle remoto original.'},
-  {label:'Controle Remoto não funciona', text:'Verificar integridade de carga da bateria do controle e realizar procedimento de pareamento. (link: https://drive.google.com/file/d/16v-38oSKjsfVL9yQnxwbRFtX-6Uf1Fja/view?usp=drive_link)'},
-  {label:'Veículo não acelera', text:'Realizar ajuste de velocidade pelo controle remoto original. (link: https://drive.google.com/file/d/16xl1z4yneIkh3JyjbaL8c0XnuSHmrGy2/view?usp=drive_link)'},
-  {label:'Veículo muito pra frente/pra trás', text:'Realizar calibração de postura com o controle remoto original. (link: https://drive.google.com/file/d/172xePg7Ko2ZNJNlACqlLhETxmGec20Lt/view?usp=drive_link)'},
+  {label:'Veículo puxando/girando', text:'Realizar calibração de postura com controle remoto original. ', url:'https://drive.google.com/file/d/172xePg7Ko2ZNJNlACqlLhETxmGec20Lt/view?usp=drive_link'},
+  {label:'Controle Remoto não funciona', text:'Verificar integridade de carga da bateria do controle e realizar procedimento de pareamento.', url:'https://drive.google.com/file/d/16v-38oSKjsfVL9yQnxwbRFtX-6Uf1Fja/view?usp=drive_link'},
+  {label:'Veículo não acelera', text:'Realizar ajuste de velocidade pelo controle remoto original.', url:'https://drive.google.com/file/d/16xl1z4yneIkh3JyjbaL8c0XnuSHmrGy2/view?usp=drive_link'},
+  {label:'Veículo muito pra frente/pra trás', text:'Realizar calibração de postura com o controle remoto original.', url:'https://drive.google.com/file/d/172xePg7Ko2ZNJNlACqlLhETxmGec20Lt/view?usp=drive_link'},
   {label:'Nenhuma', text:'Nenhuma das opções listadas. Descreva o problema.'}
 ];
 
@@ -400,8 +400,8 @@ const s6Problems = [
   {label:'Veículo apitando', text:'Solicitar imediatamente a troca do veículo.'},
   {label:'Veículo não carrega', text:'Verificar conector de carga (GX14 3 vias Macho), e carregador (66-67.5V). Se necessário solicitar troca.'},
   {label:'Veículo andando sozinho', text:'Verificar integridade do tapete/assoalho; instruir condutor sobre modo acompanhante.'},
-  {label:'Veículo desligando sozinho', text:'Solicitar troca de bateria. (link: https://drive.google.com/file/d/18tKva_egKDP7MeAm7ObcsHbafMtJe0Fi/view?usp=drive_link)'},
-  {label:'Veículo girando', text:'Realizar calibração de postura. (link: https://drive.google.com/file/d/19kLMW1rWbcsAxmkPGM_woMHKQ0uir6oM/view?usp=drive_link)'},
+  {label:'Veículo desligando sozinho', text:'Solicitar troca de bateria.', url:'https://drive.google.com/file/d/18tKva_egKDP7MeAm7ObcsHbafMtJe0Fi/view?usp=drive_link'},
+  {label:'Veículo girando', text:'Realizar calibração de postura.', url:'https://drive.google.com/file/d/19kLMW1rWbcsAxmkPGM_woMHKQ0uir6oM/view?usp=drive_link'},
   {label:'Veículo com rodas travadas', text:'Solicitar imediatamente a troca do veículo.'},
   {label:'Display quebrado', text:'Solicitar troca de display.'},
   {label:'Nenhuma', text:'Nenhuma das opções listadas. Descreva o problema.'}
@@ -432,7 +432,7 @@ const s8Errors = [
   {n:22, text:'Falha no Sensor Giroscópio. Solicite a troca da placa de Controle do veículo.'},
   {n:23, text:'Falha na inicialização da Memoria EPROM. Solicite a troca da placa de Controle do veículo.'},
   {n:24, text:'Falha de Firmware da Memoria EPROM. Solicite a troca da placa de Controle do veículo.'},
-  {n:25, text:'Falha na calibração de postura. Realize a calibração de postura (link: https://drive.google.com/file/d/1EQ8Oi2MSb75m4Gh1mXrnKSdZUhh26AGJ/view?usp=drive_link)'},
+  {n:25, text:'Falha na calibração de postura. Realize a calibração de postura.', url:'https://drive.google.com/file/d/1EQ8Oi2MSb75m4Gh1mXrnKSdZUhh26AGJ/view?usp=drive_link'},
   {n:26, text:'Falha na inicialização do Sensor Giroscópio. Solicite a troca da placa de Controle do veículo.'},
   {n:27, text:'Falha no Firmware do Sensor Giroscópio. Solicite a troca da placa de Controle do veículo.'},
   {n:28, text:'Falha no Firmware do Sensor Giroscópio. Solicite a troca da placa de Controle do veículo.'},
@@ -452,7 +452,7 @@ const s8Errors = [
   {n:42, text:'Falha na placa de pareamento. Solicite a troca da placa do veículo.'},
   {n:43, text:'Falha no carregador. Solicite a troca do carregador do veículo.'},
   {n:44, text:'Falha no Firmware do veículo. Solicite a troca imediatamente.'},
-  {n:45, text:'Falha por colisão. Realize a reinicialização do veículo e calibração de postura (link: https://drive.google.com/file/d/1EQ8Oi2MSb75m4Gh1mXrnKSdZUhh26AGJ/view?usp=drive_link)'},
+  {n:45, text:'Falha por colisão. Realize a reinicialização do veículo e calibração de postura.', url:'https://drive.google.com/file/d/1EQ8Oi2MSb75m4Gh1mXrnKSdZUhh26AGJ/view?usp=drive_link'},
   {n:46, text:'Falha na atualização do Firmware. Solicite a troca do veículo imediatamente.'},
   {n:47, text:'Falha na atualização do Firmware. Solicite a troca do veículo imediatamente.'}
 ];
@@ -493,59 +493,49 @@ const state = {
   patrimonio:'',
   modelo:'',
   descricao:'',
-  selection:'', // e.g. error code or problem label
+  selection:'',
   customDescribe:'',
   resolved:'',
   file:null,
   finalExtra:''
 };
 
-/* ---------- HELPERS ---------- */
+/* helpers */
 function el(id){ return document.getElementById(id); }
 function show(elm){ elm.style.display = ''; }
 function hide(elm){ elm.style.display = 'none'; }
 function createOptionButton(text, onclick){ const b = document.createElement('button'); b.className='option-btn'; b.type='button'; b.textContent = text; b.onclick = onclick; return b; }
 
-/* ---------- INIT UI ---------- */
+/* init */
 document.addEventListener('DOMContentLoaded', ()=>{
-  // initial fields
-  ['field-chamado','field-posto','field-patrimonio'].forEach(id=>{
-    el(id).addEventListener('input', checkInitialFields);
-  });
-  el('btn-to-model').addEventListener('click', ()=>{
-    show(el('card-model'));
-    el('card-model').scrollIntoView({behavior:'smooth', block:'center'});
-  });
+  ['field-chamado','field-posto','field-patrimonio'].forEach(id=> el(id).addEventListener('input', checkInitialFields));
+  el('btn-to-model').addEventListener('click', ()=>{ show(el('card-model')); el('card-model').scrollIntoView({behavior:'smooth', block:'center'}); });
 
-  // render models list
-  const modelsList = el('models-list');
+  // models
   MODELS.forEach(m=>{
-    const btn = createOptionButton(m, ()=>{
-      selectModel(m, btn);
-    });
-    modelsList.appendChild(btn);
+    const btn = createOptionButton(m, ()=> selectModel(m, btn));
+    el('models-list').appendChild(btn);
   });
 
-  // render i2 list
-  const i2list = el('i2-list');
+  // i2 list
   i2Errors.forEach(err=>{
-    const b = createOptionButton(err.code, ()=> selectI2(err, b) );
-    i2list.appendChild(b);
-    const s = document.createElement('div'); s.className='solution'; i2list.appendChild(s);
+    const b = createOptionButton(err.code, ()=> selectI2(err,b));
+    el('i2-list').appendChild(b);
+    const s = document.createElement('div'); s.className='solution'; el('i2-list').appendChild(s);
   });
 
-  // other lists
+  // others
   renderList('i3-list', i3Problems, selectI3);
   renderList('s6-list', s6Problems, selectS6);
   renderList('s9-list', s9Problems, selectS9);
   renderList('s10-list', s10Problems, selectS10);
   renderList('h9-list', h9Problems, selectH9);
 
-  // s8 code handler
+  // s8 handler
   el('s8-code').addEventListener('change', handleS8Input);
   el('s8-code').addEventListener('keyup', (e)=>{ if(e.key==='Enter') handleS8Input(); });
 
-  // file input preview
+  // file preview
   el('file-input').addEventListener('change', (e)=>{
     const f = e.target.files[0];
     state.file = f || null;
@@ -557,16 +547,13 @@ document.addEventListener('DOMContentLoaded', ()=>{
         preview.style.display = '';
       };
       reader.readAsDataURL(f);
-    }else{
-      preview.innerHTML=''; preview.style.display='none';
-    }
+    } else { preview.innerHTML=''; preview.style.display='none'; }
     evaluateFinal();
   });
 
-  // final extra listener
   el('field-final-extra').addEventListener('input', (e)=>{ state.finalExtra = e.target.value.trim(); evaluateFinal(); });
 
-  // contact buttons
+  // contacts
   el('btn-vanessa').addEventListener('click', ()=> sendWhats('5511989477808'));
   el('btn-willian').addEventListener('click', ()=> sendWhats('5511956544217'));
 });
@@ -575,27 +562,21 @@ function checkInitialFields(){
   state.chamado = el('field-chamado').value.trim();
   state.posto = el('field-posto').value.trim();
   state.patrimonio = el('field-patrimonio').value.trim();
-  if(state.chamado && state.posto && state.patrimonio){
-    el('btn-to-model').style.display = '';
-  } else {
-    el('btn-to-model').style.display = 'none';
-  }
+  el('btn-to-model').style.display = (state.chamado && state.posto && state.patrimonio) ? '' : 'none';
 }
 
-/* ---------- MODEL SELECTION ---------- */
+/* model selection */
 function selectModel(model, btn){
   state.modelo = model;
-  // mark active
   document.querySelectorAll('#models-list .option-btn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
-  // show description card
   show(el('card-desc'));
   el('card-desc').scrollIntoView({behavior:'smooth', block:'center'});
-  // once description is filled, show model-specific cards
-  el('field-descricao').addEventListener('input', function onDesc(){
-    state.descricao = this.value.trim();
+
+  function onDesc(){
+    state.descricao = el('field-descricao').value.trim();
     if(state.descricao){
-      // show corresponding model card(s)
+      // show card(s)
       switch(state.modelo){
         case 'i2-X2': show(el('card-i2')); break;
         case 'i3-X3': show(el('card-i3')); break;
@@ -604,88 +585,57 @@ function selectModel(model, btn){
         case 'H9-H9X': show(el('card-h9')); break;
         case 'S9-S9X': show(el('card-s9')); break;
         case 'S10-S10X': show(el('card-s10')); break;
-        default: break;
       }
       show(el('card-image'));
-      // scroll to the first relevant card of model
       const id = 'card-' + state.modelo.split('-')[0].toLowerCase();
-      const target = el(id);
-      if(target) target.scrollIntoView({behavior:'smooth', block:'center'});
-      // remove listener to avoid duplicate triggers
+      const t = el(id); if(t) t.scrollIntoView({behavior:'smooth', block:'center'});
       el('field-descricao').removeEventListener('input', onDesc);
     }
-  });
+  }
+  el('field-descricao').addEventListener('input', onDesc);
 }
 
-/* ---------- Render helper ---------- */
+/* render helper */
 function renderList(containerId, list, handler){
   const cont = el(containerId);
   list.forEach(item=>{
-    const btn = createOptionButton(item.label || item.n, ()=> handler(item, btn));
-    cont.appendChild(btn);
+    const label = item.label || ('Erro '+ (item.n||''));
+    const b = createOptionButton(label, ()=> handler(item,b));
+    cont.appendChild(b);
     const s = document.createElement('div'); s.className='solution'; cont.appendChild(s);
   });
 }
 
-/* ---------- Selection handlers ---------- */
-function markActiveAndShowSolution(btn, solutionText){
-  // unmark siblings; show solution in the next .solution sibling
+/* selection and solution display (with "clique aqui" when url present) */
+function markActiveAndShowSolution(btn, solutionText, url){
   const parent = btn.parentElement;
   parent.querySelectorAll('.option-btn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
   let next = btn.nextElementSibling;
   while(next && !next.classList.contains('solution')) next = next.nextElementSibling;
   if(next){
-    next.innerHTML = '<strong>Informação:</strong> ' + solutionText;
+    // build solution HTML with optional "clique aqui" button
+    let html = '<strong>Informação:</strong> ' + solutionText;
+    if(url){
+      // add space and clickable button labeled "clique aqui"
+      // use onclick to open url in new tab/window
+      html += '<div style="margin-top:8px;"><button class="btn btn-small btn-primary" onclick="window.open(\\''+url+'\\', \\'_blank\\')">clique aqui</button></div>';
+    }
+    next.innerHTML = html;
     next.style.display = 'block';
     next.scrollIntoView({behavior:'smooth', block:'center'});
   }
 }
 
-function selectI2(err, btn){
-  markActiveAndShowSolution(btn, err.text);
-  state.selection = err.code;
-  if(err.code === 'Nenhuma'){
-    show(el('i2-describe'));
-    el('i2-custom').addEventListener('input', function onInput(){ state.customDescribe = this.value.trim(); if(state.customDescribe) show(el('i2-resolved')); });
-  } else {
-    hide(el('i2-describe'));
-    show(el('i2-resolved'));
-  }
-  evaluateFinal();
-}
+/* selection handlers (short form) */
+function selectI2(err, btn){ markActiveAndShowSolution(btn, err.text, err.url); state.selection = err.code; if(err.code==='Nenhuma'){ show(el('i2-describe')); el('i2-custom').addEventListener('input', ()=>{ state.customDescribe = el('i2-custom').value.trim(); if(state.customDescribe) show(el('i2-resolved')); }); } else { hide(el('i2-describe')); show(el('i2-resolved')); } evaluateFinal(); }
+function selectI3(item, btn){ markActiveAndShowSolution(btn, item.text, item.url); state.selection = item.label; if(item.label==='Nenhuma'){ show(el('i3-describe')); el('i3-custom').addEventListener('input', ()=>{ state.customDescribe = el('i3-custom').value.trim(); if(state.customDescribe) show(el('i3-resolved')); }); } else { hide(el('i3-describe')); show(el('i3-resolved')); } evaluateFinal(); }
+function selectS6(item, btn){ markActiveAndShowSolution(btn, item.text, item.url); state.selection = item.label; if(item.label==='Nenhuma'){ show(el('s6-describe')); el('s6-custom').addEventListener('input', ()=>{ state.customDescribe = el('s6-custom').value.trim(); if(state.customDescribe) show(el('s6-resolved')); }); } else { hide(el('s6-describe')); show(el('s6-resolved')); } evaluateFinal(); }
+function selectS9(item, btn){ markActiveAndShowSolution(btn, item.text, item.url); state.selection = item.label; if(item.label==='Nenhuma'){ show(el('s9-describe')); el('s9-custom').addEventListener('input', ()=>{ state.customDescribe = el('s9-custom').value.trim(); if(state.customDescribe) show(el('s9-resolved')); }); } else { hide(el('s9-describe')); show(el('s9-resolved')); } evaluateFinal(); }
+function selectS10(item, btn){ markActiveAndShowSolution(btn, item.text, item.url); state.selection = item.label; if(item.label==='Nenhuma'){ show(el('s10-describe')); el('s10-custom').addEventListener('input', ()=>{ state.customDescribe = el('s10-custom').value.trim(); if(state.customDescribe) show(el('s10-resolved')); }); } else { hide(el('s10-describe')); show(el('s10-resolved')); } evaluateFinal(); }
+function selectH9(item, btn){ markActiveAndShowSolution(btn, item.text, item.url); state.selection = item.label; if(item.label==='Nenhuma'){ show(el('h9-describe')); el('h9-custom').addEventListener('input', ()=>{ state.customDescribe = el('h9-custom').value.trim(); if(state.customDescribe) show(el('h9-resolved')); }); } else { hide(el('h9-describe')); show(el('h9-resolved')); } evaluateFinal(); }
 
-function selectI3(item, btn){
-  markActiveAndShowSolution(btn, item.text);
-  state.selection = item.label;
-  if(item.label === 'Nenhuma'){
-    show(el('i3-describe'));
-    el('i3-custom').addEventListener('input', function onInput(){ state.customDescribe = this.value.trim(); if(state.customDescribe) show(el('i3-resolved')); });
-  } else {
-    hide(el('i3-describe'));
-    show(el('i3-resolved'));
-  }
-  evaluateFinal();
-}
-
-function selectS6(item, btn){
-  markActiveAndShowSolution(btn, item.text);
-  state.selection = item.label;
-  if(item.label === 'Nenhuma'){
-    show(el('s6-describe'));
-    el('s6-custom').addEventListener('input', function onInput(){ state.customDescribe = this.value.trim(); if(state.customDescribe) show(el('s6-resolved')); });
-  } else {
-    hide(el('s6-describe'));
-    show(el('s6-resolved'));
-  }
-  evaluateFinal();
-}
-
-function selectS9(item, btn){ markActiveAndShowSolution(btn, item.text); state.selection = item.label; if(item.label==='Nenhuma'){ show(el('s9-describe')); el('s9-custom').addEventListener('input', ()=>{ state.customDescribe = el('s9-custom').value.trim(); if(state.customDescribe) show(el('s9-resolved')); }); } else { hide(el('s9-describe')); show(el('s9-resolved')); } evaluateFinal(); }
-function selectS10(item, btn){ markActiveAndShowSolution(btn, item.text); state.selection = item.label; if(item.label==='Nenhuma'){ show(el('s10-describe')); el('s10-custom').addEventListener('input', ()=>{ state.customDescribe = el('s10-custom').value.trim(); if(state.customDescribe) show(el('s10-resolved')); }); } else { hide(el('s10-describe')); show(el('s10-resolved')); } evaluateFinal(); }
-function selectH9(item, btn){ markActiveAndShowSolution(btn, item.text); state.selection = item.label; if(item.label==='Nenhuma'){ show(el('h9-describe')); el('h9-custom').addEventListener('input', ()=>{ state.customDescribe = el('h9-custom').value.trim(); if(state.customDescribe) show(el('h9-resolved')); }); } else { hide(el('h9-describe')); show(el('h9-resolved')); } evaluateFinal(); }
-
-/* ---------- S8 handling ---------- */
+/* S8 handling */
 function handleS8Input(){
   const val = el('s8-code').value.trim();
   const list = el('s8-list');
@@ -703,59 +653,49 @@ function handleS8Input(){
       show(el('s8-resolved'));
     }
   } else if(num === 0){
-    // list all options
     s8Errors.forEach(e=>{
-      if(e.n===0) return;
       const b = createOptionButton('Erro ' + e.n, ()=> selectS8(e,b));
       list.appendChild(b);
       const s = document.createElement('div'); s.className='solution'; list.appendChild(s);
     });
+    // add 'Nenhuma das opções listadas' button
+    const noneBtn = createOptionButton('Nenhuma das opções listadas', ()=>{
+      document.querySelectorAll('#s8-list .option-btn').forEach(b=>b.classList.remove('active'));
+      noneBtn.classList.add('active');
+      let next = noneBtn.nextElementSibling;
+      while(next && !next.classList.contains('solution')) next = next.nextElementSibling;
+      if(next){ next.innerHTML = '<strong>Informação:</strong> Nenhuma das opções listadas. Descreva o problema.'; next.style.display = 'block'; }
+      show(el('s8-describe'));
+      el('s8-custom').addEventListener('input', ()=>{ state.customDescribe = el('s8-custom').value.trim(); if(state.customDescribe) show(el('s8-resolved')); });
+      state.selection = 'Nenhuma';
+    });
+    list.appendChild(noneBtn);
+    const snone = document.createElement('div'); snone.className='solution'; list.appendChild(snone);
   } else {
     const note = document.createElement('div'); note.className='small'; note.textContent = 'Insira um número entre 1 e 47, ou 0 para listar todas as opções.'; list.appendChild(note);
   }
   evaluateFinal();
 }
 
-function selectS8(e, btn){
-  markActiveAndShowSolution(btn, e.text);
-  state.selection = 'Erro ' + e.n;
-  if(e.n === 0){
-    show(el('s8-describe'));
-    el('s8-custom').addEventListener('input', ()=>{ state.customDescribe = el('s8-custom').value.trim(); if(state.customDescribe) show(el('s8-resolved')); });
-  } else {
-    hide(el('s8-describe'));
-    show(el('s8-resolved'));
-  }
-  evaluateFinal();
-}
+function selectS8(e, btn){ markActiveAndShowSolution(btn, e.text, e.url); state.selection = 'Erro ' + e.n; if(e.n===0){ show(el('s8-describe')); el('s8-custom').addEventListener('input', ()=>{ state.customDescribe = el('s8-custom').value.trim(); if(state.customDescribe) show(el('s8-resolved')); }); } else { hide(el('s8-describe')); show(el('s8-resolved')); } evaluateFinal(); }
 
-/* ---------- Resolved ---------- */
-function markResolved(val){
-  state.resolved = val;
-  evaluateFinal();
-}
+/* resolved */
+function markResolved(val){ state.resolved = val; evaluateFinal(); }
 
-/* ---------- Evaluate final readiness ---------- */
+/* evaluate final readiness */
 function evaluateFinal(){
-  // basic fields
   state.chamado = el('field-chamado').value.trim();
   state.posto = el('field-posto').value.trim();
   state.patrimonio = el('field-patrimonio').value.trim();
   state.descricao = el('field-descricao').value.trim();
-
   if(!state.chamado || !state.posto || !state.patrimonio) return;
   if(!state.modelo || !state.descricao) return;
-
-  // model-specific checks: selection or customDescribe must exist
   let modelOk = true;
   if(['i2-X2','i3-X3','S6','S8-R8-BR8','S9-S9X','S10-S10X','H9-H9X'].includes(state.modelo)){
     modelOk = !!state.selection || !!state.customDescribe;
   }
-
-  // resolved requirement: if resolved set (for those which asked), must be set
   let resolvedNeeded = ['i2-X2','i3-X3','S6','S8-R8-BR8','S9-S9X','S10-S10X','H9-H9X'].includes(state.modelo);
   let resolvedOk = !resolvedNeeded || !!state.resolved;
-
   if(modelOk && resolvedOk){
     show(el('card-final-extra'));
     show(el('card-contacts'));
@@ -764,7 +704,7 @@ function evaluateFinal(){
   }
 }
 
-/* ---------- Build WhatsApp message (answers bold) ---------- */
+/* build WhatsApp message (use real newlines) */
 function buildWhatsLines(){
   const lines = [];
   lines.push(['Chamado:', state.chamado]);
@@ -777,54 +717,30 @@ function buildWhatsLines(){
   lines.push(['Chamado resolvido:', state.resolved ? state.resolved : '-']);
   lines.push(['Imagem enviada:', state.file ? 'Sim' : 'Não']);
   if(state.finalExtra) lines.push(['Faltou algo:', state.finalExtra]);
-
-  // Format: Label + space + *value*
   const waLines = lines.map(l => `${l[0]} *${l[1] || ''}*` );
-  return waLines;
+  return waLines.join('\n');
 }
 
-/* ---------- Send via Web Share API or wa.me fallback ---------- */
+/* send via Web Share API or wa.me fallback */
 async function sendWhats(number){
-  // refresh some dynamic state values before sending
   state.finalExtra = el('field-final-extra').value.trim() || state.finalExtra;
-  // ensure selection from various inputs if present
-  if(el('i2-custom')) state.customDescribe = state.customDescribe || el('i2-custom').value.trim();
-  if(el('s8-custom')) state.customDescribe = state.customDescribe || el('s8-custom').value.trim();
-  const waLines = buildWhatsLines();
-  const message = waLines.join('\\n');
-
-  // If we have an image and browser supports share with files, try it
+  state.customDescribe = state.customDescribe || (el('i2-custom') && el('i2-custom').value.trim()) || (el('s8-custom') && el('s8-custom').value.trim()) || state.customDescribe;
+  const message = buildWhatsLines();
   if(state.file && navigator.canShare && navigator.canShare({ files: [state.file] })){
     try{
       await navigator.share({ files: [state.file], text: message, title: 'Chamado BRMobility' });
-      // after share, open chat (optional confirmation)
-      const openChat = confirm('Compartilhamento concluído. Deseja abrir o WhatsApp para confirmar/acompanhar?');
+      const openChat = confirm('Compartilhamento concluído. Deseja abrir o WhatsApp para confirmar o envio?');
       if(openChat){
         window.open('https://wa.me/' + number + '?text=' + encodeURIComponent(message), '_blank');
       }
       return;
-    } catch(err){
+    }catch(err){
       console.warn('Share API falhou ou cancelado', err);
-      // fallback to wa.me below
     }
   }
-  // Fallback: open wa.me with text only (user must attach image manually if needed)
   const url = 'https://wa.me/' + number + '?text=' + encodeURIComponent(message);
   window.open(url, '_blank');
 }
-
-/* ---------- Utility: wire up list renderers for i3, s6, etc ---------- */
-function renderList(id, items, handler){
-  const cont = el(id);
-  items.forEach(item=>{
-    const b = createOptionButton(item.label || item.n, ()=> handler(item, b));
-    cont.appendChild(b);
-    const s = document.createElement('div'); s.className='solution'; cont.appendChild(s);
-  });
-}
-
-/* Keep functions available for handlers defined earlier */
-window.renderList = renderList;
 
 </script>
 </body>
