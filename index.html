@@ -1,354 +1,686 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>BRMobility - Análise e Reparo</title>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Análise e Reparo em Campo - Grupo BRMobility</title>
   <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: url('logotipo empresa.jpg') no-repeat center center fixed;
-      background-size: contain;
-      background-color: #f5f5f5;
-      color: #333;
+    :root{
+      /* Colors should be adjusted to match the company logo colors.
+         Replace these variables if you want exact hex codes from the logo. */
+      --primary: #0b57a4;
+      --accent: #f2b705;
+      --bg-overlay: rgba(255,255,255,0.92);
+      --card-radius: 14px;
+      --btn-radius: 12px;
+      --max-width: 760px;
+    }
+    html,body{
+      height:100%;
+      margin:0;
+      font-family: -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+      background: center/cover no-repeat url('logotipo empresa.jpg');
+      -webkit-font-smoothing:antialiased;
+      -moz-osx-font-smoothing:grayscale;
     }
 
-    .overlay {
-      background-color: rgba(255, 255, 255, 0.85);
-      padding: 30px;
-      min-height: 100vh;
+    /* Page wrapper centered, mobile-first */
+    .page {
+      min-height:100%;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:20px;
     }
 
-    h1 {
-      text-align: center;
-      font-size: 2.5em;
-      color: #003366;
-      margin-bottom: 10px;
+    .card {
+      width:100%;
+      max-width:var(--max-width);
+      background:var(--bg-overlay);
+      border-radius:var(--card-radius);
+      box-shadow: 0 8px 24px rgba(0,0,0,0.12);
+      padding:18px;
+      box-sizing:border-box;
+      margin-bottom:20px;
+      text-align:center; /* first section must be centered */
     }
 
-    h2 {
-      text-align: center;
-      font-size: 1em;
-      font-weight: normal;
-      color: #444;
-      margin-bottom: 20px;
-      max-width: 600px;
-      margin-left: auto;
-      margin-right: auto;
+    header h1{
+      margin:6px 0 6px 0;
+      font-size:24px; /* big letters as requested */
+      line-height:1.05;
     }
-
+    header p.subtitle{
+      margin:0 0 8px 0;
+      font-size:14px;
+      color:#222;
+    }
     .alert {
-      text-align: center;
-      font-size: 0.9em;
-      color: #aa0000;
-      margin-bottom: 30px;
+      font-size:12px;
+      color:#b22222;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:8px;
+      margin:8px 0 14px 0;
     }
 
-    .alert::before {
-      content: "⚠️ ";
+    .row{
+      display:flex;
+      flex-direction:column;
+      gap:10px;
+      align-items:center;
     }
 
-    .form-group {
-      text-align: center;
-      margin-bottom: 20px;
+    input[type="text"], textarea, select {
+      width:94%;
+      max-width:680px;
+      padding:10px 12px;
+      border-radius:10px;
+      border:1px solid #ccc;
+      font-size:15px;
+      box-sizing:border-box;
     }
 
-    input[type="text"] {
-      width: 80%;
-      max-width: 400px;
-      padding: 10px;
-      font-size: 1em;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-      color: #333;
+    textarea { min-height:90px; resize:vertical; }
+
+    .hidden { display:none !important; }
+
+    .btn {
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      gap:10px;
+      width:94%;
+      max-width:680px;
+      padding:12px;
+      border-radius:var(--btn-radius);
+      border:none;
+      cursor:pointer;
+      font-weight:600;
+      font-size:15px;
+      box-sizing:border-box;
     }
 
-    input::placeholder {
-      color: #aaa;
+    .btn-primary { background:var(--primary); color:white; }
+    .btn-secondary { background:var(--accent); color:#111; }
+
+    .small {
+      width:94%;
+      max-width:680px;
+      padding:10px;
+      border-radius:10px;
+      border:1px dashed #ccc;
+      font-size:14px;
+      text-align:left;
+      background:#fff;
     }
 
-    .hidden {
-      display: none;
+    .option-grid {
+      display:grid;
+      grid-template-columns:repeat(2,1fr);
+      gap:8px;
+      width:94%;
+      max-width:680px;
+      margin:6px auto 0 auto;
     }
 
-    h3 {
-      text-align: center;
-      font-size: 1.8em;
-      margin-top: 40px;
-      color: #003366;
+    .option {
+      background:#fff;
+      border-radius:10px;
+      padding:10px;
+      border:1px solid #ddd;
+      text-align:left;
+      cursor:pointer;
+      font-size:14px;
     }
 
-    .button-group {
-      display: flex;
-      flex-wrap: wrap;
-      justify-content: center;
-      gap: 10px;
-      margin-top: 20px;
-    }
-
-    .vehicle-button {
-      padding: 10px 20px;
-      background-color: #003366;
-      color: white;
-      border: none;
-      border-radius: 5px;
-      cursor: pointer;
-      font-size: 1em;
-    }
-
-    .vehicle-button:hover {
-      background-color: #005599;
-    }
-
-    .problem-input {
-      text-align: center;
-      margin-top: 30px;
-    }
-
-    textarea {
-      width: 80%;
-      max-width: 500px;
-      height: 100px;
-      padding: 10px;
-      font-size: 1em;
-      border: 1px solid #ccc;
-      border-radius: 5px;
-      resize: none;
-    }
-
-    footer {
-      text-align: center;
-      margin-top: 50px;
-      padding: 20px;
-      background-color: #eaeaea;
-    }
-
-    footer img {
-      max-height: 40px;
-    }
+    .option.active { border-color:var(--primary); box-shadow:0 4px 12px rgba(11,87,164,0.12); }
 
     .info-box {
-      background-color: #eef;
-      border-left: 4px solid #003366;
-      padding: 10px;
-      margin: 10px auto;
-      max-width: 600px;
-      font-size: 0.95em;
-      display: block;
+      text-align:left;
+      width:94%;
+      max-width:680px;
+      margin:8px auto;
+      padding:10px;
+      border-radius:10px;
+      background:#fff;
+      border:1px solid #eee;
+      font-size:14px;
     }
 
-    a {
-      color: #003366;
-      text-decoration: underline;
+    footer.app-footer{
+      width:100%;
+      max-width:var(--max-width);
+      height:88px;
+      margin:0 auto;
+      border-radius:var(--card-radius);
+      overflow:hidden;
+      display:block;
+      background: center/cover no-repeat url('logotipo empresa.jpg');
+    }
+
+    .contact-row {
+      display:flex;
+      gap:10px;
+      justify-content:space-between;
+      width:94%;
+      max-width:680px;
+      margin:10px auto 0 auto;
+    }
+
+    .contact-btn {
+      flex:1;
+      display:flex;
+      align-items:center;
+      gap:10px;
+      padding:10px;
+      border-radius:10px;
+      border:none;
+      cursor:pointer;
+      font-weight:700;
+      justify-content:center;
+    }
+    .contact-left { background:#ffffffcc; }
+    .contact-right { background:#ffffffcc; }
+
+    /* small screens */
+    @media(max-width:420px){
+      header h1{ font-size:20px; }
+      .option-grid{ grid-template-columns:1fr; }
+      footer.app-footer{ height:110px; background-size:contain; background-position:center; }
     }
   </style>
 </head>
 <body>
-  <div class="overlay">
-    <h1>Análise e Reparo em Campo Grupo BRMobility</h1>
-    <h2>Este site tem o intuito de auxiliar as manutenções em campo dos nossos Técnicos Externos, oferecendo mais velocidade em diagnóstico e reparos, assim como instruir e capacitar cada vez mais o conhecimento dos veículos do Grupo BRMobility.</h2>
-    <div class="alert">Esse site não deve ser compartilhado com clientes ou outras pessoas que não façam parte do Grupo BRMobility.</div>
+  <div class="page">
+    <div class="card" id="step-0">
+      <header>
+        <h1>Análise e Reparo em Campo Grupo BRMobility</h1>
+        <p class="subtitle">Este site tem o intuito de auxiliar as manutenções em campo dos nossos Técnicos Externos, oferecendo mais velocidade em diagnóstico e reparos, assim como instruir e capacitar cada vez mais o conhecimento dos veículos do Grupo BRMobility.</p>
+        <div class="alert">⚠ <span>Esse site não deve ser compartilhado com clientes ou pessoas externas ao Grupo BRMobility.</span></div>
+      </header>
 
-    <div class="form-group">
-      <input type="text" id="chamado" placeholder="por exemplo #20991">
-    </div>
-    <div class="form-group">
-      <input type="text" id="posto" placeholder="por exemplo Shopping BRMobility">
-    </div>
-    <div class="form-group">
-      <input type="text" id="patrimonio" placeholder="por exemplo 0123">
-    </div>
+      <div class="row">
+        <input id="chamado" type="text" placeholder="por exemplo #20991" oninput="checkFirstInputs()" />
+        <input id="posto" type="text" placeholder="por exemplo Shopping BRMobility" oninput="checkFirstInputs()" />
+        <input id="patrimonio" type="text" placeholder="por exemplo 0123" oninput="checkFirstInputs()" />
+        <div style="font-size:13px;color:#555; margin-top:6px;">Preencha os campos acima para prosseguir.</div>
 
-    <div id="vehicleSection" class="hidden">
-      <h3>Qual o modelo do veículo?</h3>
-      <div class="button-group">
-        <button class="vehicle-button" onclick="selectModel('i2-X2')">i2-X2</button>
-        <button class="vehicle-button" onclick="selectModel('i3-X3')">i3-X3</button>
-        <button class="vehicle-button" onclick="selectModel('S6')">S6</button>
-        <button class="vehicle-button" onclick="selectModel('S8-R8-BR8')">S8-R8-BR8</button>
-        <button class="vehicle-button" onclick="selectModel('H9-H9X')">H9-H9X</button>
-        <button class="vehicle-button" onclick="selectModel('S9-S9X')">S9-S9X</button>
-        <button class="vehicle-button" onclick="selectModel('S10-S10X')">S10-S10X</button>
-      </div>
+        <button id="btn-modelo" class="btn btn-primary hidden" onclick="showModelSelect()">Qual o modelo do veículo?</button>
 
-      <div id="problemInput" class="problem-input hidden">
-        <h3>Qual o problema descrito no chamado ou informado pelo cliente?</h3>
-        <textarea id="problema" placeholder="Descreva aqui o problema..."></textarea>
       </div>
     </div>
 
-    <div id="erroSection" class="hidden">
-      <h3 id="erroTitulo">O veículo apresenta algum desses Erros?</h3>
-      <div class="button-group" id="erroButtons"></div>
-      <div id="erroDescricao" class="problem-input hidden">
-        <h3>Descreva o problema:</h3>
-        <textarea id="descricaoErro" placeholder="Descreva aqui o problema..."></textarea>
+    <!-- Modelo selection card (appears only after the three first fields are filled) -->
+    <div class="card hidden" id="step-modelo">
+      <h2 style="font-size:18px; margin:6px 0;">Qual o modelo do veículo?</h2>
+      <div class="row">
+        <div class="option-grid" id="modelos">
+          <div class="option" onclick="selectModelo('i2-X2')">i2-X2</div>
+          <div class="option" onclick="selectModelo('i3-X3')">i3-X3</div>
+          <div class="option" onclick="selectModelo('S6')">S6</div>
+          <div class="option" onclick="selectModelo('S8-R8-BR8')">S8-R8-BR8</div>
+          <div class="option" onclick="selectModelo('H9-H9X')">H9-H9X</div>
+          <div class="option" onclick="selectModelo('S9-S9X')">S9-S9X</div>
+          <div class="option" onclick="selectModelo('S10-S10X')">S10-S10X</div>
+        </div>
+        <div id="modeloHelp" class="small hidden">Modelo selecionado: <span id="modeloVal"></span></div>
       </div>
-      <div id="resolvidoSection" class="problem-input hidden">
-        <h3>Foi possível resolver o chamado?</h3>
-        <div class="button-group">
-          <button class="vehicle-button" onclick="setResolvido('Sim')">Sim</button>
-          <button class="vehicle-button" onclick="setResolvido('Não')">Não</button>
+    </div>
+
+    <!-- Generic problem description card (shows after model selected) -->
+    <div class="card hidden" id="step-desc">
+      <h2 style="font-size:18px; margin:6px 0;">Qual o problema descrito no chamado ou informado pelo cliente?</h2>
+      <div class="row">
+        <textarea id="desc_chamado" placeholder="Descreva o problema..." oninput="onDescInput()"></textarea>
+        <div style="font-size:13px;color:#555;">Preencha para prosseguir.</div>
+      </div>
+    </div>
+
+    <!-- Sections for i2-X2 errors -->
+    <div class="card hidden" id="i2-section">
+      <h2 style="font-size:18px; margin:6px 0;">Erros (i2-X2)</h2>
+      <div class="row">
+        <div class="option-grid" id="i2-options">
+          <!-- Each button shows the solution in an info box but does NOT add the solution to WhatsApp message. -->
+          <div class="option" onclick="selectError('C010/C018','Inclinação frontal excessiva. Solicite a troca do veículo imediatamente.')">C010/C018</div>
+          <div class="option" onclick="selectError('C020/C028','Inclinação traseira excessiva. Solicite a troca do veículo imediatamente.')">C020/C028</div>
+          <div class="option" onclick="selectError('C040/C048','Limitador de velocidade frontal/traseiro ativado. Realize o procedimento pelo link: clique aqui.')">C040/C048</div>
+          <div class="option" onclick="selectError('C100/C108','Bateria traseira/frontal vazia. Solicite a troca de bateria imediatamente.')">C100/C108</div>
+          <div class="option" onclick="selectError('C200/C208','Desligamento da bateria traseira/frontal. Solicite a troca de bateria imediatamente.')">C200/C208</div>
+          <div class="option" onclick="selectError('C400/C408','Ângulo de rotação excedido. Realize a solicitação de pivô mecânico para a troca.')">C400/C408</div>
+          <div class="option" onclick="selectError('C800/C808','Baixa voltagem do barramento. Solicite imediatamente a troca do veículo.')">C800/C808</div>
+          <div class="option" onclick="selectError('E012/E01A/E01B','Falha na comunicação com o módulo CU. Solicite imediatamente a troca do veículo.')">E012/E01A/E01B</div>
+          <div class="option" onclick="selectError('E022/E02A/E02B','Falha na comunicação com o módulo BSA. Solicite imediatamente a troca do veículo.')">E022/E02A/E02B</div>
+          <div class="option" onclick="selectError('E042/E04A/E04B','Falha na comunicação com o módulo BSA. Solicite imediatamente a troca do veículo.')">E042/E04A/E04B</div>
+          <div class="option" onclick="selectError('E082/E08A/E08B','Falha na comunicação com o módulo UI. Solicite imediatamente a troca do veículo.')">E082/E08A/E08B</div>
+          <div class="option" onclick="selectError('E202/E20A/E20B','Falha no slot TDM. Solicite imediatamente a troca do veículo.')">E202/E20A/E20B</div>
+          <div class="option" onclick="selectError('E402/E40A/E40B','Falha na comunicação remota com o BSA. Solicite imediatamente a troca do veículo.')">E402/E40A/E40B</div>
+          <div class="option" onclick="selectError('E802/E80A/E80B','Falha na comunicação remota com o UI. Solicite imediatamente a troca do veículo.')">E802/E80A/E80B</div>
+          <div class="option" onclick="selectError('E013/E01C/E02C','Falha na comunicação com o módulo BCU. Solicite imediatamente a troca do veículo.')">E013/E01C/E02C</div>
+          <div class="option" onclick="selectError('E014/E024/E044','Falha no sensor de pivô. Solicite um sensor de pivô para a troca.')">E014/E024/E044</div>
+          <div class="option" onclick="selectError('E084/E104/E204','Falha nos sensores auxiliares. Solicite imediatamente a troca do veículo.')">E084/E104/E204</div>
+          <div class="option" onclick="selectError('E404/E40C','Falha no sensor de detecção do piloto. Solicite imediatamente a troca do veículo.')">E404/E40C</div>
+          <div class="option" onclick="selectError('E804/E80C','Falha no sensor de alimentação. Solicite um conjunto de placa fonte para a troca.')">E804/E80C</div>
+          <div class="option" onclick="selectError('E015/E025/E045','Falha nos sensores de alimentação (12V, 5V, 3V). Solicite imediatamente a troca do veículo.')">E015/E025/E045</div>
+          <div class="option" onclick="selectError('E085/E105/E205','Falha no sensor de temperatura do BSA. Solicite um par de baterias para a troca.')">E085/E105/E205</div>
+          <div class="option" onclick="selectError('E105/E205/E405','Falha interna do BSA. Solicite imediatamente a troca do veículo.')">E105/E205/E405</div>
+          <div class="option" onclick="selectError('E016/E026/E046','Falha na temperatura da junção. Solicite imediatamente a troca do veículo.')">E016/E026/E046</div>
+          <div class="option" onclick="selectError('E086/E106/E206','Falha no motor de acionamento. Solicite um par de motores para a troca.')">E086/E106/E206</div>
+          <div class="option" onclick="selectError('E406/E406','Falha no amplificador de corrente do motor. Solicite um par de motores para a troca.')">E406/E406</div>
+          <div class="option" onclick="selectError('E806/E806','Falha no feedback de voltagem do motor. Solicite um par de motores para a troca.')">E806/E806</div>
+          <div class="option" onclick="selectError('E017/E027/E047','Falha na consistência da voltagem do motor.')">E017/E027/E047</div>
+          <div class="option" onclick="selectError('E087/E107/E207','Falha no relé do motor. Solicite um par de motores para a troca.')">E087/E107/E207</div>
+          <div class="option" onclick="selectError('E407/E407','Falha na consistência da alimentação do atuador. Solicite imediatamente a troca do veículo.')">E407/E407</div>
+          <div class="option" onclick="selectError('Nenhuma','Nenhuma das opções listadas. Descreva o problema.')">Nenhuma das opções listadas</div>
+        </div>
+
+        <div id="i2-solution" class="info-box hidden"></div>
+
+        <div id="i2-describe-container" class="hidden">
+          <textarea id="i2-describe" placeholder="Descreva o problema..."></textarea>
+        </div>
+
+        <div id="i2-resolved-container" class="hidden" style="width:94%; max-width:680px; margin:auto;">
+          <div style="text-align:left; font-weight:600; margin-bottom:6px;">Foi possível resolver o chamado?</div>
+          <div style="display:flex; gap:8px;">
+            <button class="btn btn-secondary" onclick="setResolved('i2','Sim')">Sim</button>
+            <button class="btn" style="background:#ddd;" onclick="setResolved('i2','Não')">Não</button>
+          </div>
         </div>
       </div>
-      <div id="whatsappSection" class="problem-input hidden">
-        <h3>Escolha o analista para envio via WhatsApp</h3>
-        <div class="button-group">
-          <button class="vehicle-button" onclick="enviarWhatsApp('5511989477808')">Enviar para Vanessa</button>
-          <button class="vehicle-button" onclick="enviarWhatsApp('5511956544217')">Enviar para Willian</button>
+    </div>
+
+    <!-- Sections for i3-X3 -->
+    <div class="card hidden" id="i3-section">
+      <h2 style="font-size:18px; margin:6px 0;">Problemas (i3-X3)</h2>
+      <div class="row">
+        <div class="option-grid" id="i3-options">
+          <div class="option" onclick="selectProblem('Veículo não liga','Realizar o Reset do veículo e testá-lo. Verificar baterias do controle (cada uma ~2.5V e total >7.5V). Verificar baterias do veículo >54V.')">Veículo não liga</div>
+          <div class="option" onclick="selectProblem('Baixa autonomia','Verificar tensão do carregador (>=81.5V). Se bom, solicitar troca de baterias do veículo.')">Veículo com baixa autonomia</div>
+          <div class="option" onclick="selectProblem('Veículo não carrega','Verificar tensão do carregador (>=81.5V). Se bom, solicitar troca do veículo.')">Veículo não carrega</div>
+          <div class="option" onclick="selectProblem('Rodas travando','Solicitar troca do veículo.')">Veículo com rodas travando</div>
+          <div class="option" onclick="selectProblem('Aceso mas não liga','Realizar reset; verificar baterias do controle; se ok, solicitar troca do veículo.')">Veículo aceso mas não liga</div>
+          <div class="option" onclick="selectProblem('Carregador não funciona','Solicitar troca de carregador.')">Carregador não funciona</div>
+          <div class="option" onclick="selectProblem('Veículo trepidando','Verificar integridade do chassi e couplings.')">Veículo trepidando</div>
+          <div class="option" onclick="selectProblem('Veículo puxando/girando','Realizar calibração de postura com controle remoto original.')">Veículo puxando/girando</div>
+          <div class="option" onclick="selectProblem('Controle remoto não funciona','Verificar carga do controle e realizar pareamento. Clique aqui.')">Controle Remoto não funciona</div>
+          <div class="option" onclick="selectProblem('Veículo não acelera','Realizar ajuste de velocidade pelo controle remoto original. Clique aqui.')">Veículo não acelera</div>
+          <div class="option" onclick="selectProblem('Muito pra frente/pra trás','Realizar calibração de postura com o controle remoto original. Clique aqui.')">Veículo muito pra frente/pra trás</div>
+          <div class="option" onclick="selectProblem('Nenhuma','Nenhuma das opções listadas')">Nenhuma das opções listadas</div>
         </div>
+
+        <div id="i3-solution" class="info-box hidden"></div>
+        <div id="i3-describe-container" class="hidden">
+          <textarea id="i3-describe" placeholder="Descreva o problema..."></textarea>
+        </div>
+
+        <div id="i3-resolved-container" class="hidden" style="width:94%; max-width:680px; margin:auto;">
+          <div style="text-align:left; font-weight:600; margin-bottom:6px;">Foi possível resolver o chamado?</div>
+          <div style="display:flex; gap:8px;">
+            <button class="btn btn-secondary" onclick="setResolved('i3','Sim')">Sim</button>
+            <button class="btn" style="background:#ddd;" onclick="setResolved('i3','Não')">Não</button>
+          </div>
+        </div>
+
       </div>
     </div>
 
-    <footer>
-      <img src="logotipo empresa.jpg" alt="Logo BRMobility">
-    </footer>
+    <!-- Sections for S6 -->
+    <div class="card hidden" id="s6-section">
+      <h2 style="font-size:18px; margin:6px 0;">Problemas (S6)</h2>
+      <div class="row">
+        <div class="option-grid" id="s6-options">
+          <div class="option" onclick="selectProblem('Veículo não liga','Solicitar imediatamente a troca do veículo.')">Veículo não liga</div>
+          <div class="option" onclick="selectProblem('Veículo apitando','Solicitar imediatamente a troca do veículo.')">Veículo apitando</div>
+          <div class="option" onclick="selectProblem('Veículo não carrega','Verificar conector de carga, carregador (66-67.5V).')">Veículo não carrega</div>
+          <div class="option" onclick="selectProblem('Andando sozinho','Verificar tapete/assoalho e instruir condutor sobre modo acompanhante.')">Veículo andando sozinho</div>
+          <div class="option" onclick="selectProblem('Desligando sozinho','Solicitar troca de bateria. Clique aqui.')">Veículo desligando sozinho</div>
+          <div class="option" onclick="selectProblem('Veículo girando','Realizar calibração de postura. Clique Aqui.')">Veículo girando</div>
+          <div class="option" onclick="selectProblem('Rodas travadas','Solicitar imediatamente a troca do veículo.')">Veículo com rodas travadas</div>
+          <div class="option" onclick="selectProblem('Display quebrado','Solicitar troca de display.')">Display quebrado</div>
+          <div class="option" onclick="selectProblem('Nenhuma','Nenhuma das opções listadas')">Nenhuma das opções listadas</div>
+        </div>
+
+        <div id="s6-solution" class="info-box hidden"></div>
+        <div id="s6-describe-container" class="hidden">
+          <textarea id="s6-describe" placeholder="Descreva o problema..."></textarea>
+        </div>
+
+        <div id="s6-resolved-container" class="hidden" style="width:94%; max-width:680px; margin:auto;">
+          <div style="text-align:left; font-weight:600; margin-bottom:6px;">Foi possível resolver o chamado?</div>
+          <div style="display:flex; gap:8px;">
+            <button class="btn btn-secondary" onclick="setResolved('s6','Sim')">Sim</button>
+            <button class="btn" style="background:#ddd;" onclick="setResolved('s6','Não')">Não</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Image upload card -->
+    <div class="card hidden" id="step-image">
+      <h2 style="font-size:18px; margin:6px 0;">Upload de imagem (opcional)</h2>
+      <div class="row">
+        <input type="file" id="file-input" accept="image/*" />
+        <div id="preview" class="small hidden"></div>
+      </div>
+    </div>
+
+    <!-- Final actions card: shows only when all required answers provided -->
+    <div class="card hidden" id="final-actions">
+      <h2 style="font-size:18px; margin:6px 0;">Pronto — Enviar contato</h2>
+      <div class="row">
+        <div style="width:94%; max-width:680px; text-align:left; font-size:14px;">
+          Observações:
+          <ul>
+            <li>As "soluções" exibidas na página <strong>não serão incluídas</strong> na mensagem enviada por WhatsApp.</li>
+            <li>Na mensagem de WhatsApp <strong>todas as respostas escolhidas/ preenchidas aparecerão em negrito</strong>.</li>
+            <li>A mensagem automática <strong>não será exibida na página</strong>, apenas aberta no WhatsApp quando escolher o contato.</li>
+          </ul>
+        </div>
+
+        <div class="contact-row">
+          <button class="contact-btn contact-left" onclick="sendToContact('Vanessa','5511989477808')">
+            <img src="logotipo vanessa.jpg" width="36" alt="Vanessa">Analista de Relacionamento<br>Vanessa Rodrigues
+          </button>
+          <button class="contact-btn contact-right" onclick="sendToContact('Willian','5511956544217')">
+            <img src="logotipo willian.jpg" width="36" alt="Willian">Analista de Relacionamento<br>Willian Bertuzzi
+          </button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Footer with big logo that spans mobile width -->
+    <footer class="app-footer" aria-hidden="true"></footer>
   </div>
 
   <script>
-    const chamado = document.getElementById('chamado');
-    const posto = document.getElementById('posto');
-    const patrimonio = document.getElementById('patrimonio');
-    const vehicleSection = document.getElementById('vehicleSection');
-    const problemInput = document.getElementById('problemInput');
-    const erroSection = document.getElementById('erroSection');
-    const erroButtons = document.getElementById('erroButtons');
-    const erroDescricao = document.getElementById('erroDescricao');
-    const descricaoErro = document.getElementById('descricaoErro');
-    const resolvidoSection = document.getElementById('resolvidoSection');
-    const whatsappSection = document.getElementById('whatsappSection');
-    const erroTitulo = document.getElementById('erroTitulo');
-
-    let modeloSelecionado = '';
-    let erroSelecionado = '';
-    let resolvido = '';
-
-    const erros_i2x2 = {
-      "C010/C018": "Inclinação frontal excessiva. Solicite a troca do veículo imediatamente.",
-      "C020/C028": "Inclinação traseira excessiva. Solicite a troca do veículo imediatamente.",
-      "C040/C048": 'Limitador de velocidade ativado. <a href="https://drive.google.com/file/d/1uHcirgVcKM_FAG7NPW4spNOP2jF6cpio/view?usp=drive_link" target="_blank">Clique aqui</a>.',
-      "C100/C108": "Bateria vazia. Solicite a troca de bateria imediatamente.",
-      "C200/C208": "Desligamento da bateria traseira/frontal. Solicite a troca de bateria imediatamente.",
-      "C400/C408": "Ângulo de rotação excedido. Realize a solicitação de pivô mecânico para a troca.",
-      "C800/C808": "Baixa voltagem do barramento. Solicite imediatamente a troca do veículo.",
-      "E012/E01A/E01B": "Falha na comunicação com o módulo CU. Solicite imediatamente a troca do veículo.",
-      "E022/E02A/E02B": "Falha na comunicação com o módulo BSA. Solicite imediatamente a troca do veículo.",
-      "E042/E04A/E04B": "Falha na comunicação com o módulo BSA. Solicite imediatamente a troca do veículo.",
-      "E082/E08A/E08B": "Falha na comunicação com o módulo UI. Solicite imediatamente a troca do veículo.",
-      "E202/E20A/E20B": "Falha no slot TDM. Solicite imediatamente a troca do veículo.",
-      "E402/E40A/E40B": "Falha na comunicação remota com o BSA. Solicite imediatamente a troca do veículo.",
-      "E802/E80A/E80B": "Falha na comunicação remota com o UI. Solicite imediatamente a troca do veículo.",
-      "E013/E01C/E02C": "Falha na comunicação com o módulo BCU. Solicite imediatamente a troca do veículo.",
-      "E014/E024/E044": "Falha no sensor de pivô. Solicite um sensor de pivô para a troca.",
-      "E084/E104/E204": "Falha nos sensores auxiliares. Solicite imediatamente a troca do veículo.",
-      "E404/E40C": "Falha no sensor de detecção do piloto. Solicite imediatamente a troca do veículo.",
-      "E804/E80C": "Falha no sensor de alimentação. Solicite um conjunto de placa fonte para a troca.",
-      "E015/E025/E045": "Falha nos sensores de alimentação (12V, 5V, 3V). Solicite imediatamente a troca do veículo.",
-      "E085/E105/E205": "Falha no sensor de temperatura do BSA. Solicite um par de baterias para a troca.",
-      "E105/E205/E405": "Falha interna do BSA. Solicite imediatamente a troca do veículo.",
-      "E016/E026/E046": "Falha na temperatura da junção. Solicite imediatamente a troca do veículo.",
-      "E086/E106/E206": "Falha no motor de acionamento. Solicite um par de motores para a troca.",
-      "E406/E406": "Falha no amplificador de corrente do motor. Solicite um par de motores para a troca.",
-      "E806/E806": "Falha no feedback de voltagem do motor. Solicite um par de motores para a troca.",
-      "E017/E027/E047": "Falha na consistência da voltagem do motor.",
-      "E087/E107/E207": "Falha no relé do motor. Solicite um par de motores para a troca.",
-      "E407/E407": "Falha na consistência da alimentação do atuador. Solicite imediatamente a troca do veículo.",
-      "Nenhuma das opções listadas": "Descreva o problema."
+    /* State store: we'll collect only the fields that must be sent (not the solution texts) */
+    const state = {
+      chamado: '',
+      posto: '',
+      patrimonio: '',
+      modelo: '',
+      problemaDescrito: '',
+      selectedErrorCode: '', // for i2 codes etc. (only code/label)
+      selectedProblemLabel: '', // for i3, s6 etc.
+      customDescribe: '',
+      resolved: null,
+      fileDataUrl: null
     };
 
-    const erros_i3x3 = {
-      "Veículo não liga": "Realizar o Reset do veículo e testá-lo. Verificar baterias do controle remoto (cada uma deve ter ~2,5V, total > 7,5V). Se abaixo, solicitar troca. Verificar baterias do veículo (>54V). Se tudo normal e não ligar, solicitar troca do veículo.",
-      "Veículo com baixa autonomia": "Verificar tensão do carregador (deve estar 81,5V ou mais). Se abaixo, solicitar troca do carregador. Se carregador estiver bom, solicitar troca de baterias do veículo.",
-      "Veículo não carrega": "Verificar tensão do carregador (>81,5V). Se abaixo, solicitar troca do carregador. Se carregador estiver bom, solicitar troca do veículo.",
-      "Veículo com rodas travando": "Solicitar troca do veículo.",
-      "Veículo aceso mas não liga": "Realizar reset. Verificar baterias do controle remoto (cada uma ~2,5V, total > 7,5V). Se abaixo, solicitar troca. Se não funcionar, solicitar troca do veículo.",
-      "Carregador não funciona": "Solicitar troca de carregador.",
-      "Veículo trepidando": "Verificar integridade do chassi e couplings.",
-      "Veículo puxando/girando": "Realizar calibração de postura com controle remoto original.",
-      "Controle Remoto não funciona": 'Verificar carga da bateria do controle e realizar pareamento com controle remoto auxiliar. <a href="https://drive.google.com/file/d/16v-38oSKjsfVL9yQnxwbRFtX-6Uf1Fja/view?usp=drive_link" target="_blank">Clique aqui</a>.',
-      "Veículo não acelara": 'Realizar ajuste de velocidade com controle remoto original. <a href="https://drive.google.com/file/d/16xl1z4yneIkh3JyjbaL8c0XnuSHmrGy2/view?usp=drive_link" target="_blank">Clique aqui</a>.',
-      "Veículo muito pra frente/pra trás": 'Realizar calibração de postura com controle remoto original. <a href="https://drive.google.com/file/d/172xePg7Ko2ZNJNlACqlLhETxmGec20Lt/view?usp=drive_link" target="_blank">Clique aqui</a>.',
-      "Nenhuma das opções listadas": "Descreva o problema."
-    };
-
-    function checkInputs() {
-      if (chamado.value.trim() && posto.value.trim() && patrimonio.value.trim()) {
-        vehicleSection.classList.remove('hidden');
-      }
-    }
-
-    chamado.addEventListener('input', checkInputs);
-    posto.addEventListener('input', checkInputs);
-    patrimonio.addEventListener('input', checkInputs);
-
-    function selectModel(modelo) {
-      modeloSelecionado = modelo;
-      problemInput.classList.remove('hidden');
-      erroSection.classList.remove('hidden');
-      erroButtons.innerHTML = '';
-      erroDescricao.classList.add('hidden');
-      resolvidoSection.classList.add('hidden');
-      whatsappSection.classList.add('hidden');
-      document.querySelectorAll('.info-box').forEach(e => e.remove());
-
-      if (modelo === 'i2-X2') {
-        erroTitulo.textContent = "O veículo apresenta algum desses Erros?";
-        renderErroButtons(erros_i2x2);
-      } else if (modelo === 'i3-X3') {
-        erroTitulo.textContent = "O veículo apresenta algum desses problemas?";
-        renderErroButtons(erros_i3x3);
+    // Helper: validate first three inputs
+    function checkFirstInputs(){
+      const chamado = document.getElementById('chamado').value.trim();
+      const posto = document.getElementById('posto').value.trim();
+      const patrimonio = document.getElementById('patrimonio').value.trim();
+      state.chamado = chamado;
+      state.posto = posto;
+      state.patrimonio = patrimonio;
+      if(chamado && posto && patrimonio){
+        document.getElementById('btn-modelo').classList.remove('hidden');
       } else {
-        erroSection.classList.add('hidden');
+        document.getElementById('btn-modelo').classList.add('hidden');
       }
     }
 
-    function renderErroButtons(erroSet) {
-      Object.keys(erroSet).forEach(codigo => {
-        const btn = document.createElement('button');
-        btn.className = 'vehicle-button';
-        btn.textContent = codigo;
-        btn.onclick = () => showErroInfo(codigo, erroSet);
-        erroButtons.appendChild(btn);
-      });
+    function showModelSelect(){
+      document.getElementById('step-modelo').classList.remove('hidden');
+      // scroll into view
+      document.getElementById('step-modelo').scrollIntoView({behavior:'smooth', block:'center'});
     }
 
-    function showErroInfo(codigo, erroSet) {
-      erroSelecionado = codigo;
-      erroDescricao.classList.add('hidden');
-      resolvidoSection.classList.add('hidden');
-      whatsappSection.classList.add('hidden');
-      document.querySelectorAll('.info-box').forEach(e => e.remove());
+    function selectModelo(m){
+      state.modelo = m;
+      // mark active option
+      document.querySelectorAll('#modelos .option').forEach(el=>el.classList.remove('active'));
+      const options = Array.from(document.querySelectorAll('#modelos .option'));
+      const match = options.find(o => o.textContent.trim() === m);
+      if(match) match.classList.add('active');
 
-      const box = document.createElement('div');
-      box.className = 'info-box';
-      box.innerHTML = erroSet[codigo];
-      erroSection.appendChild(box);
+      document.getElementById('modeloHelp').classList.remove('hidden');
+      document.getElementById('modeloVal').textContent = m;
 
-      if (codigo === 'Nenhuma das opções listadas') {
-        erroDescricao.classList.remove('hidden');
+      // show next generic description card
+      document.getElementById('step-desc').classList.remove('hidden');
+      document.getElementById('step-desc').scrollIntoView({behavior:'smooth', block:'center'});
+    }
+
+    function onDescInput(){
+      const v = document.getElementById('desc_chamado').value.trim();
+      state.problemaDescrito = v;
+      if(v){
+        // Based on selected model, show specific section
+        if(state.modelo === 'i2-X2') {
+          document.getElementById('i2-section').classList.remove('hidden');
+          document.getElementById('i2-section').scrollIntoView({behavior:'smooth', block:'center'});
+        } else if(state.modelo === 'i3-X3') {
+          document.getElementById('i3-section').classList.remove('hidden');
+          document.getElementById('i3-section').scrollIntoView({behavior:'smooth', block:'center'});
+        } else if(state.modelo === 'S6') {
+          document.getElementById('s6-section').classList.remove('hidden');
+          document.getElementById('s6-section').scrollIntoView({behavior:'smooth', block:'center'});
+        } else {
+          // for other models, just show the image upload and final steps
+          document.getElementById('step-image').classList.remove('hidden');
+        }
+      }
+    }
+
+    /* i2 handlers */
+    function selectError(code, solutionText){
+      // Save only the code for the message; show the solution text but don't include it in the WhatsApp message.
+      state.selectedErrorCode = code;
+      // Visual active
+      document.querySelectorAll('#i2-options .option').forEach(el=>el.classList.remove('active'));
+      event.currentTarget && event.currentTarget.classList.add('active');
+      // show solution in info box
+      const sol = document.getElementById('i2-solution');
+      sol.innerHTML = '<strong>Informação:</strong> ' + solutionText.replace('clique aqui','<a href="https://drive.google.com/file/d/1uHcirgVcKM_FAG7NPW4spNOP2jF6cpio/view?usp=drive_link" target="_blank">clique aqui</a>');
+      sol.classList.remove('hidden');
+
+      // if user chose 'Nenhuma', show describe textarea
+      if(code === 'Nenhuma'){
+        document.getElementById('i2-describe-container').classList.remove('hidden');
+        document.getElementById('i2-describe').addEventListener('input', function(){
+          state.customDescribe = this.value.trim();
+          if(state.customDescribe) {
+            document.getElementById('i2-resolved-container').classList.remove('hidden');
+          }
+        });
       } else {
-        resolvidoSection.classList.remove('hidden');
+        document.getElementById('i2-describe-container').classList.add('hidden');
+        document.getElementById('i2-resolved-container').classList.remove('hidden');
+      }
+
+      // show image upload and final actions after selecting error (but obey rule: don't show next fields until answered)
+      document.getElementById('step-image').classList.remove('hidden');
+      document.getElementById('step-image').scrollIntoView({behavior:'smooth', block:'center'});
+    }
+
+    function setResolved(section, value){
+      state.resolved = value;
+      // show final actions only when resolved set and file step visible
+      showFinalIfReady();
+    }
+
+    /* i3 handlers */
+    function selectProblem(label, solutionText){
+      state.selectedProblemLabel = label;
+      // mark active visually: find in i3 or s6 grids
+      const parent = event.currentTarget.closest('.card');
+      parent && parent.querySelectorAll('.option').forEach(el=>el.classList.remove('active'));
+      event.currentTarget && event.currentTarget.classList.add('active');
+
+      // show solution in the appropriate solution box
+      if(parent && parent.id === 'i3-section'){
+        const sol = document.getElementById('i3-solution');
+        // replace "Clique aqui" with driving link placeholders if present
+        let replaced = solutionText.replace('Clique aqui','<a href="https://drive.google.com/file/d/16v-38oSKjsfVL9yQnxwbRFtX-6Uf1Fja/view?usp=drive_link" target="_blank">clique aqui</a>');
+        sol.innerHTML = '<strong>Informação:</strong> ' + replaced;
+        sol.classList.remove('hidden');
+
+        if(label === 'Nenhuma'){
+          document.getElementById('i3-describe-container').classList.remove('hidden');
+          document.getElementById('i3-describe').addEventListener('input', function(){
+            state.customDescribe = this.value.trim();
+            if(state.customDescribe) document.getElementById('i3-resolved-container').classList.remove('hidden');
+          });
+        } else {
+          document.getElementById('i3-describe-container').classList.add('hidden');
+          document.getElementById('i3-resolved-container').classList.remove('hidden');
+        }
+      } else if(parent && parent.id === 's6-section'){
+        const sol = document.getElementById('s6-solution');
+        sol.innerHTML = '<strong>Informação:</strong> ' + solutionText.replace('Clique aqui','<a href="https://drive.google.com/file/d/18tKva_egKDP7MeAm7ObcsHbafMtJe0Fi/view?usp=drive_link" target="_blank">clique aqui</a>');
+        sol.classList.remove('hidden');
+        if(label === 'Nenhuma'){
+          document.getElementById('s6-describe-container').classList.remove('hidden');
+          document.getElementById('s6-describe').addEventListener('input', function(){
+            state.customDescribe = this.value.trim();
+            if(state.customDescribe) document.getElementById('s6-resolved-container').classList.remove('hidden');
+          });
+        } else {
+          document.getElementById('s6-describe-container').classList.add('hidden');
+          document.getElementById('s6-resolved-container').classList.remove('hidden');
+        }
+      }
+
+      // show image upload
+      document.getElementById('step-image').classList.remove('hidden');
+      document.getElementById('step-image').scrollIntoView({behavior:'smooth', block:'center'});
+    }
+
+    // File upload preview (optional)
+    document.addEventListener('DOMContentLoaded', function(){
+      const input = document.getElementById('file-input');
+      if(input){
+        input.addEventListener('change', function(e){
+          const file = e.target.files[0];
+          if(!file) return;
+          const reader = new FileReader();
+          reader.onload = function(ev){
+            state.fileDataUrl = ev.target.result;
+            const preview = document.getElementById('preview');
+            preview.innerHTML = '<div style="text-align:center;"><img src="'+ev.target.result+'" style="max-width:100%; border-radius:8px;"/></div>';
+            preview.classList.remove('hidden');
+            showFinalIfReady();
+          };
+          reader.readAsDataURL(file);
+        });
+      }
+    });
+
+    function showFinalIfReady(){
+      // Determine readiness:
+      // Must have chamado, posto, patrimonio, modelo, problemaDescrito,
+      // and for model-specific: either selectedErrorCode (i2) or selectedProblemLabel (i3/s6) OR a custom describe.
+      const basicOk = state.chamado && state.posto && state.patrimonio && state.modelo && state.problemaDescrito;
+      let modelOk = false;
+      if(state.modelo === 'i2-X2'){
+        modelOk = !!(state.selectedErrorCode && (state.selectedErrorCode !== 'Nenhuma' ? true : state.customDescribe));
+      } else if(state.modelo === 'i3-X3'){
+        modelOk = !!(state.selectedProblemLabel && (state.selectedProblemLabel !== 'Nenhuma' ? true : state.customDescribe));
+      } else if(state.modelo === 'S6'){
+        modelOk = !!(state.selectedProblemLabel && (state.selectedProblemLabel !== 'Nenhuma' ? true : state.customDescribe));
+      } else {
+        // other models: allow basic fields + description
+        modelOk = true;
+      }
+
+      // resolved must be set for cases where options were errors (only when the question appears)
+      const resolvedNeeded = (state.modelo === 'i2-X2' || state.modelo === 'i3-X3' || state.modelo === 'S6');
+      const resolvedOk = !resolvedNeeded || (resolvedNeeded && state.resolved);
+
+      if(basicOk && modelOk && resolvedOk){
+        document.getElementById('final-actions').classList.remove('hidden');
+        // ensure final actions visible
+        document.getElementById('final-actions').scrollIntoView({behavior:'smooth', block:'center'});
       }
     }
 
-    function setResolvido(resposta) {
-      resolvido = resposta;
-      whatsappSection.classList.remove('hidden');
+    /* Create WhatsApp message and open chat to number.
+       Important: include only the user answers (in bold), not the solution text.
+    */
+    function sendToContact(name, number){
+      // Build message lines with bold answers
+      // Use '*' as bold markers for WhatsApp.
+      let lines = [];
+      lines.push('*Chamado:* ' + (state.chamado || '-'));
+      lines.push('*Posto:* ' + (state.posto || '-'));
+      lines.push('*Patrimônio:* ' + (state.patrimonio || '-'));
+      lines.push('*Modelo:* ' + (state.modelo || '-'));
+      lines.push('*Descrição do chamado:* ' + (state.problemaDescrito || '-'));
+
+      // Include selected code/label or custom description, but do NOT include solution texts.
+      if(state.modelo === 'i2-X2'){
+        lines.push('*Erro selecionado:* ' + (state.selectedErrorCode || '-'));
+        if(state.selectedErrorCode === 'Nenhuma'){
+          lines.push('*Descrição adicional:* ' + (state.customDescribe || '-'));
+        }
+        lines.push('*Chamado resolvido:* ' + (state.resolved || '-'));
+      } else if(state.modelo === 'i3-X3' || state.modelo === 'S6'){
+        lines.push('*Problema selecionado:* ' + (state.selectedProblemLabel || '-'));
+        if(state.selectedProblemLabel === 'Nenhuma'){
+          lines.push('*Descrição adicional:* ' + (state.customDescribe || '-'));
+        }
+        lines.push('*Chamado resolvido:* ' + (state.resolved || '-'));
+      } else {
+        // for other models include any custom describe if present
+        if(state.customDescribe) lines.push('*Descrição adicional:* ' + state.customDescribe);
+      }
+
+      // Note about image: as an upload inside the page cannot be attached to WhatsApp via wa.me link,
+      // we will note whether an image was uploaded.
+      if(state.fileDataUrl){
+        lines.push('*Imagem enviada:* Sim (A imagem está anexada no formulário localmente; para enviar por WhatsApp anexe manualmente ao abrir o chat).');
+      } else {
+        lines.push('*Imagem enviada:* Não');
+      }
+
+      // Wrap each value in asterisks to make them bold as requested
+      // But the user requested "as respostas usadas para envio sejam todas em negrito"
+      // We'll place the asterisks around the answer text, not the label, for clarity.
+      // For example: Chamado: *#20991*
+      // Rebuild lines to ensure only answers are bolded:
+      function boldifyLine(label, value){
+        return label + ' *' + value + '*';
+      }
+      const mappedLines = [
+        boldifyLine('Chamado:', state.chamado || '-'),
+        boldifyLine('Posto:', state.posto || '-'),
+        boldifyLine('Patrimônio:', state.patrimonio || '-'),
+        boldifyLine('Modelo:', state.modelo || '-'),
+        boldifyLine('Descrição do chamado:', state.problemaDescrito || '-')
+      ];
+      if(state.modelo === 'i2-X2'){
+        mappedLines.push(boldifyLine('Erro selecionado:', state.selectedErrorCode || '-'));
+        if(state.selectedErrorCode === 'Nenhuma') mappedLines.push(boldifyLine('Descrição adicional:', state.customDescribe || '-'));
+        mappedLines.push(boldifyLine('Chamado resolvido:', state.resolved || '-'));
+      } else if(state.modelo === 'i3-X3' || state.modelo === 'S6'){
+        mappedLines.push(boldifyLine('Problema selecionado:', state.selectedProblemLabel || '-'));
+        if(state.selectedProblemLabel === 'Nenhuma') mappedLines.push(boldifyLine('Descrição adicional:', state.customDescribe || '-'));
+        mappedLines.push(boldifyLine('Chamado resolvido:', state.resolved || '-'));
+      } else {
+        if(state.customDescribe) mappedLines.push(boldifyLine('Descrição adicional:', state.customDescribe));
+      }
+      mappedLines.push(boldifyLine('Imagem enviada:', state.fileDataUrl ? 'Sim' : 'Não'));
+
+      const mensagem = mappedLines.join('%0A'); // using URL-encoded newlines
+
+      const url = 'https://wa.me/' + number + '?text=' + encodeURIComponent(mappedLines.join('\n'));
+      // open in new tab
+      window.open(url, '_blank');
     }
 
-    function enviarWhatsApp(numero) {
-      const problema = document.getElementById('problema').value.trim();
-      const descricao = descricaoErro.value.trim();
+    // Small helper: ensure that when user enters or selects things, we attempt to show final actions
+    document.addEventListener('input', function(e){
+      setTimeout(showFinalIfReady, 250);
+    });
 
-      let mensagem = `*Chamado:* *${chamado.value.trim()}*\n`;
-      mensagem += `*Posto:* *${posto.value.trim()}*\n`;
-      mensagem += `*Patrimônio:* *${patrimonio.value.trim()}*\n`;
-      mensagem += `*Modelo:* *${modeloSelecionado}*\n`;
-      mensagem += `*Problema informado:* *${problema}*\n`;
-      if (erroSelecionado) {
-        mensagem += `*Erro:* *${erroSelecionado}*\n`;
-        if (erroSelecionado === 'Nenhuma das opções listadas') {
-          mensagem += `*Descrição:* *
-
-
+  </script>
+</body>
+</html>
