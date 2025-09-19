@@ -8,34 +8,31 @@
   :root{
     --primary:#0b57a4;
     --accent:#f2b705;
-    --bg-overlay: rgba(255,255,255,0.95);
+    --bg-overlay: rgba(255,255,255,0.96);
     --card-radius:14px;
-    --max-width:820px;
+    --max-width:900px;
     --footer-height:96px;
   }
   html,body{
     height:100%;
     margin:0;
     font-family: -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
-    -webkit-font-smoothing:antialiased;
     background: #f4f6f8;
+    color:#111;
   }
 
-  /* Background logo fixed and fully visible */
-  .bg-fixed {
-    position:fixed;
-    inset:0;
-    pointer-events:none;
-    display:flex;
-    align-items:center;
-    justify-content:center;
-    z-index:0;
-  }
-  .bg-fixed img{
-    max-width:90%;
-    max-height:90%;
-    object-fit:contain;
-    opacity:0.12; /* subtle watermark */
+  /* Background logo fixed (full, not repeating) */
+  body::before{
+    content: "";
+    position: fixed;
+    inset: 0;
+    background-image: url('logotipo empresa.jpg');
+    background-position: center center;
+    background-repeat: no-repeat;
+    background-size: contain;
+    opacity: 0.08;
+    pointer-events: none;
+    z-index: 0;
   }
 
   /* App container */
@@ -45,7 +42,7 @@
     min-height:100vh;
     box-sizing:border-box;
     padding:20px;
-    padding-bottom: calc(var(--footer-height) + 24px); /* space for fixed footer */
+    padding-bottom: calc(var(--footer-height) + 24px); /* reserve space so footer won't overlap */
     display:flex;
     align-items:flex-start;
     justify-content:center;
@@ -65,10 +62,9 @@
     box-shadow:0 8px 24px rgba(0,0,0,0.08);
   }
 
-  /* first section center */
   .center{text-align:center;}
   h1{margin:6px 0; font-size:22px; line-height:1.05;}
-  p.subtitle{margin:6px 0 12px; font-size:14px; color:#222;}
+  p.subtitle{margin:6px 0 12px 0; font-size:14px; color:#222;}
 
   .alert{
     display:flex;
@@ -101,7 +97,8 @@
     box-sizing:border-box;
   }
   .btn-primary{ background:var(--primary); color:white; }
-  .btn-accent{ background:var(--accent); color:#111; }
+  .btn-accent{ background:var(--primary); color:white; } /* contact buttons also blue */
+  .btn-small{ padding:8px 12px; font-size:14px; border-radius:8px; display:inline-block; }
 
   .options{ display:flex; flex-direction:column; gap:10px; }
   .option-btn{
@@ -148,52 +145,44 @@
   /* responsive tweaks */
   @media(max-width:520px){
     h1{ font-size:20px; }
-    .bg-fixed img{ max-width:95%; }
   }
 </style>
 </head>
 <body>
-  <!-- Background watermark/logo fixed and centered -->
-  <div class="bg-fixed" aria-hidden="true">
-    <!-- place your 'logotipo empresa.jpg' file in the same folder as this HTML -->
-    <img src="logotipo empresa.jpg" alt="BRMobility Logo" />
-  </div>
-
   <div class="app">
     <div class="wrap">
 
-      <!-- 1) Header card -->
-      <section class="card center" id="card-1">
+      <!-- Header / initial fields -->
+      <section class="card center" id="card-start">
         <h1>Análise e Reparo em Campo — Grupo BRMobility</h1>
-        <p class="subtitle">Este site tem o intuito de auxiliar as manutenções em campo dos nossos Técnicos Externos, oferecendo mais velocidade em diagnóstico e reparos, assim como instruir e capacitar cada vez mais o conhecimento dos veículos do Grupo BRMobility.</p>
-        <div class="alert">⚠ <span>Esse site não deve ser compartilhado com clientes ou pessoas externas ao Grupo BRMobility.</span></div>
+        <p class="subtitle">Fluxo para diagnóstico e envio de chamados para a equipe.</p>
+        <div class="alert">⚠ Esse site não deve ser compartilhado com clientes ou externos.</div>
 
-        <div style="margin-top:12px; display:flex; flex-direction:column; gap:10px;">
-          <input id="field-chamado" type="text" placeholder="por exemplo #20991" autocomplete="off" />
-          <input id="field-posto" type="text" placeholder="por exemplo Shopping BRMobility" autocomplete="off" />
-          <input id="field-patrimonio" type="text" placeholder="por exemplo 0123" autocomplete="off" />
-          <div class="small">Preencha os 3 campos acima para prosseguir.</div>
-          <button id="btn-to-model" class="btn btn-primary" style="display:none; margin-top:8px;">Próximo: Modelo do veículo</button>
+        <div style="margin-top:12px; display:flex; flex-direction:column; gap:10px; max-width:640px; margin-left:auto; margin-right:auto;">
+          <input id="field-chamado" type="text" placeholder="Escreva aqui o número do chamado" autocomplete="off" />
+          <input id="field-posto" type="text" placeholder="Escreva aqui o nome do posto" autocomplete="off" />
+          <input id="field-patrimonio" type="text" placeholder="Escreva aqui o número do patrimônio do veículo" autocomplete="off" />
+          <div class="small">Preencha os três campos para prosseguir.</div>
+          <button id="btn-to-model" class="btn btn-primary" style="display:none;">Próximo: Modelo do veículo</button>
         </div>
       </section>
 
-      <!-- 2) Model selection -->
+      <!-- MODEL SELECTION -->
       <section class="card" id="card-model" style="display:none;">
         <h2 style="margin:0 0 10px 0; text-align:center;">Qual o modelo do veículo?</h2>
         <div class="options" id="models-list"></div>
       </section>
 
-      <!-- 3) Problem description (appears after model selected) -->
+      <!-- DESCRIPTION -->
       <section class="card" id="card-desc" style="display:none;">
-        <h2 style="margin:0 0 10px 0;">Qual o problema descrito no chamado ou informado pelo cliente?</h2>
+        <h2 style="margin:0 0 10px 0;">Descreva o problema informado pelo cliente</h2>
         <textarea id="field-descricao" placeholder="Descreva o problema..."></textarea>
-        <div class="small">Preencha para prosseguir.</div>
+        <div class="small">Preencha para prosseguir às opções do modelo.</div>
       </section>
 
-      <!-- 4) Model-specific cards -->
-      <!-- i2-X2 -->
+      <!-- MODEL SPECIFIC CARDS -->
       <section class="card" id="card-i2" style="display:none;">
-        <h2 style="margin:0 0 8px 0;">Erros — i2-X2</h2>
+        <h3>i2-X2 — Erros</h3>
         <div class="options" id="i2-list"></div>
         <div id="i2-describe" style="display:none; margin-top:8px;">
           <textarea id="i2-custom" placeholder="Descreva o problema..."></textarea>
@@ -207,9 +196,8 @@
         </div>
       </section>
 
-      <!-- i3-X3 -->
       <section class="card" id="card-i3" style="display:none;">
-        <h2 style="margin:0 0 8px 0;">Problemas — i3-X3</h2>
+        <h3>i3-X3 — Problemas</h3>
         <div class="options" id="i3-list"></div>
         <div id="i3-describe" style="display:none; margin-top:8px;">
           <textarea id="i3-custom" placeholder="Descreva o problema..."></textarea>
@@ -223,9 +211,8 @@
         </div>
       </section>
 
-      <!-- S6 -->
       <section class="card" id="card-s6" style="display:none;">
-        <h2 style="margin:0 0 8px 0;">Problemas — S6</h2>
+        <h3>S6 — Problemas</h3>
         <div class="options" id="s6-list"></div>
         <div id="s6-describe" style="display:none; margin-top:8px;">
           <textarea id="s6-custom" placeholder="Descreva o problema..."></textarea>
@@ -239,10 +226,9 @@
         </div>
       </section>
 
-      <!-- S8 (1..47) -->
       <section class="card" id="card-s8" style="display:none;">
-        <h2 style="margin:0 0 8px 0;">S8-R8-BR8 — Código de erro</h2>
-        <div class="small">Se souber o número, digite abaixo (1-47). Caso não identifique, digite 0 para listar todas as opções.</div>
+        <h3>S8-R8-BR8 — Código de erro</h3>
+        <div class="small">Se souber o número (1-47) digite abaixo. Digite 0 para listar todas as opções.</div>
         <input id="s8-code" type="text" placeholder="Ex: 32 ou 0" style="margin-top:8px;" />
         <div class="options" id="s8-list" style="margin-top:10px;"></div>
         <div id="s8-describe" style="display:none; margin-top:8px;">
@@ -257,9 +243,8 @@
         </div>
       </section>
 
-      <!-- S9 -->
       <section class="card" id="card-s9" style="display:none;">
-        <h2 style="margin:0 0 8px 0;">S9-S9X — Problemas</h2>
+        <h3>S9-S9X — Problemas</h3>
         <div class="options" id="s9-list"></div>
         <div id="s9-describe" style="display:none; margin-top:8px;">
           <textarea id="s9-custom" placeholder="Descreva o problema..."></textarea>
@@ -273,11 +258,9 @@
         </div>
       </section>
 
-      <!-- S10 -->
       <section class="card" id="card-s10" style="display:none;">
-        <h2 style="margin:0 0 8px 0;">S10-S10X — Observações e Erros</h2>
-        <div class="small">Observações: Display do Veículo; Aplicativo.</div>
-        <div class="options" id="s10-list" style="margin-top:8px;"></div>
+        <h3>S10-S10X — Observações</h3>
+        <div class="options" id="s10-list"></div>
         <div id="s10-describe" style="display:none; margin-top:8px;">
           <textarea id="s10-custom" placeholder="Descreva o problema..."></textarea>
         </div>
@@ -290,9 +273,8 @@
         </div>
       </section>
 
-      <!-- H9 -->
       <section class="card" id="card-h9" style="display:none;">
-        <h2 style="margin:0 0 8px 0;">H9-H9X — Problemas</h2>
+        <h3>H9-H9X — Problemas</h3>
         <div class="options" id="h9-list"></div>
         <div id="h9-describe" style="display:none; margin-top:8px;">
           <textarea id="h9-custom" placeholder="Descreva o problema..."></textarea>
@@ -308,7 +290,7 @@
 
       <!-- Image upload -->
       <section class="card" id="card-image" style="display:none;">
-        <h2 style="margin:0 0 8px 0;">Upload de imagem (opcional)</h2>
+        <h3>Upload de imagem (opcional)</h3>
         <input id="file-input" type="file" accept="image/*" />
         <div id="preview" class="small" style="display:none; margin-top:8px;"></div>
         <div class="small" style="margin-top:8px;">Se o navegador permitir, a imagem será enviada via compartilhamento nativo ao WhatsApp; caso contrário, anexe manualmente ao abrir o chat.</div>
@@ -316,23 +298,22 @@
 
       <!-- Final extra -->
       <section class="card" id="card-final-extra" style="display:none;">
-        <h2 style="margin:0 0 8px 0;">Faltou algo nesse site de diagnóstico?</h2>
+        <h3>Faltou algo?</h3>
         <textarea id="field-final-extra" placeholder="Se sim, descreva aqui... (opcional)"></textarea>
         <div class="small" style="margin-top:8px;">Após preencher, os contatos aparecerão para envio.</div>
       </section>
 
-      <!-- Actions: contacts -->
+      <!-- Contacts -->
       <section class="card" id="card-contacts" style="display:none;">
-        <h2 style="margin:0 0 8px 0;">Enviar via WhatsApp</h2>
+        <h3>Enviar via WhatsApp</h3>
         <div style="display:flex; gap:10px; flex-direction:column;">
           <button class="btn btn-accent" id="btn-vanessa">
-            <img src="logotipo vanessa.jpg" alt="Vanessa" style="height:28px; vertical-align:middle; margin-right:8px;" />Analista de Relacionamento — Vanessa Rodrigues<br/><small>+55 11 98947-7808</small>
+            <img src="logotipo vanessa.jpg" alt="Vanessa" style="height:28px; vertical-align:middle; margin-right:8px;" />Analista Vanessa Rodrigues — <small>+55 11 98947-7808</small>
           </button>
           <button class="btn btn-accent" id="btn-willian">
-            <img src="logotipo willian.jpg" alt="Willian" style="height:28px; vertical-align:middle; margin-right:8px;" />Analista de Relacionamento — Willian Bertuzzi<br/><small>+55 11 95654-4217</small>
+            <img src="logotipo willian.jpg" alt="Willian" style="height:28px; vertical-align:middle; margin-right:8px;" />Analista Willian Bertuzzi — <small>+55 11 95654-4217</small>
           </button>
         </div>
-        <div class="small" style="margin-top:10px;">Ao clicar em um contato o WhatsApp será aberto com a mensagem pronta. Se necessário anexe a imagem manualmente.</div>
       </section>
 
     </div>
@@ -344,13 +325,13 @@
   </footer>
 
 <script>
-/* ---------- Data from prompt (solutions + lists) ---------- */
+/* ---------- Data (completa) ---------- */
 const MODELS = ['i2-X2','i3-X3','S6','S8-R8-BR8','H9-H9X','S9-S9X','S10-S10X'];
 
 const i2Errors = [
   {code:'C010/C018', text:'Inclinação frontal excessiva. Solicite a troca do veículo imediatamente.'},
   {code:'C020/C028', text:'Inclinação traseira excessiva. Solicite a troca do veículo imediatamente.'},
-  {code:'C040/C048', text:'Limitador de velocidade frontal/traseiro ativado. Realize o procedimento pelo link: clique aqui (https://drive.google.com/file/d/1uHcirgVcKM_FAG7NPW4spNOP2jF6cpio/view?usp=drive_link)'},
+  {code:'C040/C048', text:'Limitador de velocidade frontal/traseiro ativado. Realize o procedimento no manual.', url:'https://drive.google.com/file/d/1uHcirgVcKM_FAG7NPW4spNOP2jF6cpio/view?usp=drive_link'},
   {code:'C100/C108', text:'Bateria traseira/frontal vazia. Solicite a troca de bateria imediatamente.'},
   {code:'C200/C208', text:'Desligamento da bateria traseira/frontal. Solicite a troca de bateria imediatamente.'},
   {code:'C400/C408', text:'Ângulo de rotação excedido. Realize a solicitação de pivô mecânico para a troca.'},
@@ -388,10 +369,10 @@ const i3Problems = [
   {label:'Veículo aceso mas não liga', text:'Realizar reset; verificar baterias do controle; se ok, solicitar troca do veículo.'},
   {label:'Carregador não funciona', text:'Solicitar troca de carregador.'},
   {label:'Veículo trepidando', text:'Verificar integridade do chassi e couplings.'},
-  {label:'Veículo puxando/girando', text:'Realizar calibração de postura com controle remoto original.'},
-  {label:'Controle Remoto não funciona', text:'Verificar integridade de carga da bateria do controle e realizar procedimento de pareamento. (link: https://drive.google.com/file/d/16v-38oSKjsfVL9yQnxwbRFtX-6Uf1Fja/view?usp=drive_link)'},
-  {label:'Veículo não acelera', text:'Realizar ajuste de velocidade pelo controle remoto original. (link: https://drive.google.com/file/d/16xl1z4yneIkh3JyjbaL8c0XnuSHmrGy2/view?usp=drive_link)'},
-  {label:'Veículo muito pra frente/pra trás', text:'Realizar calibração de postura com o controle remoto original. (link: https://drive.google.com/file/d/172xePg7Ko2ZNJNlACqlLhETxmGec20Lt/view?usp=drive_link)'},
+  {label:'Veículo puxando/girando', text:'Realizar calibração de postura com controle remoto original.', url:'https://drive.google.com/file/d/172xePg7Ko2ZNJNlACqlLhETxmGec20Lt/view?usp=drive_link'},
+  {label:'Controle Remoto não funciona', text:'Verificar integridade de carga da bateria do controle e realizar procedimento de pareamento.', url:'https://drive.google.com/file/d/16v-38oSKjsfVL9yQnxwbRFtX-6Uf1Fja/view?usp=drive_link'},
+  {label:'Veículo não acelera', text:'Realizar ajuste de velocidade pelo controle remoto original.', url:'https://drive.google.com/file/d/16xl1z4yneIkh3JyjbaL8c0XnuSHmrGy2/view?usp=drive_link'},
+  {label:'Veículo muito pra frente/pra trás', text:'Realizar calibração de postura com o controle remoto original.', url:'https://drive.google.com/file/d/172xePg7Ko2ZNJNlACqlLhETxmGec20Lt/view?usp=drive_link'},
   {label:'Nenhuma', text:'Nenhuma das opções listadas. Descreva o problema.'}
 ];
 
@@ -400,8 +381,8 @@ const s6Problems = [
   {label:'Veículo apitando', text:'Solicitar imediatamente a troca do veículo.'},
   {label:'Veículo não carrega', text:'Verificar conector de carga (GX14 3 vias Macho), e carregador (66-67.5V). Se necessário solicitar troca.'},
   {label:'Veículo andando sozinho', text:'Verificar integridade do tapete/assoalho; instruir condutor sobre modo acompanhante.'},
-  {label:'Veículo desligando sozinho', text:'Solicitar troca de bateria. (link: https://drive.google.com/file/d/18tKva_egKDP7MeAm7ObcsHbafMtJe0Fi/view?usp=drive_link)'},
-  {label:'Veículo girando', text:'Realizar calibração de postura. (link: https://drive.google.com/file/d/19kLMW1rWbcsAxmkPGM_woMHKQ0uir6oM/view?usp=drive_link)'},
+  {label:'Veículo desligando sozinho', text:'Solicitar troca de bateria.', url:'https://drive.google.com/file/d/18tKva_egKDP7MeAm7ObcsHbafMtJe0Fi/view?usp=drive_link'},
+  {label:'Veículo girando', text:'Realizar calibração de postura.', url:'https://drive.google.com/file/d/19kLMW1rWbcsAxmkPGM_woMHKQ0uir6oM/view?usp=drive_link'},
   {label:'Veículo com rodas travadas', text:'Solicitar imediatamente a troca do veículo.'},
   {label:'Display quebrado', text:'Solicitar troca de display.'},
   {label:'Nenhuma', text:'Nenhuma das opções listadas. Descreva o problema.'}
@@ -432,7 +413,7 @@ const s8Errors = [
   {n:22, text:'Falha no Sensor Giroscópio. Solicite a troca da placa de Controle do veículo.'},
   {n:23, text:'Falha na inicialização da Memoria EPROM. Solicite a troca da placa de Controle do veículo.'},
   {n:24, text:'Falha de Firmware da Memoria EPROM. Solicite a troca da placa de Controle do veículo.'},
-  {n:25, text:'Falha na calibração de postura. Realize a calibração de postura (link: https://drive.google.com/file/d/1EQ8Oi2MSb75m4Gh1mXrnKSdZUhh26AGJ/view?usp=drive_link)'},
+  {n:25, text:'Falha na calibração de postura. Realize a calibração de postura.', url:'https://drive.google.com/file/d/1EQ8Oi2MSb75m4Gh1mXrnKSdZUhh26AGJ/view?usp=drive_link'},
   {n:26, text:'Falha na inicialização do Sensor Giroscópio. Solicite a troca da placa de Controle do veículo.'},
   {n:27, text:'Falha no Firmware do Sensor Giroscópio. Solicite a troca da placa de Controle do veículo.'},
   {n:28, text:'Falha no Firmware do Sensor Giroscópio. Solicite a troca da placa de Controle do veículo.'},
@@ -452,7 +433,7 @@ const s8Errors = [
   {n:42, text:'Falha na placa de pareamento. Solicite a troca da placa do veículo.'},
   {n:43, text:'Falha no carregador. Solicite a troca do carregador do veículo.'},
   {n:44, text:'Falha no Firmware do veículo. Solicite a troca imediatamente.'},
-  {n:45, text:'Falha por colisão. Realize a reinicialização do veículo e calibração de postura (link: https://drive.google.com/file/d/1EQ8Oi2MSb75m4Gh1mXrnKSdZUhh26AGJ/view?usp=drive_link)'},
+  {n:45, text:'Falha por colisão. Realize a reinicialização do veículo e calibração de postura.', url:'https://drive.google.com/file/d/1EQ8Oi2MSb75m4Gh1mXrnKSdZUhh26AGJ/view?usp=drive_link'},
   {n:46, text:'Falha na atualização do Firmware. Solicite a troca do veículo imediatamente.'},
   {n:47, text:'Falha na atualização do Firmware. Solicite a troca do veículo imediatamente.'}
 ];
@@ -486,62 +467,48 @@ const h9Problems = [
   {label:'Nenhuma', text:'Nenhuma das opções listadas. Descreva o problema.'}
 ];
 
-/* ---------- STATE ---------- */
+/* ---------- State ---------- */
 const state = {
   chamado:'',
   posto:'',
   patrimonio:'',
   modelo:'',
   descricao:'',
-  selection:'', // e.g. error code or problem label
+  selection:'',
   customDescribe:'',
   resolved:'',
   file:null,
   finalExtra:''
 };
 
-/* ---------- HELPERS ---------- */
+/* ---------- Helpers ---------- */
 function el(id){ return document.getElementById(id); }
 function show(elm){ elm.style.display = ''; }
 function hide(elm){ elm.style.display = 'none'; }
 function createOptionButton(text, onclick){ const b = document.createElement('button'); b.className='option-btn'; b.type='button'; b.textContent = text; b.onclick = onclick; return b; }
 
-/* ---------- INIT UI ---------- */
+/* ---------- Init UI ---------- */
 document.addEventListener('DOMContentLoaded', ()=>{
   // initial fields
-  ['field-chamado','field-posto','field-patrimonio'].forEach(id=>{
-    el(id).addEventListener('input', checkInitialFields);
-  });
-  el('btn-to-model').addEventListener('click', ()=>{
-    show(el('card-model'));
-    el('card-model').scrollIntoView({behavior:'smooth', block:'center'});
-  });
+  ['field-chamado','field-posto','field-patrimonio'].forEach(id=> el(id).addEventListener('input', checkInitialFields));
+  el('btn-to-model').addEventListener('click', ()=>{ show(el('card-model')); el('card-model').scrollIntoView({behavior:'smooth', block:'center'}); });
 
   // render models list
   const modelsList = el('models-list');
   MODELS.forEach(m=>{
-    const btn = createOptionButton(m, ()=>{
-      selectModel(m, btn);
-    });
+    const btn = createOptionButton(m, ()=> selectModel(m, btn));
     modelsList.appendChild(btn);
   });
 
-  // render i2 list
-  const i2list = el('i2-list');
-  i2Errors.forEach(err=>{
-    const b = createOptionButton(err.code, ()=> selectI2(err, b) );
-    i2list.appendChild(b);
-    const s = document.createElement('div'); s.className='solution'; i2list.appendChild(s);
-  });
-
-  // other lists
+  // render lists
+  const i2list = el('i2-list'); i2Errors.forEach(err=>{ const b = createOptionButton(err.code, ()=> selectI2(err, b)); i2list.appendChild(b); const s = document.createElement('div'); s.className='solution'; i2list.appendChild(s); });
   renderList('i3-list', i3Problems, selectI3);
   renderList('s6-list', s6Problems, selectS6);
   renderList('s9-list', s9Problems, selectS9);
   renderList('s10-list', s10Problems, selectS10);
   renderList('h9-list', h9Problems, selectH9);
 
-  // s8 code handler
+  // s8 handler
   el('s8-code').addEventListener('change', handleS8Input);
   el('s8-code').addEventListener('keyup', (e)=>{ if(e.key==='Enter') handleS8Input(); });
 
@@ -563,18 +530,21 @@ document.addEventListener('DOMContentLoaded', ()=>{
     evaluateFinal();
   });
 
-  // final extra listener
+  // final extra
   el('field-final-extra').addEventListener('input', (e)=>{ state.finalExtra = e.target.value.trim(); evaluateFinal(); });
 
-  // contact buttons
+  // contacts
   el('btn-vanessa').addEventListener('click', ()=> sendWhats('5511989477808'));
   el('btn-willian').addEventListener('click', ()=> sendWhats('5511956544217'));
 });
 
+/* ---------- Initial fields validation ---------- */
 function checkInitialFields(){
   state.chamado = el('field-chamado').value.trim();
   state.posto = el('field-posto').value.trim();
   state.patrimonio = el('field-patrimonio').value.trim();
+
+  // show next when all three filled
   if(state.chamado && state.posto && state.patrimonio){
     el('btn-to-model').style.display = '';
   } else {
@@ -582,20 +552,19 @@ function checkInitialFields(){
   }
 }
 
-/* ---------- MODEL SELECTION ---------- */
+/* ---------- Model selection flow ---------- */
 function selectModel(model, btn){
   state.modelo = model;
-  // mark active
   document.querySelectorAll('#models-list .option-btn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
-  // show description card
   show(el('card-desc'));
   el('card-desc').scrollIntoView({behavior:'smooth', block:'center'});
-  // once description is filled, show model-specific cards
-  el('field-descricao').addEventListener('input', function onDesc(){
-    state.descricao = this.value.trim();
+
+  // once description is provided, show model-specific card
+  function onDesc(){
+    state.descricao = el('field-descricao').value.trim();
     if(state.descricao){
-      // show corresponding model card(s)
+      // show corresponding model card
       switch(state.modelo){
         case 'i2-X2': show(el('card-i2')); break;
         case 'i3-X3': show(el('card-i3')); break;
@@ -604,50 +573,62 @@ function selectModel(model, btn){
         case 'H9-H9X': show(el('card-h9')); break;
         case 'S9-S9X': show(el('card-s9')); break;
         case 'S10-S10X': show(el('card-s10')); break;
-        default: break;
       }
       show(el('card-image'));
-      // scroll to the first relevant card of model
+      // scroll to first relevant card
       const id = 'card-' + state.modelo.split('-')[0].toLowerCase();
       const target = el(id);
       if(target) target.scrollIntoView({behavior:'smooth', block:'center'});
-      // remove listener to avoid duplicate triggers
       el('field-descricao').removeEventListener('input', onDesc);
     }
-  });
+  }
+  el('field-descricao').addEventListener('input', onDesc);
 }
 
 /* ---------- Render helper ---------- */
 function renderList(containerId, list, handler){
   const cont = el(containerId);
   list.forEach(item=>{
-    const btn = createOptionButton(item.label || item.n, ()=> handler(item, btn));
-    cont.appendChild(btn);
+    const label = item.label || ('Erro ' + (item.n||''));
+    const b = createOptionButton(label, ()=> handler(item, b));
+    cont.appendChild(b);
     const s = document.createElement('div'); s.className='solution'; cont.appendChild(s);
   });
 }
 
-/* ---------- Selection handlers ---------- */
-function markActiveAndShowSolution(btn, solutionText){
-  // unmark siblings; show solution in the next .solution sibling
+/* ---------- Show solution helper (creates "clique aqui" button when url present) ---------- */
+function markActiveAndShowSolution(btn, solutionText, url){
   const parent = btn.parentElement;
   parent.querySelectorAll('.option-btn').forEach(b=>b.classList.remove('active'));
   btn.classList.add('active');
   let next = btn.nextElementSibling;
   while(next && !next.classList.contains('solution')) next = next.nextElementSibling;
   if(next){
+    // set text
     next.innerHTML = '<strong>Informação:</strong> ' + solutionText;
+    // if url, append a button element (safer than injecting onclick via HTML)
+    if(url){
+      const wrap = document.createElement('div');
+      wrap.style.marginTop = '8px';
+      const cbtn = document.createElement('button');
+      cbtn.className = 'btn-small btn-primary';
+      cbtn.textContent = 'clique aqui';
+      cbtn.onclick = ()=> window.open(url, '_blank');
+      wrap.appendChild(cbtn);
+      next.appendChild(wrap);
+    }
     next.style.display = 'block';
     next.scrollIntoView({behavior:'smooth', block:'center'});
   }
 }
 
+/* ---------- Selection handlers ---------- */
 function selectI2(err, btn){
-  markActiveAndShowSolution(btn, err.text);
+  markActiveAndShowSolution(btn, err.text, err.url);
   state.selection = err.code;
   if(err.code === 'Nenhuma'){
     show(el('i2-describe'));
-    el('i2-custom').addEventListener('input', function onInput(){ state.customDescribe = this.value.trim(); if(state.customDescribe) show(el('i2-resolved')); });
+    el('i2-custom').addEventListener('input', function onI2(){ state.customDescribe = this.value.trim(); if(state.customDescribe) show(el('i2-resolved')); });
   } else {
     hide(el('i2-describe'));
     show(el('i2-resolved'));
@@ -656,11 +637,11 @@ function selectI2(err, btn){
 }
 
 function selectI3(item, btn){
-  markActiveAndShowSolution(btn, item.text);
+  markActiveAndShowSolution(btn, item.text, item.url);
   state.selection = item.label;
   if(item.label === 'Nenhuma'){
     show(el('i3-describe'));
-    el('i3-custom').addEventListener('input', function onInput(){ state.customDescribe = this.value.trim(); if(state.customDescribe) show(el('i3-resolved')); });
+    el('i3-custom').addEventListener('input', function onI3(){ state.customDescribe = this.value.trim(); if(state.customDescribe) show(el('i3-resolved')); });
   } else {
     hide(el('i3-describe'));
     show(el('i3-resolved'));
@@ -669,11 +650,11 @@ function selectI3(item, btn){
 }
 
 function selectS6(item, btn){
-  markActiveAndShowSolution(btn, item.text);
+  markActiveAndShowSolution(btn, item.text, item.url);
   state.selection = item.label;
   if(item.label === 'Nenhuma'){
     show(el('s6-describe'));
-    el('s6-custom').addEventListener('input', function onInput(){ state.customDescribe = this.value.trim(); if(state.customDescribe) show(el('s6-resolved')); });
+    el('s6-custom').addEventListener('input', function onS6(){ state.customDescribe = this.value.trim(); if(state.customDescribe) show(el('s6-resolved')); });
   } else {
     hide(el('s6-describe'));
     show(el('s6-resolved'));
@@ -681,11 +662,46 @@ function selectS6(item, btn){
   evaluateFinal();
 }
 
-function selectS9(item, btn){ markActiveAndShowSolution(btn, item.text); state.selection = item.label; if(item.label==='Nenhuma'){ show(el('s9-describe')); el('s9-custom').addEventListener('input', ()=>{ state.customDescribe = el('s9-custom').value.trim(); if(state.customDescribe) show(el('s9-resolved')); }); } else { hide(el('s9-describe')); show(el('s9-resolved')); } evaluateFinal(); }
-function selectS10(item, btn){ markActiveAndShowSolution(btn, item.text); state.selection = item.label; if(item.label==='Nenhuma'){ show(el('s10-describe')); el('s10-custom').addEventListener('input', ()=>{ state.customDescribe = el('s10-custom').value.trim(); if(state.customDescribe) show(el('s10-resolved')); }); } else { hide(el('s10-describe')); show(el('s10-resolved')); } evaluateFinal(); }
-function selectH9(item, btn){ markActiveAndShowSolution(btn, item.text); state.selection = item.label; if(item.label==='Nenhuma'){ show(el('h9-describe')); el('h9-custom').addEventListener('input', ()=>{ state.customDescribe = el('h9-custom').value.trim(); if(state.customDescribe) show(el('h9-resolved')); }); } else { hide(el('h9-describe')); show(el('h9-resolved')); } evaluateFinal(); }
+function selectS9(item, btn){
+  markActiveAndShowSolution(btn, item.text, item.url);
+  state.selection = item.label;
+  if(item.label === 'Nenhuma'){
+    show(el('s9-describe'));
+    el('s9-custom').addEventListener('input', function onS9(){ state.customDescribe = this.value.trim(); if(state.customDescribe) show(el('s9-resolved')); });
+  } else {
+    hide(el('s9-describe'));
+    show(el('s9-resolved'));
+  }
+  evaluateFinal();
+}
 
-/* ---------- S8 handling ---------- */
+function selectS10(item, btn){
+  markActiveAndShowSolution(btn, item.text, item.url);
+  state.selection = item.label;
+  if(item.label === 'Nenhuma'){
+    show(el('s10-describe'));
+    el('s10-custom').addEventListener('input', function onS10(){ state.customDescribe = this.value.trim(); if(state.customDescribe) show(el('s10-resolved')); });
+  } else {
+    hide(el('s10-describe'));
+    show(el('s10-resolved'));
+  }
+  evaluateFinal();
+}
+
+function selectH9(item, btn){
+  markActiveAndShowSolution(btn, item.text, item.url);
+  state.selection = item.label;
+  if(item.label === 'Nenhuma'){
+    show(el('h9-describe'));
+    el('h9-custom').addEventListener('input', function onH9(){ state.customDescribe = this.value.trim(); if(state.customDescribe) show(el('h9-resolved')); });
+  } else {
+    hide(el('h9-describe'));
+    show(el('h9-resolved'));
+  }
+  evaluateFinal();
+}
+
+/* ---------- S8 handling (with 'Nenhuma das opções listadas') ---------- */
 function handleS8Input(){
   const val = el('s8-code').value.trim();
   const list = el('s8-list');
@@ -695,21 +711,33 @@ function handleS8Input(){
   if(!isNaN(num) && num>=1 && num<=47){
     const e = s8Errors.find(x=>x.n===num);
     if(e){
-      const b = createOptionButton('Erro ' + e.n, ()=> selectS8(e,b));
+      const b = createOptionButton('Erro ' + e.n, ()=> selectS8(e, b));
       b.classList.add('active');
       list.appendChild(b);
-      const s = document.createElement('div'); s.className='solution'; s.innerHTML='<strong>Informação:</strong> '+e.text; s.style.display='block'; list.appendChild(s);
+      const s = document.createElement('div'); s.className='solution'; s.innerHTML='<strong>Informação:</strong> '+ e.text; s.style.display='block'; list.appendChild(s);
       state.selection = 'Erro ' + e.n;
       show(el('s8-resolved'));
     }
   } else if(num === 0){
     // list all options
     s8Errors.forEach(e=>{
-      if(e.n===0) return;
       const b = createOptionButton('Erro ' + e.n, ()=> selectS8(e,b));
       list.appendChild(b);
       const s = document.createElement('div'); s.className='solution'; list.appendChild(s);
     });
+    // add "Nenhuma das opções listadas"
+    const noneBtn = createOptionButton('Nenhuma das opções listadas', ()=>{
+      document.querySelectorAll('#s8-list .option-btn').forEach(b=>b.classList.remove('active'));
+      noneBtn.classList.add('active');
+      let next = noneBtn.nextElementSibling;
+      while(next && !next.classList.contains('solution')) next = next.nextElementSibling;
+      if(next){ next.innerHTML = '<strong>Informação:</strong> Nenhuma das opções listadas. Descreva o problema.'; next.style.display = 'block'; }
+      show(el('s8-describe'));
+      el('s8-custom').addEventListener('input', function onS8Custom(){ state.customDescribe = this.value.trim(); if(state.customDescribe) show(el('s8-resolved')); });
+      state.selection = 'Nenhuma';
+    });
+    list.appendChild(noneBtn);
+    const sn = document.createElement('div'); sn.className='solution'; list.appendChild(sn);
   } else {
     const note = document.createElement('div'); note.className='small'; note.textContent = 'Insira um número entre 1 e 47, ou 0 para listar todas as opções.'; list.appendChild(note);
   }
@@ -717,11 +745,11 @@ function handleS8Input(){
 }
 
 function selectS8(e, btn){
-  markActiveAndShowSolution(btn, e.text);
+  markActiveAndShowSolution(btn, e.text, e.url);
   state.selection = 'Erro ' + e.n;
   if(e.n === 0){
     show(el('s8-describe'));
-    el('s8-custom').addEventListener('input', ()=>{ state.customDescribe = el('s8-custom').value.trim(); if(state.customDescribe) show(el('s8-resolved')); });
+    el('s8-custom').addEventListener('input', function onS8(){ state.customDescribe = this.value.trim(); if(state.customDescribe) show(el('s8-resolved')); });
   } else {
     hide(el('s8-describe'));
     show(el('s8-resolved'));
@@ -735,9 +763,9 @@ function markResolved(val){
   evaluateFinal();
 }
 
-/* ---------- Evaluate final readiness ---------- */
+/* ---------- Evaluate readiness for final actions ---------- */
 function evaluateFinal(){
-  // basic fields
+  // update basic state
   state.chamado = el('field-chamado').value.trim();
   state.posto = el('field-posto').value.trim();
   state.patrimonio = el('field-patrimonio').value.trim();
@@ -746,13 +774,13 @@ function evaluateFinal(){
   if(!state.chamado || !state.posto || !state.patrimonio) return;
   if(!state.modelo || !state.descricao) return;
 
-  // model-specific checks: selection or customDescribe must exist
+  // model-specific check: either selection OR customDescribe must exist
   let modelOk = true;
   if(['i2-X2','i3-X3','S6','S8-R8-BR8','S9-S9X','S10-S10X','H9-H9X'].includes(state.modelo)){
     modelOk = !!state.selection || !!state.customDescribe;
   }
 
-  // resolved requirement: if resolved set (for those which asked), must be set
+  // if model requires resolved state (those model cards that ask), ensure resolved is set
   let resolvedNeeded = ['i2-X2','i3-X3','S6','S8-R8-BR8','S9-S9X','S10-S10X','H9-H9X'].includes(state.modelo);
   let resolvedOk = !resolvedNeeded || !!state.resolved;
 
@@ -764,7 +792,7 @@ function evaluateFinal(){
   }
 }
 
-/* ---------- Build WhatsApp message (answers bold) ---------- */
+/* ---------- Build WhatsApp message (formatted with real newlines, bold using *) ---------- */
 function buildWhatsLines(){
   const lines = [];
   lines.push(['Chamado:', state.chamado]);
@@ -778,42 +806,37 @@ function buildWhatsLines(){
   lines.push(['Imagem enviada:', state.file ? 'Sim' : 'Não']);
   if(state.finalExtra) lines.push(['Faltou algo:', state.finalExtra]);
 
-  // Format: Label + space + *value*
   const waLines = lines.map(l => `${l[0]} *${l[1] || ''}*` );
-  return waLines;
+  return waLines.join('\n');
 }
 
-/* ---------- Send via Web Share API or wa.me fallback ---------- */
+/* ---------- Send via WhatsApp: try Web Share API for files, otherwise wa.me fallback ---------- */
 async function sendWhats(number){
-  // refresh some dynamic state values before sending
+  // refresh fields
   state.finalExtra = el('field-final-extra').value.trim() || state.finalExtra;
-  // ensure selection from various inputs if present
-  if(el('i2-custom')) state.customDescribe = state.customDescribe || el('i2-custom').value.trim();
-  if(el('s8-custom')) state.customDescribe = state.customDescribe || el('s8-custom').value.trim();
-  const waLines = buildWhatsLines();
-  const message = waLines.join('\\n');
+  state.customDescribe = state.customDescribe || (el('i2-custom') && el('i2-custom').value.trim()) || (el('s8-custom') && el('s8-custom').value.trim()) || (el('i3-custom') && el('i3-custom').value.trim()) || state.customDescribe;
+  const message = buildWhatsLines();
 
-  // If we have an image and browser supports share with files, try it
+  // Try Web Share API with files (mobile browsers)
   if(state.file && navigator.canShare && navigator.canShare({ files: [state.file] })){
     try{
       await navigator.share({ files: [state.file], text: message, title: 'Chamado BRMobility' });
-      // after share, open chat (optional confirmation)
-      const openChat = confirm('Compartilhamento concluído. Deseja abrir o WhatsApp para confirmar/acompanhar?');
+      const openChat = confirm('Compartilhamento concluído. Deseja abrir o WhatsApp para confirmar o envio?');
       if(openChat){
         window.open('https://wa.me/' + number + '?text=' + encodeURIComponent(message), '_blank');
       }
       return;
-    } catch(err){
-      console.warn('Share API falhou ou cancelado', err);
-      // fallback to wa.me below
+    }catch(err){
+      console.warn('Share API falhou', err);
     }
   }
-  // Fallback: open wa.me with text only (user must attach image manually if needed)
+
+  // fallback: open wa.me with text only (user should attach image manually if needed)
   const url = 'https://wa.me/' + number + '?text=' + encodeURIComponent(message);
   window.open(url, '_blank');
 }
 
-/* ---------- Utility: wire up list renderers for i3, s6, etc ---------- */
+/* ---------- Utility renderList for initial lists ---------- */
 function renderList(id, items, handler){
   const cont = el(id);
   items.forEach(item=>{
@@ -823,9 +846,7 @@ function renderList(id, items, handler){
   });
 }
 
-/* Keep functions available for handlers defined earlier */
-window.renderList = renderList;
-
 </script>
 </body>
 </html>
+
