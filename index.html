@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8" />
 <meta name="viewport" content="width=device-width,initial-scale=1" />
-<title>Análise e Reparo em Campo — BRMobility</title>
+<title>Análise e Reparo em Campo — BRMobility (v4)</title>
 <style>
   :root{
     --primary:#0b57a4;
@@ -21,7 +21,7 @@
     color:#111;
   }
 
-  /* Background logo fixed (full, not repeating) */
+  /* Larger background logo as watermark (takes most of mobile screen) */
   body::before{
     content: "";
     position: fixed;
@@ -29,8 +29,9 @@
     background-image: url('logotipo empresa.jpg');
     background-position: center center;
     background-repeat: no-repeat;
-    background-size: contain;
-    opacity: 0.08;
+    /* make it large, nearly proportional to mobile screen */
+    background-size: 85vw auto;
+    opacity: 0.10;
     pointer-events: none;
     z-index: 0;
   }
@@ -42,7 +43,7 @@
     min-height:100vh;
     box-sizing:border-box;
     padding:20px;
-    padding-bottom: calc(var(--footer-height) + 24px); /* reserve space so footer won't overlap */
+    padding-bottom: calc(var(--footer-height) + 24px);
     display:flex;
     align-items:flex-start;
     justify-content:center;
@@ -95,22 +96,25 @@
     cursor:pointer;
     font-size:15px;
     box-sizing:border-box;
+    background:var(--primary);
+    color:white;
   }
-  .btn-primary{ background:var(--primary); color:white; }
-  .btn-accent{ background:var(--primary); color:white; } /* contact buttons also blue */
-  .btn-small{ padding:8px 12px; font-size:14px; border-radius:8px; display:inline-block; }
+  .btn-small{ padding:8px 12px; font-size:14px; border-radius:8px; display:inline-block; background:var(--primary); color:white; border:none; cursor:pointer; }
 
-  .options{ display:flex; flex-direction:column; gap:10px; }
+  /* option buttons: now filled blue with white letters as requested */
   .option-btn{
     text-align:left;
     padding:12px;
     border-radius:10px;
-    border:1px solid #e6e6e6;
-    background:white;
+    border: none;
+    background:var(--primary);
+    color:white;
     cursor:pointer;
     font-size:15px;
   }
-  .option-btn.active{ border-color:var(--primary); box-shadow:0 6px 18px rgba(11,87,164,0.06); }
+  .option-btn + .solution{ margin-top:8px; }
+
+  .option-btn.active{ box-shadow:0 6px 18px rgba(11,87,164,0.18); transform:translateY(-1px); }
 
   .solution{
     margin-top:8px;
@@ -120,11 +124,12 @@
     border:1px solid #eee;
     display:none;
     font-size:14px;
+    color:#111;
   }
 
   .small{ font-size:13px; color:#444; }
 
-  /* fixed footer (won't overlay because padding-bottom reserved) */
+  /* fixed footer */
   footer.fixed-footer{
     position:fixed;
     left:0;
@@ -142,8 +147,16 @@
   }
   footer.fixed-footer img{ max-height:72px; width:auto; object-fit:contain; }
 
-  /* responsive tweaks */
+  .info-box{
+    background:#fff;
+    border-radius:10px;
+    border:1px solid #eee;
+    padding:10px;
+    margin-top:8px;
+  }
+
   @media(max-width:520px){
+    body::before{ background-size: 92vw auto; opacity:0.12; }
     h1{ font-size:20px; }
   }
 </style>
@@ -159,11 +172,11 @@
         <div class="alert">⚠ Esse site não deve ser compartilhado com clientes ou externos.</div>
 
         <div style="margin-top:12px; display:flex; flex-direction:column; gap:10px; max-width:640px; margin-left:auto; margin-right:auto;">
-          <input id="field-chamado" type="text" placeholder="Escreva aqui o número do chamado" autocomplete="off" />
-          <input id="field-posto" type="text" placeholder="Escreva aqui o nome do posto" autocomplete="off" />
-          <input id="field-patrimonio" type="text" placeholder="Escreva aqui o número do patrimônio do veículo" autocomplete="off" />
+          <input id="field-chamado" type="text" placeholder="Número do chamado (ex: 20991)" autocomplete="off" />
+          <input id="field-posto" type="text" placeholder="Nome do posto" autocomplete="off" />
+          <input id="field-patrimonio" type="text" placeholder="Número do patrimônio" autocomplete="off" />
           <div class="small">Preencha os três campos para prosseguir.</div>
-          <button id="btn-to-model" class="btn btn-primary" style="display:none;">Próximo: Modelo do veículo</button>
+          <button id="btn-to-model" class="btn" style="display:none;">Próximo: Modelo do veículo</button>
         </div>
       </section>
 
@@ -190,7 +203,7 @@
         <div id="i2-resolved" style="display:none; margin-top:10px;">
           <div style="font-weight:700; margin-bottom:6px;">Foi possível resolver o chamado?</div>
           <div style="display:flex; gap:8px;">
-            <button class="btn btn-accent" onclick="markResolved('Sim')">Sim</button>
+            <button class="btn" onclick="markResolved('Sim')">Sim</button>
             <button class="btn" onclick="markResolved('Não')">Não</button>
           </div>
         </div>
@@ -205,7 +218,7 @@
         <div id="i3-resolved" style="display:none; margin-top:10px;">
           <div style="font-weight:700; margin-bottom:6px;">Foi possível resolver o chamado?</div>
           <div style="display:flex; gap:8px;">
-            <button class="btn btn-accent" onclick="markResolved('Sim')">Sim</button>
+            <button class="btn" onclick="markResolved('Sim')">Sim</button>
             <button class="btn" onclick="markResolved('Não')">Não</button>
           </div>
         </div>
@@ -220,7 +233,7 @@
         <div id="s6-resolved" style="display:none; margin-top:10px;">
           <div style="font-weight:700; margin-bottom:6px;">Foi possível resolver o chamado?</div>
           <div style="display:flex; gap:8px;">
-            <button class="btn btn-accent" onclick="markResolved('Sim')">Sim</button>
+            <button class="btn" onclick="markResolved('Sim')">Sim</button>
             <button class="btn" onclick="markResolved('Não')">Não</button>
           </div>
         </div>
@@ -237,7 +250,7 @@
         <div id="s8-resolved" style="display:none; margin-top:10px;">
           <div style="font-weight:700; margin-bottom:6px;">Foi possível resolver o chamado?</div>
           <div style="display:flex; gap:8px;">
-            <button class="btn btn-accent" onclick="markResolved('Sim')">Sim</button>
+            <button class="btn" onclick="markResolved('Sim')">Sim</button>
             <button class="btn" onclick="markResolved('Não')">Não</button>
           </div>
         </div>
@@ -252,7 +265,7 @@
         <div id="s9-resolved" style="display:none; margin-top:10px;">
           <div style="font-weight:700; margin-bottom:6px;">Foi possível resolver o chamado?</div>
           <div style="display:flex; gap:8px;">
-            <button class="btn btn-accent" onclick="markResolved('Sim')">Sim</button>
+            <button class="btn" onclick="markResolved('Sim')">Sim</button>
             <button class="btn" onclick="markResolved('Não')">Não</button>
           </div>
         </div>
@@ -260,6 +273,15 @@
 
       <section class="card" id="card-s10" style="display:none;">
         <h3>S10-S10X — Observações</h3>
+
+        <!-- COMMENT/EXPLANATION REQUESTED BY USER -->
+        <div class="info-box">
+          <strong>Como funcionam os erros do S10-S10X</strong>
+          <p class="small">Os códigos/erros do S10 referem-se a problemas detectados pelo painel (ex.: chave inglesa / padrões de piscada). 
+          Use as opções abaixo para identificar o erro mais próximo. Se não encontrar, escolha "Nenhuma" e descreva. 
+          Alguns itens têm procedimentos rápidos ou links para calibração/recuperação — use o botão "clique aqui" quando disponível.</p>
+        </div>
+
         <div class="options" id="s10-list"></div>
         <div id="s10-describe" style="display:none; margin-top:8px;">
           <textarea id="s10-custom" placeholder="Descreva o problema..."></textarea>
@@ -267,7 +289,7 @@
         <div id="s10-resolved" style="display:none; margin-top:10px;">
           <div style="font-weight:700; margin-bottom:6px;">Foi possível resolver o chamado?</div>
           <div style="display:flex; gap:8px;">
-            <button class="btn btn-accent" onclick="markResolved('Sim')">Sim</button>
+            <button class="btn" onclick="markResolved('Sim')">Sim</button>
             <button class="btn" onclick="markResolved('Não')">Não</button>
           </div>
         </div>
@@ -277,12 +299,12 @@
         <h3>H9-H9X — Problemas</h3>
         <div class="options" id="h9-list"></div>
         <div id="h9-describe" style="display:none; margin-top:8px;">
-          <textarea id="h9-custom" placeholder="Descreva o problema..."></textarea>
+          <textarea id="h9-custom" placeholder="Descreva the problema..."></textarea>
         </div>
         <div id="h9-resolved" style="display:none; margin-top:10px;">
           <div style="font-weight:700; margin-bottom:6px;">Foi possível resolver o chamado?</div>
           <div style="display:flex; gap:8px;">
-            <button class="btn btn-accent" onclick="markResolved('Sim')">Sim</button>
+            <button class="btn" onclick="markResolved('Sim')">Sim</button>
             <button class="btn" onclick="markResolved('Não')">Não</button>
           </div>
         </div>
@@ -293,7 +315,11 @@
         <h3>Upload de imagem (opcional)</h3>
         <input id="file-input" type="file" accept="image/*" />
         <div id="preview" class="small" style="display:none; margin-top:8px;"></div>
-        <div class="small" style="margin-top:8px;">Se o navegador permitir, a imagem será enviada via compartilhamento nativo ao WhatsApp; caso contrário, anexe manualmente ao abrir o chat.</div>
+        <div style="display:flex; gap:8px; margin-top:10px;">
+          <button id="share-image" class="btn-small" style="display:none;">Compartilhar imagem (WhatsApp)</button>
+          <a id="download-image" class="btn-small" style="display:none; text-decoration:none;">Baixar imagem</a>
+        </div>
+        <div class="small" style="margin-top:8px;">Se o navegador permitir, a imagem será enviada via compartilhamento nativo ao WhatsApp; caso contrário, clique em "Baixar imagem" e anexe manualmente ao abrir o chat.</div>
       </section>
 
       <!-- Final extra -->
@@ -307,10 +333,10 @@
       <section class="card" id="card-contacts" style="display:none;">
         <h3>Enviar via WhatsApp</h3>
         <div style="display:flex; gap:10px; flex-direction:column;">
-          <button class="btn btn-accent" id="btn-vanessa">
+          <button class="btn" id="btn-vanessa">
             <img src="logotipo vanessa.jpg" alt="Vanessa" style="height:28px; vertical-align:middle; margin-right:8px;" />Analista Vanessa Rodrigues — <small>+55 11 98947-7808</small>
           </button>
-          <button class="btn btn-accent" id="btn-willian">
+          <button class="btn" id="btn-willian">
             <img src="logotipo willian.jpg" alt="Willian" style="height:28px; vertical-align:middle; margin-right:8px;" />Analista Willian Bertuzzi — <small>+55 11 95654-4217</small>
           </button>
         </div>
@@ -321,11 +347,11 @@
 
   <!-- Fixed footer -->
   <footer class="fixed-footer" aria-hidden="true">
-    <img src="logotipo empresa.jpg" alt="BRMobility" />
+    <img src="logotipo empresa.jpg" alt="BRMobility" style="opacity:0.9; max-height:84px;" />
   </footer>
 
 <script>
-/* ---------- Data (completa) ---------- */
+/* ---------- Data ---------- */
 const MODELS = ['i2-X2','i3-X3','S6','S8-R8-BR8','H9-H9X','S9-S9X','S10-S10X'];
 
 const i2Errors = [
@@ -467,7 +493,7 @@ const h9Problems = [
   {label:'Nenhuma', text:'Nenhuma das opções listadas. Descreva o problema.'}
 ];
 
-/* ---------- State ---------- */
+/* State */
 const state = {
   chamado:'',
   posto:'',
@@ -481,26 +507,24 @@ const state = {
   finalExtra:''
 };
 
-/* ---------- Helpers ---------- */
+/* Helpers */
 function el(id){ return document.getElementById(id); }
 function show(elm){ elm.style.display = ''; }
 function hide(elm){ elm.style.display = 'none'; }
 function createOptionButton(text, onclick){ const b = document.createElement('button'); b.className='option-btn'; b.type='button'; b.textContent = text; b.onclick = onclick; return b; }
 
-/* ---------- Init UI ---------- */
+/* Init */
 document.addEventListener('DOMContentLoaded', ()=>{
-  // initial fields
   ['field-chamado','field-posto','field-patrimonio'].forEach(id=> el(id).addEventListener('input', checkInitialFields));
   el('btn-to-model').addEventListener('click', ()=>{ show(el('card-model')); el('card-model').scrollIntoView({behavior:'smooth', block:'center'}); });
 
-  // render models list
-  const modelsList = el('models-list');
+  // models
   MODELS.forEach(m=>{
     const btn = createOptionButton(m, ()=> selectModel(m, btn));
-    modelsList.appendChild(btn);
+    el('models-list').appendChild(btn);
   });
 
-  // render lists
+  // lists
   const i2list = el('i2-list'); i2Errors.forEach(err=>{ const b = createOptionButton(err.code, ()=> selectI2(err, b)); i2list.appendChild(b); const s = document.createElement('div'); s.className='solution'; i2list.appendChild(s); });
   renderList('i3-list', i3Problems, selectI3);
   renderList('s6-list', s6Problems, selectS6);
@@ -512,23 +536,12 @@ document.addEventListener('DOMContentLoaded', ()=>{
   el('s8-code').addEventListener('change', handleS8Input);
   el('s8-code').addEventListener('keyup', (e)=>{ if(e.key==='Enter') handleS8Input(); });
 
-  // file input preview
-  el('file-input').addEventListener('change', (e)=>{
-    const f = e.target.files[0];
-    state.file = f || null;
-    const preview = el('preview');
-    if(f){
-      const reader = new FileReader();
-      reader.onload = (ev)=>{
-        preview.innerHTML = '<img src="'+ev.target.result+'" style="max-width:100%; border-radius:8px;" />';
-        preview.style.display = '';
-      };
-      reader.readAsDataURL(f);
-    }else{
-      preview.innerHTML=''; preview.style.display='none';
-    }
-    evaluateFinal();
-  });
+  // file input
+  el('file-input').addEventListener('change', handleFileChange);
+
+  // share/download buttons
+  el('share-image').addEventListener('click', shareImageButtonClicked);
+  el('download-image').addEventListener('click', downloadImageButtonClicked);
 
   // final extra
   el('field-final-extra').addEventListener('input', (e)=>{ state.finalExtra = e.target.value.trim(); evaluateFinal(); });
@@ -538,13 +551,11 @@ document.addEventListener('DOMContentLoaded', ()=>{
   el('btn-willian').addEventListener('click', ()=> sendWhats('5511956544217'));
 });
 
-/* ---------- Initial fields validation ---------- */
+/* initial validation */
 function checkInitialFields(){
   state.chamado = el('field-chamado').value.trim();
   state.posto = el('field-posto').value.trim();
   state.patrimonio = el('field-patrimonio').value.trim();
-
-  // show next when all three filled
   if(state.chamado && state.posto && state.patrimonio){
     el('btn-to-model').style.display = '';
   } else {
@@ -552,7 +563,7 @@ function checkInitialFields(){
   }
 }
 
-/* ---------- Model selection flow ---------- */
+/* model selection flow */
 function selectModel(model, btn){
   state.modelo = model;
   document.querySelectorAll('#models-list .option-btn').forEach(b=>b.classList.remove('active'));
@@ -560,11 +571,9 @@ function selectModel(model, btn){
   show(el('card-desc'));
   el('card-desc').scrollIntoView({behavior:'smooth', block:'center'});
 
-  // once description is provided, show model-specific card
   function onDesc(){
     state.descricao = el('field-descricao').value.trim();
     if(state.descricao){
-      // show corresponding model card
       switch(state.modelo){
         case 'i2-X2': show(el('card-i2')); break;
         case 'i3-X3': show(el('card-i3')); break;
@@ -575,28 +584,26 @@ function selectModel(model, btn){
         case 'S10-S10X': show(el('card-s10')); break;
       }
       show(el('card-image'));
-      // scroll to first relevant card
       const id = 'card-' + state.modelo.split('-')[0].toLowerCase();
-      const target = el(id);
-      if(target) target.scrollIntoView({behavior:'smooth', block:'center'});
+      const t = el(id); if(t) t.scrollIntoView({behavior:'smooth', block:'center'});
       el('field-descricao').removeEventListener('input', onDesc);
     }
   }
   el('field-descricao').addEventListener('input', onDesc);
 }
 
-/* ---------- Render helper ---------- */
+/* render helper */
 function renderList(containerId, list, handler){
   const cont = el(containerId);
   list.forEach(item=>{
-    const label = item.label || ('Erro ' + (item.n||''));
-    const b = createOptionButton(label, ()=> handler(item, b));
+    const label = item.label || ('Erro '+ (item.n||''));
+    const b = createOptionButton(label, ()=> handler(item,b));
     cont.appendChild(b);
     const s = document.createElement('div'); s.className='solution'; cont.appendChild(s);
   });
 }
 
-/* ---------- Show solution helper (creates "clique aqui" button when url present) ---------- */
+/* show solution helper */
 function markActiveAndShowSolution(btn, solutionText, url){
   const parent = btn.parentElement;
   parent.querySelectorAll('.option-btn').forEach(b=>b.classList.remove('active'));
@@ -604,14 +611,12 @@ function markActiveAndShowSolution(btn, solutionText, url){
   let next = btn.nextElementSibling;
   while(next && !next.classList.contains('solution')) next = next.nextElementSibling;
   if(next){
-    // set text
     next.innerHTML = '<strong>Informação:</strong> ' + solutionText;
-    // if url, append a button element (safer than injecting onclick via HTML)
     if(url){
       const wrap = document.createElement('div');
       wrap.style.marginTop = '8px';
       const cbtn = document.createElement('button');
-      cbtn.className = 'btn-small btn-primary';
+      cbtn.className = 'btn-small';
       cbtn.textContent = 'clique aqui';
       cbtn.onclick = ()=> window.open(url, '_blank');
       wrap.appendChild(cbtn);
@@ -622,7 +627,7 @@ function markActiveAndShowSolution(btn, solutionText, url){
   }
 }
 
-/* ---------- Selection handlers ---------- */
+/* selection handlers */
 function selectI2(err, btn){
   markActiveAndShowSolution(btn, err.text, err.url);
   state.selection = err.code;
@@ -701,7 +706,7 @@ function selectH9(item, btn){
   evaluateFinal();
 }
 
-/* ---------- S8 handling (with 'Nenhuma das opções listadas') ---------- */
+/* S8 handling */
 function handleS8Input(){
   const val = el('s8-code').value.trim();
   const list = el('s8-list');
@@ -719,13 +724,11 @@ function handleS8Input(){
       show(el('s8-resolved'));
     }
   } else if(num === 0){
-    // list all options
     s8Errors.forEach(e=>{
       const b = createOptionButton('Erro ' + e.n, ()=> selectS8(e,b));
       list.appendChild(b);
       const s = document.createElement('div'); s.className='solution'; list.appendChild(s);
     });
-    // add "Nenhuma das opções listadas"
     const noneBtn = createOptionButton('Nenhuma das opções listadas', ()=>{
       document.querySelectorAll('#s8-list .option-btn').forEach(b=>b.classList.remove('active'));
       noneBtn.classList.add('active');
@@ -747,43 +750,31 @@ function handleS8Input(){
 function selectS8(e, btn){
   markActiveAndShowSolution(btn, e.text, e.url);
   state.selection = 'Erro ' + e.n;
-  if(e.n === 0){
-    show(el('s8-describe'));
-    el('s8-custom').addEventListener('input', function onS8(){ state.customDescribe = this.value.trim(); if(state.customDescribe) show(el('s8-resolved')); });
-  } else {
-    hide(el('s8-describe'));
-    show(el('s8-resolved'));
-  }
+  hide(el('s8-describe'));
+  show(el('s8-resolved'));
   evaluateFinal();
 }
 
-/* ---------- Resolved ---------- */
+/* resolved */
 function markResolved(val){
   state.resolved = val;
   evaluateFinal();
 }
 
-/* ---------- Evaluate readiness for final actions ---------- */
+/* evaluate final readiness */
 function evaluateFinal(){
-  // update basic state
   state.chamado = el('field-chamado').value.trim();
   state.posto = el('field-posto').value.trim();
   state.patrimonio = el('field-patrimonio').value.trim();
   state.descricao = el('field-descricao').value.trim();
-
   if(!state.chamado || !state.posto || !state.patrimonio) return;
   if(!state.modelo || !state.descricao) return;
-
-  // model-specific check: either selection OR customDescribe must exist
   let modelOk = true;
   if(['i2-X2','i3-X3','S6','S8-R8-BR8','S9-S9X','S10-S10X','H9-H9X'].includes(state.modelo)){
     modelOk = !!state.selection || !!state.customDescribe;
   }
-
-  // if model requires resolved state (those model cards that ask), ensure resolved is set
   let resolvedNeeded = ['i2-X2','i3-X3','S6','S8-R8-BR8','S9-S9X','S10-S10X','H9-H9X'].includes(state.modelo);
   let resolvedOk = !resolvedNeeded || !!state.resolved;
-
   if(modelOk && resolvedOk){
     show(el('card-final-extra'));
     show(el('card-contacts'));
@@ -792,7 +783,7 @@ function evaluateFinal(){
   }
 }
 
-/* ---------- Build WhatsApp message (formatted with real newlines, bold using *) ---------- */
+/* Build WhatsApp message */
 function buildWhatsLines(){
   const lines = [];
   lines.push(['Chamado:', state.chamado]);
@@ -805,48 +796,93 @@ function buildWhatsLines(){
   lines.push(['Chamado resolvido:', state.resolved ? state.resolved : '-']);
   lines.push(['Imagem enviada:', state.file ? 'Sim' : 'Não']);
   if(state.finalExtra) lines.push(['Faltou algo:', state.finalExtra]);
-
   const waLines = lines.map(l => `${l[0]} *${l[1] || ''}*` );
   return waLines.join('\n');
 }
 
-/* ---------- Send via WhatsApp: try Web Share API for files, otherwise wa.me fallback ---------- */
+/* --- File handling (preview + share + download) --- */
+function handleFileChange(e){
+  const f = e.target.files[0];
+  state.file = f || null;
+  const preview = el('preview');
+  const shareBtn = el('share-image');
+  const downloadLink = el('download-image');
+  if(f){
+    const reader = new FileReader();
+    reader.onload = (ev)=>{
+      preview.innerHTML = '<img src="'+ev.target.result+'" style="max-width:100%; border-radius:8px;" />';
+      preview.style.display = '';
+      // prepare download link
+      downloadLink.href = ev.target.result;
+      const safeName = f.name || 'imagem.jpg';
+      downloadLink.download = safeName;
+      downloadLink.style.display = '';
+      // show share button (may or may not succeed depending on browser)
+      shareBtn.style.display = '';
+    };
+    reader.readAsDataURL(f);
+  } else {
+    preview.innerHTML=''; preview.style.display='none';
+    shareBtn.style.display = 'none';
+    downloadLink.style.display = 'none';
+  }
+  evaluateFinal();
+}
+
+async function shareImageButtonClicked(){
+  if(!state.file){ alert('Selecione uma imagem antes'); return; }
+  try{
+    if(navigator.canShare && navigator.canShare({ files: [state.file] })){
+      await navigator.share({ files: [state.file], text: buildWhatsLines(), title: 'Chamado BRMobility' });
+      const number = prompt('Compartilhamento concluído. Deseja abrir o WhatsApp com a mensagem? Digite o número (sem + ou espaços) ou cancele.');
+      if(number) window.open('https://wa.me/' + number + '?text=' + encodeURIComponent(buildWhatsLines()), '_blank');
+      return;
+    } else {
+      alert('Seu navegador não permite envio direto de arquivos via Web Share API. Use "Baixar imagem" e anexe manualmente ao abrir o chat.');
+    }
+  }catch(err){
+    console.warn('Erro no share:', err);
+    alert('Falha ao tentar compartilhar. Use "Baixar imagem" para salvar e anexe manualmente.');
+  }
+}
+
+function downloadImageButtonClicked(ev){
+  setTimeout(()=>{ alert('Imagem salva no dispositivo. Abra o WhatsApp e anexe esta imagem na conversa.'); }, 400);
+}
+
+/* ---------- Send via WhatsApp (text + try share if file) ---------- */
 async function sendWhats(number){
-  // refresh fields
   state.finalExtra = el('field-final-extra').value.trim() || state.finalExtra;
   state.customDescribe = state.customDescribe || (el('i2-custom') && el('i2-custom').value.trim()) || (el('s8-custom') && el('s8-custom').value.trim()) || (el('i3-custom') && el('i3-custom').value.trim()) || state.customDescribe;
   const message = buildWhatsLines();
 
-  // Try Web Share API with files (mobile browsers)
   if(state.file && navigator.canShare && navigator.canShare({ files: [state.file] })){
     try{
       await navigator.share({ files: [state.file], text: message, title: 'Chamado BRMobility' });
       const openChat = confirm('Compartilhamento concluído. Deseja abrir o WhatsApp para confirmar o envio?');
-      if(openChat){
-        window.open('https://wa.me/' + number + '?text=' + encodeURIComponent(message), '_blank');
-      }
+      if(openChat){ window.open('https://wa.me/' + number + '?text=' + encodeURIComponent(message), '_blank'); }
       return;
     }catch(err){
-      console.warn('Share API falhou', err);
+      console.warn('Share API error', err);
+      alert('Não foi possível compartilhar automaticamente. Você pode salvar a imagem e anexar manualmente.');
     }
   }
 
-  // fallback: open wa.me with text only (user should attach image manually if needed)
   const url = 'https://wa.me/' + number + '?text=' + encodeURIComponent(message);
   window.open(url, '_blank');
 }
 
-/* ---------- Utility renderList for initial lists ---------- */
+/* Utility renderList for initial lists (used above) */
 function renderList(id, items, handler){
   const cont = el(id);
   items.forEach(item=>{
-    const b = createOptionButton(item.label || item.n, ()=> handler(item, b));
+    const b = createOptionButton(item.label || (item.n ? 'Erro ' + item.n : 'Item'), ()=> handler(item, b));
     cont.appendChild(b);
     const s = document.createElement('div'); s.className='solution'; cont.appendChild(s);
   });
 }
-
 </script>
 </body>
 </html>
+
 
