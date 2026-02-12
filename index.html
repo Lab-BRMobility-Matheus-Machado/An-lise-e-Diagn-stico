@@ -601,32 +601,52 @@ function buildWhatsText(){
 
 async function sendWhats(number){
 
-  // Atualiza dados atuais
+  // Atualiza state com valores atuais
   state.chamado = el('field-chamado').value.trim();
   state.posto = el('field-posto').value.trim();
   state.patrimonio = el('field-patrimonio').value.trim();
   state.descricao = el('field-descricao').value.trim();
-  state.finalExtra = el('field-final-extra').value.trim();
+  state.customDescribe = (el('i2-custom') && el('i2-custom').value.trim()) || 
+                         (el('i3-custom') && el('i3-custom').value.trim()) || 
+                         (el('s6-custom') && el('s6-custom').value.trim()) || 
+                         (el('s8-custom') && el('s8-custom').value.trim()) || 
+                         (el('s9-custom') && el('s9-custom').value.trim()) || 
+                         (el('s10-custom') && el('s10-custom').value.trim()) || 
+                         (el('h9-custom') && el('h9-custom').value.trim()) || 
+                         state.customDescribe || '';
+  state.finalExtra = el('field-final-extra').value.trim() || state.finalExtra;
 
   const text = buildWhatsText();
 
-  let whatsappURL = '';
+  // LINK DIRETO OFICIAL
+  const whatsappURL = 'https://api.whatsapp.com/send?phone=' + number + '&text=' + encodeURIComponent(text);
 
-  // Vanessa
-  if(number === '5511989477808'){
-    whatsappURL = 'https://api.whatsapp.com/send?phone=5511989477808&text=' + encodeURIComponent(text);
+  // 🔹 Se houver imagens e navegador suportar compartilhamento
+  if(state.files && state.files.length > 0){
+    try{
+      if(navigator.canShare && navigator.canShare({ files: state.files })){
+        await navigator.share({ 
+          files: state.files,
+          text: text,
+          title: 'Chamado BRMobility'
+        });
+
+        // Após compartilhar, redireciona direto para conversa
+        setTimeout(()=> {
+          window.location.href = whatsappURL;
+        }, 500);
+
+        return;
+      }
+    } catch(err){
+      console.warn('Erro ao compartilhar:', err);
+    }
   }
 
-  // Willian
-  if(number === '5511956544217'){
-    whatsappURL = 'https://api.whatsapp.com/send?phone=5511956544217&text=' + encodeURIComponent(text);
-  }
-
-  // Redireciona DIRETO para a conversa
+  // 🔹 Se não houver imagem ou não suportar
   window.location.href = whatsappURL;
 }
 
-}
 function evaluateFinal(){
   state.chamado = el('field-chamado').value.trim();
   state.posto = el('field-posto').value.trim();
@@ -646,5 +666,6 @@ function reattachListeners(){
 </body>
 </html>
 </html>
+
 
 
