@@ -616,43 +616,33 @@ async function sendWhats(number){
   state.finalExtra = el('field-final-extra').value.trim() || state.finalExtra;
 
   const text = buildWhatsText();
+  const whatsappURL = 'https://wa.me/' + number + '?text=' + encodeURIComponent(text);
 
-  // Se tem arquivos, tenta enviar via Web Share API
+  // Se tem imagens e o navegador suporta Web Share
   if(state.files && state.files.length > 0){
     try{
-      // Verifica se o navegador suporta compartilhar arquivos
       if(navigator.canShare && navigator.canShare({ files: state.files })){
         await navigator.share({ 
           files: state.files, 
           text: text, 
           title: 'Chamado BRMobility' 
         });
-        // Após compartilhar, abre o WhatsApp do contato selecionado
+
+        // Após compartilhar, redireciona direto para o contato
         setTimeout(()=> {
-          window.open('https://wa.me/' + number + '?text=' + encodeURIComponent(text), '_blank');
-        }, 800);
-        return;
-      } else {
-        // Navegador não suporta - abre WhatsApp e avisa para anexar manualmente
-        alert('Seu navegador não permite anexar arquivos automaticamente.\n\nO WhatsApp será aberto com a mensagem. Por favor, anexe as imagens manualmente.');
-        window.open('https://wa.me/' + number + '?text=' + encodeURIComponent(text), '_blank');
+          window.location.href = whatsappURL;
+        }, 500);
+
         return;
       }
     } catch(err){
       console.warn('Erro no Web Share API:', err);
-      // Se usuário cancelou ou deu erro, abre WhatsApp normalmente
-      if(err.name !== 'AbortError'){
-        alert('Não foi possível compartilhar as imagens automaticamente.\n\nO WhatsApp será aberto com a mensagem. Por favor, anexe as imagens manualmente.');
-      }
-      window.open('https://wa.me/' + number + '?text=' + encodeURIComponent(text), '_blank');
-      return;
     }
   }
 
-  // Sem arquivos - abre WhatsApp direto com a mensagem
-  window.open('https://wa.me/' + number + '?text=' + encodeURIComponent(text), '_blank');
+  // Redireciona direto para a conversa específica
+  window.location.href = whatsappURL;
 }
-
 function evaluateFinal(){
   state.chamado = el('field-chamado').value.trim();
   state.posto = el('field-posto').value.trim();
@@ -672,3 +662,4 @@ function reattachListeners(){
 </body>
 </html>
 </html>
+
