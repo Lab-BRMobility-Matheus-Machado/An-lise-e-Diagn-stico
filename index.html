@@ -76,6 +76,13 @@ footer.fixed-footer img{
 }
 
 .small{ font-size:13px; color:#444; }
+
+/* Espaçamento dos botões de contato */
+#contacts-area{
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
 </style>
 </head>
 <body>
@@ -227,7 +234,7 @@ footer.fixed-footer img{
         <h3>Upload de imagem (opcional) — até 3 fotos</h3>
         <input id="file-input" type="file" accept="image/*" multiple />
         <div id="preview" class="thumbs" style="display:none;"></div>
-        <div class="small" style="margin-top:8px;">Se o navegador permitir, as imagens serão incluídas automaticamente no compartilhamento com o WhatsApp. Caso contrário, baixe e anexe manualmente.</div>
+        <div class="small" style="margin-top:8px;">As imagens serão enviadas junto com a mensagem no WhatsApp (se o navegador suportar). Caso contrário, anexe manualmente.</div>
       </section>
 
       <!-- final question -->
@@ -240,10 +247,8 @@ footer.fixed-footer img{
       <!-- contacts -->
       <section class="card" id="card-contacts" style="display:none;">
         <h3>Enviar via WhatsApp</h3>
-        <div style="display:flex; flex-direction:column; gap:12px;">
-          <div id="contacts-area"></div>
-        </div>
-        <div class="small" style="margin-top:10px;">Ao clicar no contato o WhatsApp será aberto automaticamente com a mensagem pronta. Se necessário, anexe as imagens manualmente.</div>
+        <div id="contacts-area"></div>
+        <div class="small" style="margin-top:16px;">Ao clicar no contato, o WhatsApp será aberto com a mensagem e imagens (quando possível).</div>
       </section>
 
     </div>
@@ -595,6 +600,7 @@ function buildWhatsText(){
 }
 
 async function sendWhats(number){
+  // Atualiza state com valores atuais
   state.chamado = el('field-chamado').value.trim();
   state.posto = el('field-posto').value.trim();
   state.patrimonio = el('field-patrimonio').value.trim();
@@ -611,25 +617,39 @@ async function sendWhats(number){
 
   const text = buildWhatsText();
 
-  if(state.files && state.files.length>0){
+  // Se tem arquivos, tenta enviar via Web Share API
+  if(state.files && state.files.length > 0){
     try{
+      // Verifica se o navegador suporta compartilhar arquivos
       if(navigator.canShare && navigator.canShare({ files: state.files })){
-        await navigator.share({ files: state.files, text: text, title: 'Chamado BRMobility' });
-        setTimeout(()=> window.open('https://wa.me/' + number + '?text=' + encodeURIComponent(text), '_blank'), 600);
+        await navigator.share({ 
+          files: state.files, 
+          text: text, 
+          title: 'Chamado BRMobility' 
+        });
+        // Após compartilhar, abre o WhatsApp do contato selecionado
+        setTimeout(()=> {
+          window.open('https://wa.me/' + number + '?text=' + encodeURIComponent(text), '_blank');
+        }, 800);
         return;
       } else {
-        alert('Seu navegador não permite anexar arquivos automaticamente. A conversa será aberta; anexe as imagens manualmente.');
+        // Navegador não suporta - abre WhatsApp e avisa para anexar manualmente
+        alert('Seu navegador não permite anexar arquivos automaticamente.\n\nO WhatsApp será aberto com a mensagem. Por favor, anexe as imagens manualmente.');
         window.open('https://wa.me/' + number + '?text=' + encodeURIComponent(text), '_blank');
         return;
       }
-    }catch(err){
-      console.warn('Share API error', err);
-      alert('Erro ao tentar compartilhar imagens automaticamente. Abrindo WhatsApp com a mensagem (anexe imagens manualmente).');
+    } catch(err){
+      console.warn('Erro no Web Share API:', err);
+      // Se usuário cancelou ou deu erro, abre WhatsApp normalmente
+      if(err.name !== 'AbortError'){
+        alert('Não foi possível compartilhar as imagens automaticamente.\n\nO WhatsApp será aberto com a mensagem. Por favor, anexe as imagens manualmente.');
+      }
       window.open('https://wa.me/' + number + '?text=' + encodeURIComponent(text), '_blank');
       return;
     }
   }
 
+  // Sem arquivos - abre WhatsApp direto com a mensagem
   window.open('https://wa.me/' + number + '?text=' + encodeURIComponent(text), '_blank');
 }
 
@@ -651,8 +671,4 @@ function reattachListeners(){
 </script>
 </body>
 </html>
-
-</script>
-</body>
 </html>
-
