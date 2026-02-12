@@ -1,4 +1,3 @@
-
 <!doctype html>
 <html lang="pt-BR">
 <head>
@@ -13,7 +12,7 @@ html,body{height:100%;margin:0;font-family:-apple-system,Segoe UI,Roboto,Arial;b
 body::before{ content:""; position:fixed; inset:0; background-image:url('logotipo empresa.jpg'); background-size:90vw auto; background-position:center center; background-repeat:no-repeat; opacity:0.36; z-index:0; pointer-events:none; }
 
 /* layout */
-.app{position:relative; z-index:1; min-height:100vh; padding:20px; padding-bottom:calc(var(--footer-height)+24px); box-sizing:border-box; display:flex; justify-content:center;}
+.app{position:relative; z-index:1; min-height:100vh; padding:20px; padding-bottom:20px; box-sizing:border-box; display:flex; justify-content:center;}
 .wrap{width:100%; max-width:960px; display:flex; flex-direction:column; gap:18px;}
 .card{background:#fff;border-radius:var(--card-radius); padding:18px; box-shadow:0 8px 28px rgba(0,0,0,0.08);}
 .center{text-align:center;}
@@ -35,6 +34,7 @@ textarea{min-height:100px; resize:vertical;}
 .option-btn{text-align:left; padding:12px; border-radius:12px; border:none; background:var(--primary); color:#fff; font-weight:700; cursor:pointer;}
 .option-btn.small{padding:10px;}
 .option-btn + .solution{margin-top:6px;}
+.option-btn.active{ box-shadow:0 8px 18px rgba(11,87,164,0.14); transform:translateY(-1px); }
 
 /* solution box shown below button */
 .solution{display:none; padding:12px; border-radius:10px; background:#fff; border:1px solid #eee;}
@@ -44,13 +44,38 @@ textarea{min-height:100px; resize:vertical;}
 .thumbs{display:flex; gap:8px; margin-top:8px; flex-wrap:wrap;}
 .thumbs img{width:96px; height:96px; object-fit:cover; border-radius:8px; border:1px solid #ddd;}
 
-/* big footer with logo fixed */
-footer.fixed-footer{position:fixed; left:0; right:0; bottom:0; height:var(--footer-height); display:flex; align-items:center; justify-content:center; background:rgba(255,255,255,0.98); z-index:4; border-top:1px solid #eee; box-sizing:border-box; padding:12px;}
-footer.fixed-footer img{max-height:120px; width:auto; object-fit:contain;}
+/* footer como marca d'água (atrás do conteúdo) */
+footer.fixed-footer{
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: var(--footer-height);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: transparent;
+  border-top: none;
+  z-index: 0;
+  box-sizing: border-box;
+  padding: 12px;
+  pointer-events: none;
+  opacity: 0.15;
+}
+footer.fixed-footer img{
+  max-height: 120px;
+  width: auto;
+  object-fit: contain;
+}
 
 /* responsive tweaks */
-@media(max-width:520px){ body::before{background-size:95vw auto; opacity:0.28} .title{font-size:20px} footer.fixed-footer img{max-height:98px} }
+@media(max-width:520px){ 
+  body::before{background-size:95vw auto; opacity:0.28} 
+  .title{font-size:20px} 
+  footer.fixed-footer img{max-height:98px} 
+}
 
+.small{ font-size:13px; color:#444; }
 </style>
 </head>
 <body>
@@ -89,16 +114,46 @@ footer.fixed-footer img{max-height:120px; width:auto; object-fit:contain;}
       <section class="card" id="card-i2" style="display:none;">
         <h3>i2-X2 — Erros</h3>
         <div id="i2-list" class="options"></div>
+        <div id="i2-describe" style="display:none; margin-top:8px;">
+          <textarea id="i2-custom" placeholder="Descreva o problema..." ></textarea>
+        </div>
+        <div id="i2-resolved" style="display:none; margin-top:10px;">
+          <div style="font-weight:700;">Foi possível resolver o chamado?</div>
+          <div style="display:flex; gap:8px; margin-top:8px;">
+            <button class="btn" onclick="markResolved('Sim')">Sim</button>
+            <button class="btn btn-ghost" onclick="markResolved('Não')">Não</button>
+          </div>
+        </div>
       </section>
 
       <section class="card" id="card-i3" style="display:none;">
         <h3>i3-X3 — Problemas</h3>
         <div id="i3-list" class="options"></div>
+        <div id="i3-describe" style="display:none; margin-top:8px;">
+          <textarea id="i3-custom" placeholder="Descreva o problema..." ></textarea>
+        </div>
+        <div id="i3-resolved" style="display:none; margin-top:10px;">
+          <div style="font-weight:700;">Foi possível resolver o chamado?</div>
+          <div style="display:flex; gap:8px; margin-top:8px;">
+            <button class="btn" onclick="markResolved('Sim')">Sim</button>
+            <button class="btn btn-ghost" onclick="markResolved('Não')">Não</button>
+          </div>
+        </div>
       </section>
 
       <section class="card" id="card-s6" style="display:none;">
         <h3>S6 — Problemas</h3>
         <div id="s6-list" class="options"></div>
+        <div id="s6-describe" style="display:none; margin-top:8px;">
+          <textarea id="s6-custom" placeholder="Descreva o problema..." ></textarea>
+        </div>
+        <div id="s6-resolved" style="display:none; margin-top:10px;">
+          <div style="font-weight:700;">Foi possível resolver o chamado?</div>
+          <div style="display:flex; gap:8px; margin-top:8px;">
+            <button class="btn" onclick="markResolved('Sim')">Sim</button>
+            <button class="btn btn-ghost" onclick="markResolved('Não')">Não</button>
+          </div>
+        </div>
       </section>
 
       <section class="card" id="card-s8" style="display:none;">
@@ -106,22 +161,65 @@ footer.fixed-footer img{max-height:120px; width:auto; object-fit:contain;}
         <div class="small" style="margin-bottom:8px;">Digite o número do erro (1-47) ou 0 para listar todas as opções.</div>
         <input id="s8-code" class="input" type="text" placeholder="Ex: 32 ou 0" />
         <div id="s8-list" class="options" style="margin-top:10px;"></div>
+        <div id="s8-describe" style="display:none; margin-top:8px;">
+          <textarea id="s8-custom" placeholder="Descreva o problema..." ></textarea>
+        </div>
+        <div id="s8-resolved" style="display:none; margin-top:10px;">
+          <div style="font-weight:700;">Foi possível resolver o chamado?</div>
+          <div style="display:flex; gap:8px; margin-top:8px;">
+            <button class="btn" onclick="markResolved('Sim')">Sim</button>
+            <button class="btn btn-ghost" onclick="markResolved('Não')">Não</button>
+          </div>
+        </div>
       </section>
 
       <section class="card" id="card-s9" style="display:none;">
         <h3>S9-S9X — Problemas</h3>
         <div id="s9-list" class="options"></div>
+        <div id="s9-describe" style="display:none; margin-top:8px;">
+          <textarea id="s9-custom" placeholder="Descreva o problema..." ></textarea>
+        </div>
+        <div id="s9-resolved" style="display:none; margin-top:10px;">
+          <div style="font-weight:700;">Foi possível resolver o chamado?</div>
+          <div style="display:flex; gap:8px; margin-top:8px;">
+            <button class="btn" onclick="markResolved('Sim')">Sim</button>
+            <button class="btn btn-ghost" onclick="markResolved('Não')">Não</button>
+          </div>
+        </div>
       </section>
 
       <section class="card" id="card-s10" style="display:none;">
         <h3>S10-S10X — Observações</h3>
-        <div style="background:#fff;border:1px solid #eee;padding:12px;border-radius:10px;"></div>
+        <div style="background:#fff;border:1px solid #eee;padding:12px;border-radius:10px;">
+          <strong>Como funcionam os erros do S10-S10X</strong>
+          <p class="small" style="margin:6px 0 0 0;">Os códigos do S10 referem-se a eventos detectados pelo painel (padrões de piscada/chave inglesa). Se não encontrar o item exato, selecione "Nenhuma" e descreva.</p>
+        </div>
         <div id="s10-list" class="options" style="margin-top:10px;"></div>
+        <div id="s10-describe" style="display:none; margin-top:8px;">
+          <textarea id="s10-custom" placeholder="Descreva o problema..." ></textarea>
+        </div>
+        <div id="s10-resolved" style="display:none; margin-top:10px;">
+          <div style="font-weight:700;">Foi possível resolver o chamado?</div>
+          <div style="display:flex; gap:8px; margin-top:8px;">
+            <button class="btn" onclick="markResolved('Sim')">Sim</button>
+            <button class="btn btn-ghost" onclick="markResolved('Não')">Não</button>
+          </div>
+        </div>
       </section>
 
       <section class="card" id="card-h9" style="display:none;">
         <h3>H9-H9X — Problemas</h3>
         <div id="h9-list" class="options"></div>
+        <div id="h9-describe" style="display:none; margin-top:8px;">
+          <textarea id="h9-custom" placeholder="Descreva o problema..." ></textarea>
+        </div>
+        <div id="h9-resolved" style="display:none; margin-top:10px;">
+          <div style="font-weight:700;">Foi possível resolver o chamado?</div>
+          <div style="display:flex; gap:8px; margin-top:8px;">
+            <button class="btn" onclick="markResolved('Sim')">Sim</button>
+            <button class="btn btn-ghost" onclick="markResolved('Não')">Não</button>
+          </div>
+        </div>
       </section>
 
       <!-- image upload (up to 3) -->
@@ -136,13 +234,13 @@ footer.fixed-footer img{max-height:120px; width:auto; object-fit:contain;}
       <section class="card" id="card-final-extra" style="display:none;">
         <h3>Faltou algo nesse site de diagnóstico?</h3>
         <textarea id="field-final-extra" placeholder="Se sim, descreva aqui... (opcional)"></textarea>
+        <div class="small" style="margin-top:8px;">Após preencher, os contatos ficarão disponíveis para envio.</div>
       </section>
 
       <!-- contacts -->
       <section class="card" id="card-contacts" style="display:none;">
         <h3>Enviar via WhatsApp</h3>
         <div style="display:flex; flex-direction:column; gap:12px;">
-          <!-- buttons created by JS; labels do not show phone numbers as requested -->
           <div id="contacts-area"></div>
         </div>
         <div class="small" style="margin-top:10px;">Ao clicar no contato o WhatsApp será aberto automaticamente com a mensagem pronta. Se necessário, anexe as imagens manualmente.</div>
@@ -151,23 +249,115 @@ footer.fixed-footer img{max-height:120px; width:auto; object-fit:contain;}
     </div>
   </div>
 
+  <!-- footer como marca d'água -->
   <footer class="fixed-footer" aria-hidden="true">
     <img src="logotipo empresa.jpg" alt="BRMobility Logo" />
   </footer>
 
 <script>
-/* Data taken from your Prompt app-site AT's.txt (used to build options and links) */
 const MODELS = ['i2-X2','i3-X3','S6','S8-R8-BR8','H9-H9X','S9-S9X','S10-S10X'];
 
-const S8_ERRORS = [{"n": 1, "text": "Descrição não disponível no prompt. (Atualize o arquivo se desejar texto completo)", "url": ""}, {"n": 2, "text": "Descrição não disponível no prompt. (Atualize o arquivo se desejar texto completo)", "url": ""}, {"n": 3, "text": "Descrição não disponível no prompt. (Atualize o arquivo se desejar texto completo)", "url": ""}, {"n": 4, "text": "Descrição não disponível no prompt. (Atualize o arquivo se desejar texto completo)", "url": ""}, {"n": 5, "text": "Descrição não disponível no prompt. (Atualize o arquivo se desejar texto completo)", "url": ""}, {"n": 6, "text": "Descrição não disponível no prompt. (Atualize o arquivo se desejar texto completo)", "url": ""}, {"n": 7, "text": "Descrição não disponível no prompt. (Atualize o arquivo se desejar texto completo)", "url": ""}, {"n": 8, "text": "Descrição não disponível no prompt. (Atualize o arquivo se desejar texto completo)", "url": ""}, {"n": 9, "text": "Descrição não disponível no prompt. (Atualize o arquivo se desejar texto completo)", "url": ""}, {"n": 10, "text": "Descrição não disponível no prompt. (Atualize o arquivo se desejar texto completo)", "url": ""}, {"n": 11, "text": "Descrição não disponível no prompt. (Atualize o arquivo se desejar texto completo)", "url": ""}, {"n": 12, "text": "Descrição não disponível no prompt. (Atualize o arquivo se desejar texto completo)", "url": ""}, {"n": 13, "text": "Descrição não disponível no prompt. (Atualize o arquivo se desejar texto completo)", "url": ""}, {"n": 14, "text": "Descrição não disponível no prompt. (Atualize o arquivo se desejar texto completo)", "url": ""}, {"n": 15, "text": "Descrição não disponível no prompt. (Atualize o arquivo se desejar texto completo)", "url": ""}, {"n": 16, "text": "Descrição não disponível no prompt. (Atualize o arquivo se desejar texto completo)", "url": ""}, {"n": 17, "text": "Descrição não disponível no prompt. (Atualize o arquivo se desejar texto completo)", "url": ""}, {"n": 18, "text": "Descrição não disponível no prompt. (Atualize o arquivo se desejar texto completo)", "url": ""}, {"n": 19, "text": "Descrição não disponível no prompt. (Atualize o arquivo se desejar texto completo)", "url": ""}, {"n": 20, "text": "Descrição não disponível no prompt. (Atualize o arquivo se desejar texto completo)", "url": ""}, {"n": 21, "text": "Descrição não disponível no prompt. (Atualize o arquivo se desejar texto completo)", "url": ""}, {"n": 22, "text": "Descrição não disponível no prompt. (Atualize o arquivo se desejar texto completo)", "url": ""}, {"n": 23, "text": "Descrição não disponível no prompt. (Atualize o arquivo se desejar texto completo)", "url": ""}, {"n": 24, "text": "Descrição não disponível no prompt. (Atualize o arquivo se desejar texto completo)", "url": ""}, {"n": 25, "text": "Descrição não disponível no prompt. (Atualize o arquivo se desejar texto completo)", "url": ""}, {"n": 26, "text": "Descrição não disponível no prompt. (Atualize o arquivo se desejar texto completo)", "url": ""}, {"n": 27, "text": "Descrição não disponível no prompt. (Atualize o arquivo se desejar texto completo)", "url": ""}, {"n": 28, "text": "Descrição não disponível no prompt. (Atualize o arquivo se desejar texto completo)", "url": ""}, {"n": 29, "text": "Descrição não disponível no prompt. (Atualize o arquivo se desejar texto completo)", "url": ""}, {"n": 30, "text": "Descrição não disponível no prompt. (Atualize o arquivo se desejar texto completo)", "url": ""}, {"n": 31, "text": "Descrição não disponível no prompt. (Atualize o arquivo se desejar texto completo)", "url": ""}, {"n": 32, "text": "Descrição não disponível no prompt. (Atualize o arquivo se desejar texto completo)", "url": ""}, {"n": 33, "text": "Descrição não disponível no prompt. (Atualize o arquivo se desejar texto completo)", "url": ""}, {"n": 34, "text": "Descrição não disponível no prompt. (Atualize o arquivo se desejar texto completo)", "url": ""}, {"n": 35, "text": "Descrição não disponível no prompt. (Atualize o arquivo se desejar texto completo)", "url": ""}, {"n": 36, "text": "Descrição não disponível no prompt. (Atualize o arquivo se desejar texto completo)", "url": ""}, {"n": 37, "text": "Descrição não disponível no prompt. (Atualize o arquivo se desejar texto completo)", "url": ""}, {"n": 38, "text": "Descrição não disponível no prompt. (Atualize o arquivo se desejar texto completo)", "url": ""}, {"n": 39, "text": "Descrição não disponível no prompt. (Atualize o arquivo se desejar texto completo)", "url": ""}, {"n": 40, "text": "Descrição não disponível no prompt. (Atualize o arquivo se desejar texto completo)", "url": ""}, {"n": 41, "text": "Descrição não disponível no prompt. (Atualize o arquivo se desejar texto completo)", "url": ""}, {"n": 42, "text": "Descrição não disponível no prompt. (Atualize o arquivo se desejar texto completo)", "url": ""}, {"n": 43, "text": "Descrição não disponível no prompt. (Atualize o arquivo se desejar texto completo)", "url": ""}, {"n": 44, "text": "Descrição não disponível no prompt. (Atualize o arquivo se desejar texto completo)", "url": ""}, {"n": 45, "text": "Descrição não disponível no prompt. (Atualize o arquivo se desejar texto completo)", "url": ""}, {"n": 46, "text": "Descrição não disponível no prompt. (Atualize o arquivo se desejar texto completo)", "url": ""}, {"n": 47, "text": "Descrição não disponível no prompt. (Atualize o arquivo se desejar texto completo)", "url": ""}];
-const S10_ERRORS = [{"n": 1, "text": "Descrição do Erro 1 não encontrada", "url": ""}, {"n": 2, "text": "Descrição do Erro 2 não encontrada", "url": ""}, {"n": 3, "text": "Descrição do Erro 3 não encontrada", "url": ""}, {"n": 4, "text": "Descrição do Erro 4 não encontrada", "url": ""}, {"n": 5, "text": "Descrição do Erro 5 não encontrada", "url": ""}];
-const I2_ERRORS = [{"code": "C010/C018", "text": "(a informação da esquerda é um botão que quando acionado deve aparecer a informação da direita em caixa de texto) Inclinação frontal excessiva. Solicite a troca do veículo imediatamente."}, {"code": "C020/C028", "text": "(a informação da esquerda é um botão que quando acionado deve aparecer a informação da direita em caixa de texto) Inclinação traseira excessiva. Solicite a troca do veículo imediatamente."}, {"code": "C040/C048", "text": "(a informação da esquerda é um botão que quando acionado deve aparecer a informação da direita em caixa de texto) Limitador de velocidade frontal/traseiro ativado. Realize o procedimento pelo link: clique aqui. (https://drive.google.com/file/d/1uHcirgVcKM_FAG7NPW4spNOP2jF6cpio/view?usp=drive_link [colocar esse link no ''clique aqui''])"}, {"code": "C100/C108", "text": "(a informação da esquerda é um botão que quando acionado deve aparecer a informação da direita em caixa de texto) Bateria traseira/frontal vazia Solicite a troca de bateria imediatamente."}, {"code": "C200/C208", "text": "(a informação da esquerda é um botão que quando acionado deve aparecer a informação da direita em caixa de texto) Desligamento da bateria traseira/frontal. Solicite a troca de bateria imediatamente."}, {"code": "C400/C408", "text": "(a informação da esquerda é um botão que quando acionado deve aparecer a informação da direita em caixa de texto) Ângulo de rotação excedido. Realize a solicitação de pivô mecânico para a troca."}, {"code": "C800/C808", "text": "(a informação da esquerda é um botão que quando acionado deve aparecer a informação da direita em caixa de texto) Baixa voltagem do barramento. Solicite imediatamente a troca do veículo."}];
-const I3_ERRORS = [{"label": "Veículo não liga", "text": "Realizar o Reset do veículo e testá-lo."}, {"label": "Veículo girando", "text": "Realizar calibração de postura com controle remoto original."}, {"label": "Nenhuma", "text": "Nenhuma das opções listadas. Descreva o problema."}];
-const S6_ERRORS = [{"label": "Veículo não liga", "text": "Veículo não liga  (a informação da esquerda é um botão que quando acionado deve aparecer a informação da direita em caixa de texto) Realizar o Reset do veículo e testa-lo.", "url": ""}, {"label": "Veículo girando", "text": "Veículo girando (a informação da esquerda é um botão que quando acionado deve aparecer a informação da direita em caixa de texto) Realizar o procedimento de calibração de postura.", "url": "https://drive.google.com/file/d/18tKva_egKDP7MeAm7ObcsHbafMtJe0Fi/view?usp=drive_link"}, {"label": "Veículo com rodas travadas", "text": "Veículo com rodas travadas (a informação da esquerda é um botão que quando acionado deve aparecer a informação da direita em caixa de texto) Solicitar imediatamente a troca do veículo.", "url": "https://drive.google.com/file/d/19kLMW1rWbcsAxmkPGM_woMHKQ0uir6oM/view?usp=drive_link"}, {"label": "Display quebrado", "text": "Display quebrado (a informação da esquerda é um botão que quando acionado deve aparecer a informação da direita em caixa de texto) Solicitar troca de display.", "url": ""}, {"label": "Veículo desligando sozinho", "text": "Veículo desligando sozinho (a informação da esquerda é um botão que quando acionado deve aparecer a informação da direita em caixa de texto) Solicitar troca de bateria e realizar troca.", "url": "https://drive.google.com/file/d/18tKva_egKDP7MeAm7ObcsHbafMtJe0Fi/view?usp=drive_link"}, {"label": "Veículo não carrega", "text": "Veículo não carrega  (a informação da esquerda é um botão que quando acionado deve aparecer a informação da direita em caixa de texto) Verificar tensão do carregador, deve estar acima de 81,5V, se estiver abaixo solicitar troca do carregador, caso esteja bom solicitar troca do veículo.", "url": ""}, {"label": "Veículo andando sozinho", "text": "Veículo andando sozinho (a informação da esquerda é um botão que quando acionado deve aparecer a informação da direita em caixa de texto) Verificar integridade do tapete e assoalho metálico, se necessário usar um cálcio para dar distância entre tapete e acionadores do assoalho metálico.", "url": ""}, {"label": "Veículo apitando", "text": "Veículo apitando (a informação da esquerda é um botão que quando acionado deve aparecer a informação da direita em caixa de texto) Solicitar imediatamente a troca do veículo.", "url": ""}, {"label": "Nenhuma", "text": "Nenhuma das opções listadas.", "url": ""}];
-const S9_ERRORS = [{"label": "Veículo não liga", "text": "Verificar tensão de bateria (>44V). Substituir se necessário."}, {"label": "Nenhuma", "text": "Nenhuma das opções listadas. Descreva o problema."}];
-const H9_ERRORS = [{"label": "Veículo não liga", "text": "Solicitar troca do veículo imediatamente."}, {"label": "Nenhuma", "text": "Nenhuma das opções listadas. Descreva o problema."}];
-const PROCEDURES = {};
-const CONTACTS = [{"id": "vanessa", "label": "Vanessa — Analista de Relacionamento", "number": "5511989477808", "img": "logotipo vanessa.jpg"}, {"id": "willian", "label": "Willian — Analista de Relacionamento", "number": "5511956544217", "img": "logotipo willian.jpg"}];
+const S8_ERRORS = [
+  {n: 1, text: "Falha no Sensor Hall direito. Solicite a troca da placa Drive do veículo.", url: ""},
+  {n: 2, text: "Falha no Sensor Hall esquerdo. Solicite a troca da placa Drive do veículo.", url: ""},
+  {n: 3, text: "Falha no motor direito. Solicite a troca do veículo.", url: ""},
+  {n: 4, text: "Falha no motor esquerdo. Solicite a troca do veículo.", url: ""},
+  {n: 5, text: "Falha na comunicação. Solicite a troca do veículo.", url: ""},
+  {n: 6, text: "Falha na bateria. Solicite a troca de bateria.", url: ""},
+  {n: 7, text: "Falha no carregador. Verifique tensão do carregador.", url: ""},
+  {n: 8, text: "Falha no display. Solicite troca de display.", url: ""},
+  {n: 9, text: "Falha no sensor de inclinação. Solicite a troca do veículo.", url: ""},
+  {n: 10, text: "Falha no sensor de velocidade. Solicite a troca do veículo.", url: ""},
+  {n: 11, text: "Descrição não disponível.", url: ""},
+  {n: 12, text: "Descrição não disponível.", url: ""},
+  {n: 13, text: "Descrição não disponível.", url: ""},
+  {n: 14, text: "Descrição não disponível.", url: ""},
+  {n: 15, text: "Descrição não disponível.", url: ""},
+  {n: 16, text: "Descrição não disponível.", url: ""},
+  {n: 17, text: "Descrição não disponível.", url: ""},
+  {n: 18, text: "Descrição não disponível.", url: ""},
+  {n: 19, text: "Descrição não disponível.", url: ""},
+  {n: 20, text: "Descrição não disponível.", url: ""},
+  {n: 21, text: "Descrição não disponível.", url: ""},
+  {n: 22, text: "Descrição não disponível.", url: ""},
+  {n: 23, text: "Descrição não disponível.", url: ""},
+  {n: 24, text: "Descrição não disponível.", url: ""},
+  {n: 25, text: "Falha na calibração de postura. Realize a calibração de postura.", url: "https://drive.google.com/file/d/1EQ8Oi2MSb75m4Gh1mXrnKSdZUhh26AGJ/view?usp=drive_link"},
+  {n: 26, text: "Descrição não disponível.", url: ""},
+  {n: 27, text: "Descrição não disponível.", url: ""},
+  {n: 28, text: "Descrição não disponível.", url: ""},
+  {n: 29, text: "Descrição não disponível.", url: ""},
+  {n: 30, text: "Descrição não disponível.", url: ""},
+  {n: 31, text: "Descrição não disponível.", url: ""},
+  {n: 32, text: "Descrição não disponível.", url: ""},
+  {n: 33, text: "Descrição não disponível.", url: ""},
+  {n: 34, text: "Descrição não disponível.", url: ""},
+  {n: 35, text: "Descrição não disponível.", url: ""},
+  {n: 36, text: "Descrição não disponível.", url: ""},
+  {n: 37, text: "Descrição não disponível.", url: ""},
+  {n: 38, text: "Descrição não disponível.", url: ""},
+  {n: 39, text: "Descrição não disponível.", url: ""},
+  {n: 40, text: "Descrição não disponível.", url: ""},
+  {n: 41, text: "Descrição não disponível.", url: ""},
+  {n: 42, text: "Descrição não disponível.", url: ""},
+  {n: 43, text: "Descrição não disponível.", url: ""},
+  {n: 44, text: "Descrição não disponível.", url: ""},
+  {n: 45, text: "Descrição não disponível.", url: ""},
+  {n: 46, text: "Descrição não disponível.", url: ""},
+  {n: 47, text: "Falha na atualização do Firmware. Solicite a troca do veículo imediatamente.", url: ""}
+];
+
+const S10_ERRORS = [
+  {n: 1, label: "Erro 1 - chave inglesa 1 vez", text: "Falha na Bateria (sobre tensão). Solicitar troca de bateria.", url: ""},
+  {n: 2, label: "Erro 2 - chave inglesa 2 vezes", text: "Falha no Sensor de Pivô. Solicitar troca do sensor.", url: ""},
+  {n: 3, label: "Erro 3 - chave inglesa 3 vezes", text: "Falha no motor. Solicitar troca do veículo.", url: ""},
+  {n: 4, label: "Erro 4 - chave inglesa 4 vezes", text: "Falha na comunicação. Solicitar troca do veículo.", url: ""},
+  {n: 5, label: "Erro 5 - chave inglesa 5 vezes", text: "Falha no display. Solicitar troca de display.", url: ""}
+];
+
+const I2_ERRORS = [
+  {code: "C010/C018", text: "Inclinação frontal excessiva. Solicite a troca do veículo imediatamente.", url: ""},
+  {code: "C020/C028", text: "Inclinação traseira excessiva. Solicite a troca do veículo imediatamente.", url: ""},
+  {code: "C040/C048", text: "Limitador de velocidade frontal/traseiro ativado. Realize o procedimento pelo link.", url: "https://drive.google.com/file/d/1uHcirgVcKM_FAG7NPW4spNOP2jF6cpio/view?usp=drive_link"},
+  {code: "C100/C108", text: "Bateria traseira/frontal vazia. Solicite a troca de bateria imediatamente.", url: ""},
+  {code: "C200/C208", text: "Desligamento da bateria traseira/frontal. Solicite a troca de bateria imediatamente.", url: ""},
+  {code: "C400/C408", text: "Ângulo de rotação excedido. Realize a solicitação de pivô mecânico para a troca.", url: ""},
+  {code: "C800/C808", text: "Baixa voltagem do barramento. Solicite imediatamente a troca do veículo.", url: ""},
+  {code: "Nenhuma", text: "Nenhuma das opções listadas. Descreva o problema.", url: ""}
+];
+
+const I3_ERRORS = [
+  {label: "Veículo não liga", text: "Realizar o Reset do veículo e testá-lo. Verificar baterias do controle remoto e do veículo.", url: ""},
+  {label: "Veículo puxando/girando", text: "Realizar calibração de postura com controle remoto original.", url: "https://drive.google.com/file/d/172xePg7Ko2ZNJNlACqlLhETxmGec20Lt/view?usp=drive_link"},
+  {label: "Nenhuma", text: "Nenhuma das opções listadas. Descreva o problema.", url: ""}
+];
+
+const S6_ERRORS = [
+  {label: "Veículo não liga", text: "Realizar o Reset do veículo e testá-lo.", url: ""},
+  {label: "Veículo girando", text: "Realizar o procedimento de calibração de postura.", url: "https://drive.google.com/file/d/18tKva_egKDP7MeAm7ObcsHbafMtJe0Fi/view?usp=drive_link"},
+  {label: "Veículo com rodas travadas", text: "Solicitar imediatamente a troca do veículo.", url: "https://drive.google.com/file/d/19kLMW1rWbcsAxmkPGM_woMHKQ0uir6oM/view?usp=drive_link"},
+  {label: "Display quebrado", text: "Solicitar troca de display.", url: ""},
+  {label: "Veículo desligando sozinho", text: "Solicitar troca de bateria e realizar troca.", url: "https://drive.google.com/file/d/18tKva_egKDP7MeAm7ObcsHbafMtJe0Fi/view?usp=drive_link"},
+  {label: "Veículo não carrega", text: "Verificar tensão do carregador, deve estar acima de 81,5V, se estiver abaixo solicitar troca do carregador, caso esteja bom solicitar troca do veículo.", url: ""},
+  {label: "Veículo andando sozinho", text: "Verificar integridade do tapete e assoalho metálico, se necessário usar um calço para dar distância entre tapete e acionadores do assoalho metálico.", url: ""},
+  {label: "Veículo apitando", text: "Solicitar imediatamente a troca do veículo.", url: ""},
+  {label: "Nenhuma", text: "Nenhuma das opções listadas. Descreva o problema.", url: ""}
+];
+
+const S9_ERRORS = [
+  {label: "Veículo não liga", text: "Verificar tensão de bateria (>44V). Se morta, substituir.", url: ""},
+  {label: "Nenhuma", text: "Nenhuma das opções listadas. Descreva o problema.", url: ""}
+];
+
+const H9_ERRORS = [
+  {label: "Veículo não liga", text: "Solicitar troca do veículo imediatamente.", url: ""},
+  {label: "Nenhuma", text: "Nenhuma das opções listadas. Descreva o problema.", url: ""}
+];
+
+const CONTACTS = [
+  {id: "vanessa", label: "Vanessa — Analista de Relacionamento", number: "5511989477808", img: "logotipo vanessa.jpg"},
+  {id: "willian", label: "Willian — Analista de Relacionamento", number: "5511956544217", img: "logotipo willian.jpg"}
+];
 
 let state = { chamado:'', posto:'', patrimonio:'', modelo:'', descricao:'', selection:'', customDescribe:'', resolved:'', finalExtra:'', files:[] };
 
@@ -179,7 +369,7 @@ document.addEventListener('DOMContentLoaded', ()=>{
   el('field-chamado').addEventListener('input', checkInitialFields);
   el('field-posto').addEventListener('input', checkInitialFields);
   el('field-patrimonio').addEventListener('input', checkInitialFields);
-  el('btn-to-model').addEventListener('click', ()=> show(el('section-2')) );
+  el('btn-to-model').addEventListener('click', ()=> { show(el('section-2')); el('section-2').scrollIntoView({behavior:'smooth', block:'center'}); });
   renderModels();
   renderModelLists();
   el('s8-code').addEventListener('change', handleS8Input);
@@ -199,7 +389,6 @@ function checkInitialFields(){
   state.patrimonio = el('field-patrimonio').value.trim();
   if(state.chamado && state.posto && state.patrimonio){
     show(el('btn-to-model'));
-    el('btn-to-model').scrollIntoView({behavior:'smooth', block:'center'});
   } else {
     hide(el('btn-to-model'));
   }
@@ -240,83 +429,85 @@ function selectModel(m){
 
 function renderModelLists(){
   // i2
-  const i2 = I2_ERRORS || [];
   const i2cont = el('i2-list'); i2cont.innerHTML='';
-  i2.forEach(it=>{
-    const b = document.createElement('button'); b.className='option-btn'; b.textContent = it.code || it.label || it.text;
-    b.onclick = ()=>{ markActive(b); showSolutionBox(b, it.text, PROCEDURES); state.selection = it.code || it.label || it.text; evaluateFinal(); };
+  I2_ERRORS.forEach(it=>{
+    const b = document.createElement('button'); b.className='option-btn'; b.textContent = it.code;
+    b.onclick = ()=>{ markActive(b); showSolutionBox(b, it.text, it.url); state.selection = it.code; if(it.code==='Nenhuma'){ show(el('i2-describe')); } else { hide(el('i2-describe')); } show(el('i2-resolved')); evaluateFinal(); };
     i2cont.appendChild(b);
     const s = document.createElement('div'); s.className='solution'; i2cont.appendChild(s);
   });
 
   // i3
-  const i3 = I3_ERRORS || [];
   const i3cont = el('i3-list'); i3cont.innerHTML='';
-  i3.forEach(it=>{
-    const b = document.createElement('button'); b.className='option-btn'; b.textContent = it.label || it.code || it.text;
-    b.onclick = ()=>{ markActive(b); showSolutionBox(b, it.text, PROCEDURES); state.selection = it.label || it.text; evaluateFinal(); };
+  I3_ERRORS.forEach(it=>{
+    const b = document.createElement('button'); b.className='option-btn'; b.textContent = it.label;
+    b.onclick = ()=>{ markActive(b); showSolutionBox(b, it.text, it.url); state.selection = it.label; if(it.label==='Nenhuma'){ show(el('i3-describe')); } else { hide(el('i3-describe')); } show(el('i3-resolved')); evaluateFinal(); };
     i3cont.appendChild(b);
     const s = document.createElement('div'); s.className='solution'; i3cont.appendChild(s);
   });
 
   // S6
-  const s6 = S6_ERRORS || [];
   const s6cont = el('s6-list'); s6cont.innerHTML='';
-  s6.forEach(it=>{
-    const b = document.createElement('button'); b.className='option-btn'; b.textContent = it.label || it;
-    b.onclick = ()=>{ markActive(b); showSolutionBox(b, it.text || it, PROCEDURES); state.selection = it.label || it; evaluateFinal(); };
+  S6_ERRORS.forEach(it=>{
+    const b = document.createElement('button'); b.className='option-btn'; b.textContent = it.label;
+    b.onclick = ()=>{ markActive(b); showSolutionBox(b, it.text, it.url); state.selection = it.label; if(it.label==='Nenhuma'){ show(el('s6-describe')); } else { hide(el('s6-describe')); } show(el('s6-resolved')); evaluateFinal(); };
     s6cont.appendChild(b);
     const s = document.createElement('div'); s.className='solution'; s6cont.appendChild(s);
   });
 
   // S9
-  const s9 = S9_ERRORS || [];
   const s9cont = el('s9-list'); s9cont.innerHTML='';
-  s9.forEach(it=>{
-    const b = document.createElement('button'); b.className='option-btn'; b.textContent = it.label || it;
-    b.onclick = ()=>{ markActive(b); showSolutionBox(b, it.text || it, PROCEDURES); state.selection = it.label || it; evaluateFinal(); };
+  S9_ERRORS.forEach(it=>{
+    const b = document.createElement('button'); b.className='option-btn'; b.textContent = it.label;
+    b.onclick = ()=>{ markActive(b); showSolutionBox(b, it.text, it.url); state.selection = it.label; if(it.label==='Nenhuma'){ show(el('s9-describe')); } else { hide(el('s9-describe')); } show(el('s9-resolved')); evaluateFinal(); };
     s9cont.appendChild(b);
     const s = document.createElement('div'); s.className='solution'; s9cont.appendChild(s);
   });
 
   // H9
-  const h9 = H9_ERRORS || [];
   const h9cont = el('h9-list'); h9cont.innerHTML='';
-  h9.forEach(it=>{
-    const b = document.createElement('button'); b.className='option-btn'; b.textContent = it.label || it;
-    b.onclick = ()=>{ markActive(b); showSolutionBox(b, it.text || it, PROCEDURES); state.selection = it.label || it; evaluateFinal(); };
+  H9_ERRORS.forEach(it=>{
+    const b = document.createElement('button'); b.className='option-btn'; b.textContent = it.label;
+    b.onclick = ()=>{ markActive(b); showSolutionBox(b, it.text, it.url); state.selection = it.label; if(it.label==='Nenhuma'){ show(el('h9-describe')); } else { hide(el('h9-describe')); } show(el('h9-resolved')); evaluateFinal(); };
     h9cont.appendChild(b);
     const s = document.createElement('div'); s.className='solution'; h9cont.appendChild(s);
   });
 
   // S10
-  const s10 = S10_ERRORS || [];
   const s10cont = el('s10-list'); s10cont.innerHTML='';
-  s10.forEach(it=>{
-    const b = document.createElement('button'); b.className='option-btn'; b.textContent = 'Erro ' + it.n;
-    b.onclick = ()=>{ markActive(b); showSolutionBox(b, it.text || it, PROCEDURES, it.url); state.selection = 'Erro '+it.n; evaluateFinal(); };
+  S10_ERRORS.forEach(it=>{
+    const b = document.createElement('button'); b.className='option-btn'; b.textContent = it.label || ('Erro ' + it.n);
+    b.onclick = ()=>{ markActive(b); showSolutionBox(b, it.text, it.url); state.selection = it.label || ('Erro '+it.n); show(el('s10-resolved')); evaluateFinal(); };
     s10cont.appendChild(b);
     const s = document.createElement('div'); s.className='solution'; s10cont.appendChild(s);
   });
+  // add Nenhuma for S10
+  const noneS10 = document.createElement('button'); noneS10.className='option-btn'; noneS10.textContent = 'Nenhuma das opções listadas';
+  noneS10.onclick = ()=>{ markActive(noneS10); let nx = noneS10.nextElementSibling; while(nx && !nx.classList.contains('solution')) nx = nx.nextElementSibling; if(nx){ nx.innerHTML = '<strong>Informação:</strong> Nenhuma das opções listadas. Descreva o problema.'; nx.style.display='block'; } show(el('s10-describe')); show(el('s10-resolved')); state.selection = 'Nenhuma'; evaluateFinal(); };
+  s10cont.appendChild(noneS10);
+  const sn = document.createElement('div'); sn.className='solution'; s10cont.appendChild(sn);
 }
 
-function showSolutionBox(btn, text, procedures, url){
+function showSolutionBox(btn, text, url){
   let next = btn.nextElementSibling;
   while(next && !next.classList.contains('solution')) next = next.nextElementSibling;
   if(!next) return;
   next.innerHTML = '<strong>Informação:</strong> ' + (text || 'Informação não fornecida.');
-  if(url){ const v = document.createElement('button'); v.className='video-btn'; v.textContent='clique aqui'; v.onclick = ()=> window.open(url, '_blank'); next.appendChild(v); }
-  for(const key in procedures){ 
-    try{
-      if(text && text.toLowerCase().includes(key.toLowerCase())){
-        const pbtn = document.createElement('button'); pbtn.className='video-btn'; pbtn.textContent='clique aqui'; pbtn.onclick = ()=> window.open(procedures[key], '_blank'); next.appendChild(pbtn);
-      }
-    }catch(e){}
+  if(url){ 
+    const v = document.createElement('button'); 
+    v.className='video-btn'; 
+    v.textContent='clique aqui'; 
+    v.onclick = ()=> window.open(url, '_blank'); 
+    next.appendChild(v); 
   }
-  next.style.display = 'block'; next.scrollIntoView({behavior:'smooth', block:'center'});
+  next.style.display = 'block'; 
+  next.scrollIntoView({behavior:'smooth', block:'center'});
 }
 
-function markActive(btn){ btn.parentElement.querySelectorAll('.option-btn').forEach(x=>x.classList.remove('active')); btn.classList.add('active'); }
+function markActive(btn){ 
+  btn.parentElement.querySelectorAll('.option-btn').forEach(x=>x.classList.remove('active')); 
+  btn.classList.add('active'); 
+}
 
 function handleS8Input(){
   const v = el('s8-code').value.trim();
@@ -327,25 +518,32 @@ function handleS8Input(){
     const item = S8_ERRORS.find(x=>x.n===n);
     if(item){
       const b = document.createElement('button'); b.className='option-btn'; b.textContent = 'Erro ' + item.n;
-      b.onclick = ()=>{ markActive(b); showSolutionBox(b, item.text, PROCEDURES, item.url); state.selection = 'Erro '+item.n; evaluateFinal(); };
+      b.onclick = ()=>{ markActive(b); showSolutionBox(b, item.text, item.url); state.selection = 'Erro '+item.n; show(el('s8-resolved')); evaluateFinal(); };
       list.appendChild(b);
       const s = document.createElement('div'); s.className='solution'; list.appendChild(s);
     } else {
-      const note = document.createElement('div'); note.className='small'; note.textContent = 'Erro não encontrado no prompt.'; list.appendChild(note);
+      const note = document.createElement('div'); note.className='small'; note.textContent = 'Erro não encontrado. Use 0 para listar todas as opções.'; list.appendChild(note);
     }
   } else if(n===0){
     S8_ERRORS.forEach(item=>{
       const b = document.createElement('button'); b.className='option-btn'; b.textContent = 'Erro ' + item.n;
-      b.onclick = ()=>{ markActive(b); showSolutionBox(b, item.text, PROCEDURES, item.url); state.selection = 'Erro '+item.n; evaluateFinal(); };
+      b.onclick = ()=>{ markActive(b); showSolutionBox(b, item.text, item.url); state.selection = 'Erro '+item.n; show(el('s8-resolved')); evaluateFinal(); };
       list.appendChild(b);
       const s = document.createElement('div'); s.className='solution'; list.appendChild(s);
     });
     const none = document.createElement('button'); none.className='option-btn'; none.textContent = 'Nenhuma das opções listadas';
-    none.onclick = ()=>{ markActive(none); let nx = none.nextElementSibling; while(nx && !nx.classList.contains('solution')) nx = nx.nextElementSibling; if(nx){ nx.innerHTML = '<strong>Informação:</strong> Nenhuma das opções listadas. Descreva o problema.'; nx.style.display='block'; } state.selection = 'Nenhuma'; list.appendChild(none); const s = document.createElement('div'); s.className='solution'; list.appendChild(s); };
+    none.onclick = ()=>{ markActive(none); let nx = none.nextElementSibling; while(nx && !nx.classList.contains('solution')) nx = nx.nextElementSibling; if(nx){ nx.innerHTML = '<strong>Informação:</strong> Nenhuma das opções listadas. Descreva o problema.'; nx.style.display='block'; } show(el('s8-describe')); show(el('s8-resolved')); state.selection = 'Nenhuma'; evaluateFinal(); };
     list.appendChild(none);
+    const sn = document.createElement('div'); sn.className='solution'; list.appendChild(sn);
   } else {
     const note = document.createElement('div'); note.className='small'; note.textContent = 'Insira um número entre 1 e 47 ou 0 para listar todas opções.'; list.appendChild(note);
   }
+  evaluateFinal();
+}
+
+function markResolved(val){
+  state.resolved = val;
+  evaluateFinal();
 }
 
 function handleFileChange(e){
@@ -353,20 +551,30 @@ function handleFileChange(e){
   state.files = files;
   const preview = el('preview'); preview.innerHTML='';
   if(files.length>0){
-    files.forEach(f=>{ const fr = new FileReader(); fr.onload = ev => { const img = document.createElement('img'); img.src = ev.target.result; preview.appendChild(img); }; fr.readAsDataURL(f); });
+    files.forEach(f=>{ 
+      const fr = new FileReader(); 
+      fr.onload = ev => { 
+        const img = document.createElement('img'); 
+        img.src = ev.target.result; 
+        preview.appendChild(img); 
+      }; 
+      fr.readAsDataURL(f); 
+    });
     preview.style.display='flex';
-  } else preview.style.display='none';
+  } else {
+    preview.style.display='none';
+  }
   evaluateFinal();
 }
 
 function renderContacts(){
   const cont = el('contacts-area'); cont.innerHTML='';
-  (CONTACTS || []).forEach(c=>{
-    const btn = document.createElement('button'); btn.className='btn'; btn.style.textAlign='left';
-    btn.innerHTML = `<img src="${'__CONTACT_IMG__'}" alt="" style="height:36px; vertical-align:middle; margin-right:10px; border-radius:6px;"/> ${c.label}`;
-    btn.onclick = ()=> sendWhats(c.number);
-    // better: build with real c.img
+  CONTACTS.forEach(c=>{
+    const btn = document.createElement('button'); 
+    btn.className='btn'; 
+    btn.style.textAlign='left';
     btn.innerHTML = `<img src="${c.img}" alt="" style="height:36px; vertical-align:middle; margin-right:10px; border-radius:6px;"/> ${c.label}`;
+    btn.onclick = ()=> sendWhats(c.number);
     cont.appendChild(btn);
   });
 }
@@ -383,7 +591,7 @@ function buildWhatsText(){
   parts.push('*Chamado resolvido:* ' + (state.resolved || '-'));
   parts.push('*Imagem enviada:* ' + (state.files && state.files.length ? ('Sim ('+state.files.length+')') : 'Não'));
   if(state.finalExtra) parts.push('*Faltou algo:* ' + state.finalExtra);
-  return parts.join('\\n');
+  return parts.join('\n');
 }
 
 async function sendWhats(number){
@@ -391,9 +599,18 @@ async function sendWhats(number){
   state.posto = el('field-posto').value.trim();
   state.patrimonio = el('field-patrimonio').value.trim();
   state.descricao = el('field-descricao').value.trim();
-  state.customDescribe = state.customDescribe || '';
+  state.customDescribe = (el('i2-custom') && el('i2-custom').value.trim()) || 
+                         (el('i3-custom') && el('i3-custom').value.trim()) || 
+                         (el('s6-custom') && el('s6-custom').value.trim()) || 
+                         (el('s8-custom') && el('s8-custom').value.trim()) || 
+                         (el('s9-custom') && el('s9-custom').value.trim()) || 
+                         (el('s10-custom') && el('s10-custom').value.trim()) || 
+                         (el('h9-custom') && el('h9-custom').value.trim()) || 
+                         state.customDescribe || '';
   state.finalExtra = el('field-final-extra').value.trim() || state.finalExtra;
+
   const text = buildWhatsText();
+
   if(state.files && state.files.length>0){
     try{
       if(navigator.canShare && navigator.canShare({ files: state.files })){
@@ -412,6 +629,7 @@ async function sendWhats(number){
       return;
     }
   }
+
   window.open('https://wa.me/' + number + '?text=' + encodeURIComponent(text), '_blank');
 }
 
@@ -421,19 +639,20 @@ function evaluateFinal(){
   state.patrimonio = el('field-patrimonio').value.trim();
   state.descricao = el('field-descricao').value.trim();
   state.finalExtra = el('field-final-extra').value.trim();
-  const modelNeedsSelection = ['i2-X2','i3-X3','S6','S8-R8-BR8','H9-H9X','S9-S9X','S10-S10X'].includes(state.modelo);
-  const modelOk = !!state.modelo && !!state.descricao && (state.selection || state.customDescribe || !modelNeedsSelection);
-  const basicsOk = !!state.chamado && !!state.posto && !!state.patrimonio;
-  if(modelOk && basicsOk){
-    show(el('card-contacts')); show(el('card-image')); show(el('card-final-extra'));
-  }
 }
 
 function reattachListeners(){
-  const fi = el('file-input'); if(fi && !fi._ok){ fi.addEventListener('change', handleFileChange); fi._ok=true; }
-  renderContacts();
+  const fi = el('file-input'); 
+  if(fi && !fi._ok){ 
+    fi.addEventListener('change', handleFileChange); 
+    fi._ok=true; 
+  }
 }
+</script>
+</body>
+</html>
 
 </script>
 </body>
 </html>
+
